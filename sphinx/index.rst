@@ -1,22 +1,23 @@
-.. freeton_ocaml_sdk documentation master file, created by
+.. freeton_wallet documentation master file, created by
    drom new
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to freeton_ocaml_sdk
-================
+Welcome to Freeton OCaml Wallet
+===============================
 
 .. toctree::
    :maxdepth: 2
    :caption: Documentation
 
-   Home <https://ocamlpro.github.io/freeton_ocaml_sdk>
+   Home <https://ocamlpro.github.io/freeton_wallet>
    about
+   quickstart
+   commands
    install
-   API doc <https://ocamlpro.github.io/freeton_ocaml_sdk/doc>
    license
 
-   Devel and Issues on Github <https://github.com/ocamlpro/freeton_ocaml_sdk>
+   Devel and Issues on Github <https://github.com/ocamlpro/freeton_wallet>
 
 
 Indices and tables

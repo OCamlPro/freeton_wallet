@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# freeton_ocaml_sdk documentation build configuration file, created by
+# freeton_wallet documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its
@@ -50,7 +50,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'freeton_ocaml_sdk'
+project = 'freeton_wallet'
 copyright = 'OCamlPro SAS'
 author = 'Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>'
 
@@ -167,7 +167,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'freeton_ocaml_sdk.tex', 'freeton_ocaml_sdk Documentation',
+    (master_doc, 'freeton_wallet.tex', 'freeton_wallet Documentation',
      'author', 'manual'),
 ]
 
@@ -177,7 +177,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'freeton_ocaml_sdk', 'freeton_ocaml_sdk Documentation',
+    (master_doc, 'freeton_wallet', 'freeton_wallet Documentation',
      [author], 1)
 ]
 
@@ -188,8 +188,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'freeton_ocaml_sdk', 'freeton_ocaml_sdk Documentation',
-     author, 'freeton_ocaml_sdk', 'One line description of project.',
+    (master_doc, 'freeton_wallet', 'freeton_wallet Documentation',
+     author, 'freeton_wallet', 'One line description of project.',
      'Miscellaneous'),
 ]
 

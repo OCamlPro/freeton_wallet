@@ -15,13 +15,13 @@ you can for example create it with::
 
   opam switch create 4.10.0
   
-Second, checkout the sources of :code:`freeton_ocaml_sdk` in a directory::
+Second, checkout the sources of :code:`freeton_wallet` in a directory::
 
-  git clone git@github.com:OCamlPro/freeton_ocaml_sdk.git
+  git clone git@github.com:OCamlPro/freeton_wallet.git
 
 Then, you need to install all the dependencies::
 
-  cd freeton_ocaml_sdk/
+  cd freeton_wallet/
   opam install --deps-only .
 
 Finally, you can build the package and install it::

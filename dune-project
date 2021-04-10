@@ -25,7 +25,7 @@
  (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
  (depends
    (ocaml (>= 4.07.0))
-   (freeton_ocaml_sdk (= version))
+   (freeton_ocaml_sdk (and (>= 0.1.0) (< 1.0.0)))
    (ez_subst ( >= 0.1 ))
    (ez_file (and (>= 0.2.0) (< 1.0.0)))
    (ez_config (and (>= 0.1.0) (< 1.0.0)))
