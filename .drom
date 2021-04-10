@@ -1,0 +1,206 @@
+# Keep this file in your GIT repo to help drom track generated files
+
+# hash of toml configuration files
+# used for generation of all files
+374d3f54decd5f683297985b39c72928:.
+# end context for .
+
+# begin context for .github/workflows/doc-deploy.yml
+# file .github/workflows/doc-deploy.yml
+ff6085c3194f0d76a2b3e93a66af693d:.github/workflows/doc-deploy.yml
+# end context for .github/workflows/doc-deploy.yml
+
+# begin context for .github/workflows/workflow.yml
+# file .github/workflows/workflow.yml
+8216894ca2d67e31c8f4e611f927b27b:.github/workflows/workflow.yml
+# end context for .github/workflows/workflow.yml
+
+# begin context for .gitignore
+# file .gitignore
+df992160866d8ba4690233a39148ccf3:.gitignore
+# end context for .gitignore
+
+# begin context for .ocamlformat
+# file .ocamlformat
+51f788c6dcd47d33ffec6427b686ed4f:.ocamlformat
+# end context for .ocamlformat
+
+# begin context for .ocamlformat-ignore
+# file .ocamlformat-ignore
+a8d1bcd6f62c6b813b77d3ff8959d8d2:.ocamlformat-ignore
+# end context for .ocamlformat-ignore
+
+# begin context for .ocp-indent
+# file .ocp-indent
+6048407431b8d9baf725ae5365d4c2f2:.ocp-indent
+# end context for .ocp-indent
+
+# begin context for CHANGES.md
+# file CHANGES.md
+a7165eaa3da3f82ad89c94a7c9eb93bb:CHANGES.md
+# end context for CHANGES.md
+
+# begin context for LICENSE.md
+# file LICENSE.md
+02f5d892afcdc564e5fb067198a06740:LICENSE.md
+# end context for LICENSE.md
+
+# begin context for Makefile
+# file Makefile
+acb774e346d4125fe13419742df17b44:Makefile
+# end context for Makefile
+
+# begin context for README.md
+# file README.md
+e963081481497f7b15b7f12d0905e2cf:README.md
+# end context for README.md
+
+# begin context for docs/README.txt
+# file docs/README.txt
+bfbacf00053bb9ab2a6e2ce94ed4a642:docs/README.txt
+# end context for docs/README.txt
+
+# begin context for docs/doc/index.html
+# file docs/doc/index.html
+b63a34e6589737cead04e024c2909c0b:docs/doc/index.html
+# end context for docs/doc/index.html
+
+# begin context for docs/favicon.png
+# file docs/favicon.png
+e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
+# end context for docs/favicon.png
+
+# begin context for docs/index.html
+# file docs/index.html
+59be64602096a7ad2cc59fb68c9f9ac6:docs/index.html
+# end context for docs/index.html
+
+# begin context for docs/sphinx/index.html
+# file docs/sphinx/index.html
+03b6121c396f777323d29af5ac415b88:docs/sphinx/index.html
+# end context for docs/sphinx/index.html
+
+# begin context for docs/style.css
+# file docs/style.css
+c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
+# end context for docs/style.css
+
+# begin context for drom.toml
+# file drom.toml
+8e4c74b23e24de6403e67f8d1d8d49ca:drom.toml
+# end context for drom.toml
+
+# begin context for dune
+# file dune
+0d57afa9756f983af2551804954af609:dune
+# end context for dune
+
+# begin context for dune-project
+# file dune-project
+62e9db4c1b3b038e72e233cddf80d83d:dune-project
+# end context for dune-project
+
+# begin context for freeton_wallet_lib.opam
+# file freeton_wallet_lib.opam
+53f1c6cce581be81604a8fb488ad04b6:freeton_wallet_lib.opam
+# end context for freeton_wallet_lib.opam
+
+# begin context for ft.opam
+# file ft.opam
+7394c6085131e2a3ca8d9c4ddc939bd8:ft.opam
+# end context for ft.opam
+
+# begin context for scripts/after.sh
+# file scripts/after.sh
+1112fbe7067fce342365a25613b5659d:scripts/after.sh
+# end context for scripts/after.sh
+
+# begin context for scripts/before.sh
+# file scripts/before.sh
+ae050b3099ac0b43d7c7f4295f6b2319:scripts/before.sh
+# end context for scripts/before.sh
+
+# begin context for scripts/copy-bin.sh
+# file scripts/copy-bin.sh
+bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
+# end context for scripts/copy-bin.sh
+
+# begin context for sphinx/_static/css/fixes.css
+# file sphinx/_static/css/fixes.css
+20bbe7a5dbb3c3278a1511d960616fe5:sphinx/_static/css/fixes.css
+# end context for sphinx/_static/css/fixes.css
+
+# begin context for sphinx/about.rst
+# file sphinx/about.rst
+9e3d9b637555a1228f8ab9c231e831d5:sphinx/about.rst
+# end context for sphinx/about.rst
+
+# begin context for sphinx/conf.py
+# file sphinx/conf.py
+0812a6122f010422c9103e19a1255481:sphinx/conf.py
+# end context for sphinx/conf.py
+
+# begin context for sphinx/index.rst
+# file sphinx/index.rst
+9a794c3e905ff03f04fba32ff1203a85:sphinx/index.rst
+# end context for sphinx/index.rst
+
+# begin context for sphinx/install.rst
+# file sphinx/install.rst
+cb118e5d830d1ab79f56d384c97020b1:sphinx/install.rst
+# end context for sphinx/install.rst
+
+# begin context for sphinx/license.rst
+# file sphinx/license.rst
+8d984cbb854fe94fc5fa77b97b6ee046:sphinx/license.rst
+# end context for sphinx/license.rst
+
+# begin context for src/freeton_wallet_lib/package.toml
+# file src/freeton_wallet_lib/package.toml
+f7b7eb80bc9955aa99c18270989f64ea:src/freeton_wallet_lib/package.toml
+# end context for src/freeton_wallet_lib/package.toml
+
+# begin context for src/ft/package.toml
+# file src/ft/package.toml
+636d33e8123adaf8b13b927187479928:src/ft/package.toml
+# end context for src/ft/package.toml
+
+# begin context for test/expect-tests/dune
+# file test/expect-tests/dune
+91a6054fcb5f4ca254b606c8e0749450:test/expect-tests/dune
+# end context for test/expect-tests/dune
+
+# begin context for test/expect-tests/test.ml
+# file test/expect-tests/test.ml
+24150bafd4bec9b34e6c2987843f0d50:test/expect-tests/test.ml
+# end context for test/expect-tests/test.ml
+
+# begin context for test/inline-tests/dune
+# file test/inline-tests/dune
+8ff3f614c7a514289b26e937beb90a09:test/inline-tests/dune
+# end context for test/inline-tests/dune
+
+# begin context for test/inline-tests/test.ml
+# file test/inline-tests/test.ml
+37b8bc6035cda6302a80178c61f9626e:test/inline-tests/test.ml
+# end context for test/inline-tests/test.ml
+
+# begin context for test/output-tests/dune
+# file test/output-tests/dune
+494e35b853c0586457f32e1555f851be:test/output-tests/dune
+# end context for test/output-tests/dune
+
+# begin context for test/output-tests/test1.expected
+# file test/output-tests/test1.expected
+dc8d6157230e9ef8e965865f990fbc49:test/output-tests/test1.expected
+# end context for test/output-tests/test1.expected
+
+# begin context for test/output-tests/test2.expected
+# file test/output-tests/test2.expected
+ee63957b3b77455a12e6c269a5032c3f:test/output-tests/test2.expected
+# end context for test/output-tests/test2.expected
+
+# begin context for test/output-tests/test2.ml
+# file test/output-tests/test2.ml
+e8eaab7626ef0aace5e570fffe81f869:test/output-tests/test2.ml
+# end context for test/output-tests/test2.ml

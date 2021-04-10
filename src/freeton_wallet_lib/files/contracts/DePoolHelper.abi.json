@@ -1,0 +1,85 @@
+{
+	"ABI version": 2,
+	"header": ["time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"pool","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "updateDePoolPoolAddress",
+			"inputs": [
+				{"name":"addr","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "initTimer",
+			"inputs": [
+				{"name":"timer","type":"address"},
+				{"name":"period","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onTimer",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "sendTicktock",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getDePoolPoolAddress",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"addr","type":"address"}
+			]
+		},
+		{
+			"name": "getHistory",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"list","type":"address[]"}
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newcode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "sendTransaction",
+			"inputs": [
+				{"name":"dest","type":"address"},
+				{"name":"value","type":"uint64"},
+				{"name":"bounce","type":"bool"},
+				{"name":"flags","type":"uint16"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+	]
+}

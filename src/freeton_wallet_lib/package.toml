@@ -1,0 +1,72 @@
+
+# name of package
+name = "freeton_wallet_lib"
+skeleton = "library"
+
+# version if different from project version
+# version = "0.1.0"
+
+# synopsis if different from project synopsis
+synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (associated library)"
+
+# description if different from project description
+description = """The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.
+
+The FreeTON blockchain is the open-source version of the Telegram Open
+Network. FreeTON is one of the only blockchains with dynamic sharding
+for unlimited scalability and immediate finality for real-time
+applications. It also uses Proof-of-Stake with delegation through
+smart contracts. Smart contracts are written in dialects of Solidity
+and C++ with asynchonous external calls.
+"""
+
+# kind is either "library", "program" or "virtual"
+kind = "library"
+
+# authors if different from project authors
+# authors = [ "Me <me@metoo.org>" ]
+
+# name of a file to generate with the current version
+gen-version = "version.ml"
+
+# supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
+# default is [ "ocamllex", "ocamlyacc" ] 
+# generators = [ "ocamllex", "menhir" ]
+
+# whether all modules should be packed/wrapped (default is true)
+# pack-modules = false
+
+# module name used to pack modules (if pack-modules is true)
+# pack = "Mylib"
+
+# files to skip while updating at package level
+skip = [ "main.ml" , "index.mld" ]
+
+# package library dependencies
+#   [dependencies]
+#   ez_file = ">=0.1 <1.3"
+#   base-unix = { libname = "unix", version = ">=base" } 
+[dependencies]
+ez_cmdliner = "0.2.0"
+ez_config = "0.1.0"
+ez_file = "0.2.0"
+ez_subst = ">=0.1"
+freeton_ocaml_sdk = "version"
+
+# package tools dependencies
+[tools]
+crunch = ""
+ppx_deriving_encoding = ""
+
+# package fields (depends on package skeleton)
+[fields]
+dune-stanzas = "(preprocess (pps ppx_deriving_encoding))"
+dune-trailer = """(rule
+  (targets files.ml)
+  (deps
+   (:data
+     (source_tree files)))
+  (action
+      (run %{bin:ocaml-crunch} -m plain -o files.ml files/))
+)
+"""
