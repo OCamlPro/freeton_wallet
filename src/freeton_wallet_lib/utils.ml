@@ -162,8 +162,10 @@ let post config req =
   REQUEST.post_run url req
 
 let address_of_account config account =
-  if String.contains account ':' then
-    account
+  let _wc, addr = EzString.cut_at account ':' in
+  let len = String.length addr in
+  if len <> 0 then
+    account ^ String.make (64 - len) '0'
   else
     let net = Config.current_network config in
     let key = Misc.find_key_exn net account in

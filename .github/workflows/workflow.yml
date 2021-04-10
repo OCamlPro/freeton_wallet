@@ -15,8 +15,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
-          - windows-latest
         ocaml-version:
           - 4.10.0
         skip_test:
@@ -24,7 +22,7 @@ jobs:
 
         include:
           - os: ubuntu-latest
-            ocaml-version: 4.07.0
+            ocaml-version: 4.08.0
             skip_test: true
 
 
@@ -53,9 +51,11 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions-bot@users.noreply.github.com
 
+      - run: opam repo add extra git+https://github.com/OCamlPro/ocp-opam-repository
+
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y freeton_wallet freeton_wallet_lib ft
+      - run: opam depext -y freeton_wallet_lib ft
         if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y ./*.opam --deps-only --with-test

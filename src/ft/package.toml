@@ -51,7 +51,7 @@ freeton_wallet_lib = "version"
 
 # package tools dependencies
 [tools]
-# ...
+conf-libssl = ""
 
 # package fields (depends on package skeleton)
 [fields]

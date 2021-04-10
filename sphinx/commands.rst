@@ -342,35 +342,21 @@ Monitor a given account
 Where options are:
 
 
+* :code:`-2`   Verbosity level 2
+
+* :code:`-3`   Verbosity level 3
+
 * :code:`-a STRING`   ACCOUNT Inspect account TR_ID on blockchain
-
-* :code:`--a2 STRING`   ACCOUNT Inspect account TR_ID on blockchain
-
-* :code:`--a3 STRING`   ACCOUNT Inspect account TR_ID on blockchain
 
 * :code:`-b STRING`   BLOCK Inspect block TR_ID on blockchain
 
-* :code:`--b2 STRING`   BLOCK Inspect block TR_ID on blockchain
-
-* :code:`--b3 STRING`   BLOCK Inspect block TR_ID on blockchain
-
 * :code:`--bn STRING`   LEVEL Inspect block at LEVEL on blockchain
-
-* :code:`--bn2 STRING`   LEVEL Inspect block at LEVEL on blockchain
-
-* :code:`--bn3 STRING`   LEVEL Inspect block at LEVEL on blockchain
 
 * :code:`-h`   Inspect head
 
-* :code:`--h2`   Inspect head
-
-* :code:`--h3`   Inspect head
+* :code:`--limit INT`   LIMIT Limit the number of results to LIMIT
 
 * :code:`-m STRING`   MSG_ID Inspect message MSG_ID on blockchain
-
-* :code:`--m2 STRING`   MSG_ID Inspect message MSG_ID on blockchain
-
-* :code:`--m3 STRING`   MSG_ID Inspect message MSG_ID on blockchain
 
 * :code:`--shard STRING`   SHARD Block info level/head for this shard
 
@@ -379,10 +365,6 @@ Where options are:
 * :code:`--shard-block STRING`   BLOCK_ID Block info level/head for this shard
 
 * :code:`-t STRING`   TR_ID Inspect transaction TR_ID on blockchain
-
-* :code:`--t2 STRING`   TR_ID Inspect transaction TR_ID on blockchain
-
-* :code:`--t3 STRING`   TR_ID Inspect transaction TR_ID on blockchain
 
 
 drom list

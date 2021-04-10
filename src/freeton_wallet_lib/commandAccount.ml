@@ -192,7 +192,8 @@ let get_account_info accounts ~list ~info =
         match key.key_account with
         | None -> ()
         | Some _ ->
-            get_key_info config key ~info) net.net_keys
+            get_key_info config key ~info
+      ) net.net_keys
     | names ->
         List.iter (fun name ->
             match Misc.find_key net name with
@@ -202,10 +203,19 @@ let get_account_info accounts ~list ~info =
                 get_key_info config key ~info
           ) names
   else
-    List.iter (fun account ->
-        let address = Utils.address_of_account config account in
-        get_account_info config ~address ~name:account
-      ) accounts
+    match accounts with
+    | [] ->
+        List.iter (fun key ->
+            match key.key_account with
+            | None -> ()
+            | Some acc ->
+                get_account_info config ~address:acc.acc_address ~name:key.key_name
+          ) net.net_keys
+    | _ ->
+        List.iter (fun account ->
+            let address = Utils.address_of_account config account in
+            get_account_info config ~address ~name:account
+          ) accounts
 
 let whois address =
   let config = Config.config () in

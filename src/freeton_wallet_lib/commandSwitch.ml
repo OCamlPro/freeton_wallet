@@ -22,7 +22,8 @@ let action ~switch ~create ~url ~remove =
         if create || remove then
           Error.raise
             "You must specify the name of the switch to perform an action of it"
-
+        else
+          Config.print ()
     | Some net_name ->
         if create then begin
           let config = Config.config () in
@@ -104,8 +105,12 @@ let action ~switch ~create ~url ~remove =
           config.modified <- true
         end else begin
           let config = Config.config () in
+          if List.for_all (fun net -> net.net_name <> net_name )
+              config.networks then
+            Error.raise "Network %S does not exist" net_name ;
           config.current_network <- net_name ;
-          config.modified <- true
+          config.modified <- true;
+          Printf.eprintf "Switched to network %S\n%!" net_name
         end
   end
 

@@ -3,12 +3,12 @@ drom-version = "0.1"
 
 [project]
 authors = ["Fabrice Le Fessant <fabrice.le_fessant@origin-labs.com>"]
-ci-systems = ["ubuntu-latest", "macos-latest", "windows-latest"]
+ci-systems = ["ubuntu-latest"]
 copyright = "OCamlPro SAS"
 edition = "4.10.0"
 github-organization = "ocamlpro"
 license = "LGPL2"
-min-edition = "4.07.0"
+min-edition = "4.08.0"
 name = "freeton_wallet"
 version = "0.1.2"
 
@@ -74,7 +74,7 @@ share-dirs = ["share"]
 
 # project-wide fields (depends on project skeleton)
 [fields]
-# ...
+opam-repo = "git+https://github.com/OCamlPro/ocp-opam-repository"
 
 [[package]]
 dir = "src/freeton_wallet"
