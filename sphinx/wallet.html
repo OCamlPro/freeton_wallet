@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Managing Multiple Accounts &mdash; freeton_wallet master
+ (84d796b
+) (2021/04/12 11:45) documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Managing Multiple Networks" href="switches.html" />
+    <link rel="prev" title="How to install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> freeton_wallet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+ (84d796b
+)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Managing Multiple Accounts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-accounts">Creating Accounts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multisig-accounts">Multisig Accounts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">freeton_wallet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Managing Multiple Accounts</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/wallet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="managing-multiple-accounts">
+<h1>Managing Multiple Accounts<a class="headerlink" href="#managing-multiple-accounts" title="Permalink to this headline">¶</a></h1>
+<p>The main job of <code class="code docutils literal notranslate"><span class="pre">ft</span></code> is to manage accounts: it can create new
+key-pairs, associate them with names, compute addresses with key-pairs
+and query information for such accounts.</p>
+<div class="section" id="creating-accounts">
+<h2>Creating Accounts<a class="headerlink" href="#creating-accounts" title="Permalink to this headline">¶</a></h2>
+<p>To create a new account, you may use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">user10</span>
+<span class="o">{</span> <span class="s2">&quot;public&quot;</span><span class="o">:</span> <span class="s2">&quot;fcb4663820d060d605d8642f590ea68b69e2bc039168a5887325e749385afe05&quot;</span><span class="o">,</span>
+<span class="s2">&quot;secret&quot;</span><span class="o">:</span> <span class="s2">&quot;b6056a37deac87aa4889ed092d593762fed7641adff1621281337ae2fa8da26b&quot;</span> <span class="o">}</span>
+<span class="nc">Key</span> <span class="k">for</span> <span class="n">user</span> <span class="s2">&quot;user10&quot;</span> <span class="n">generated</span>
+</pre></div>
+</div>
+<p>To be able to use this account, you may want to associate a contract
+with that account:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">user10</span> <span class="o">--</span><span class="n">surf</span>
+<span class="o">{</span>
+<span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;user10&quot;</span><span class="o">,</span>
+<span class="s2">&quot;passphrase&quot;</span><span class="o">:</span> <span class="s2">&quot;pumpkin juice main spray accident wisdom scene organ lesson suit pen swear&quot;</span><span class="o">,</span>
+<span class="s2">&quot;pair&quot;</span><span class="o">:</span> <span class="o">{</span>
+  <span class="s2">&quot;public&quot;</span><span class="o">:</span> <span class="s2">&quot;fcb4663820d060d605d8642f590ea68b69e2bc039168a5887325e749385afe05&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;secret&quot;</span><span class="o">:</span> <span class="s2">&quot;b6056a37deac87aa4889ed092d593762fed7641adff1621281337ae2fa8da26b&quot;</span>
+<span class="o">},</span>
+<span class="s2">&quot;account&quot;</span><span class="o">:</span> <span class="o">{</span>
+  <span class="s2">&quot;address&quot;</span><span class="o">:</span> <span class="s2">&quot;0:28b049f29b97c5a473f68198f413d0e516509c60a842020ed5e92185eeae0ada&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;contract&quot;</span><span class="o">:</span> <span class="s2">&quot;SetcodeMultisigWallet2&quot;</span>
+<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Here, we used the option <code class="code docutils literal notranslate"><span class="pre">--surf</span></code> to associate the same contract
+that on the Surf wallet. It is equivalent to using <code class="code docutils literal notranslate"><span class="pre">--contract</span>
+<span class="pre">SetcodeMultisigWallet2</span></code>. It works because <code class="code docutils literal notranslate"><span class="pre">ft</span></code> knowns about a
+predefined set of contracts, among which the one used by Surf (you can
+use <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">list</span></code> to check the full list).</p>
+<p>It is possible to query the balance for such an account:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span>  <span class="n">ft</span> <span class="n">account</span> <span class="n">user10</span>
+<span class="nc">Account</span> <span class="s2">&quot;user10&quot;</span><span class="o">:</span> <span class="mi">999</span><span class="o">.</span><span class="mi">944_105_999</span> <span class="nc">TONs</span>
+</pre></div>
+</div>
+<p>You can use the argument <code class="code docutils literal notranslate"><span class="pre">-v</span></code> to display more information.</p>
+<p>However, FreeTON accounts do not exist until a smart contract has been
+deployed on their address. Such a deployment is only possible if the
+address balance has been credited with a minimal amount, that mainly
+depends on the size of the smart contract. We will explain how to
+perform these operations in the following Multisig section.</p>
+<p>Note that you may create an account by providing only its address and
+contract:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>$ ft account --create user13 \
+  --address 0:28b049f29b97c5a473f68198f413d0e516509c60a842020ed5e92185eeae0ada \
+  --contract SetcodeMultisigWallet2
+Account created.
+{
+  &quot;name&quot;: &quot;user13&quot;,
+  &quot;account&quot;: {
+    &quot;address&quot;: &quot;0:28b049f29b97c5a473f68198f413d0e516509c60a842020ed5e92185eeae0ada&quot;,
+    &quot;contract&quot;: &quot;SetcodeMultisigWallet2&quot;
+  }
+}
+</pre></div>
+</div>
+<p>Note that, since <code class="code docutils literal notranslate"><span class="pre">ft</span></code> does not know the key-pair for this
+account, it won’t be able to sign operations originating from this
+account.</p>
+</div>
+<div class="section" id="multisig-accounts">
+<h2>Multisig Accounts<a class="headerlink" href="#multisig-accounts" title="Permalink to this headline">¶</a></h2>
+<p>Most accounts on FreeTON are Multisig accounts, i.e. accounts holding
+a multi-signature contract. Most of them are actually allowing only
+one signature, but still, they share the same contract code.</p>
+<p>The most used Multisig contracts are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">SafeMultisigWallet</span></code> : a multisig wallet, formally verified</li>
+<li><code class="code docutils literal notranslate"><span class="pre">SetcodeMultisigWallet2</span></code> : an extension of the multisig
+wallet, allowing to change the set of owners. This is the contract
+used by the <code class="code docutils literal notranslate"><span class="pre">TON</span> <span class="pre">Surf</span></code> wallet</li>
+</ul>
+<p>To manage Multisig accounts, you should use the <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">multisig</span></code>
+sub-command.</p>
+<p>Then, to create a single-owner multisig:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span>
+</pre></div>
+</div>
+<p>To create a multi-owners multisig:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="n">owner4</span>
+</pre></div>
+</div>
+<p>To create a multi-owners multisig with 2 signs required:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">req</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>To create a multi-owners multisig not self-owning:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner1</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">not</span><span class="o">-</span><span class="n">owner</span>
+</pre></div>
+</div>
+<p>Verify that it worked:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p><strong>GET CUSTODIANS</strong></p>
+<p>To get the list of signers:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">custodians</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><strong>SEND TOKENS</strong></p>
+<p>Should be like that:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+</pre></div>
+</div>
+<p>If the target is not an active account:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">parrain</span>
+</pre></div>
+</div>
+<p>To send all the balance:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+</pre></div>
+</div>
+<p><strong>LIST WAITING TRANSACTIONS</strong></p>
+<p>Display transactions waiting for confirmations:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">waiting</span>
+</pre></div>
+</div>
+<p><strong>CONFIRM TRANSACTION</strong></p>
+<p>Get the transaction ID from above, and use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">confirm</span> <span class="nc">TX_ID</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="switches.html" class="btn btn-neutral float-right" title="Managing Multiple Networks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral float-left" title="How to install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright OCamlPro SAS
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Exploring the Blockchain &mdash; freeton_wallet master
+ (84d796b
+) (2021/04/12 11:45) documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Watching an Account" href="watch.html" />
+    <link rel="prev" title="Calling Commands with Substitutions" href="substitutions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> freeton_wallet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+ (84d796b
+)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wallet.html">Managing Multiple Accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Exploring the Blockchain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#account-information">Account Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#head-of-the-blockchain">Head of the blockchain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#block-information">Block Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transaction-information">Transaction Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#message-information">Message Information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">freeton_wallet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Exploring the Blockchain</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/explorer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="exploring-the-blockchain">
+<h1>Exploring the Blockchain<a class="headerlink" href="#exploring-the-blockchain" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">inspect</span></code> sub-command can be used to inspect data on the
+blockchain.</p>
+<p>Arguments <code class="code docutils literal notranslate"><span class="pre">-2</span></code> and <code class="code docutils literal notranslate"><span class="pre">-3</span></code> can be used to increase the level
+of information retrieved and displayed. The environment variable
+<code class="code docutils literal notranslate"><span class="pre">FT_DEBUG_GRAPHQL</span></code> can be set to display the query sent to the
+server.</p>
+<div class="section" id="account-information">
+<h2>Account Information<a class="headerlink" href="#account-information" title="Permalink to this headline">¶</a></h2>
+<p>First, we can check the state of an account or address:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">a</span> <span class="n">fabrice</span>
+<span class="nc">ACCOUNT</span><span class="o">:</span> <span class="o">{</span>
+  <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de8&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;acc_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Active&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;balance&quot;</span><span class="o">:</span> <span class="s2">&quot;99834388127&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;code_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>We can set the variable <code class="code docutils literal notranslate"><span class="pre">FT_DEBUG_GRAPHQL</span></code> to understand what happens:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="nc">FT_DEBUG_GRAPHQL</span><span class="o">=</span><span class="mi">1</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">a</span> <span class="n">fabrice</span>
+<span class="nc">Graphql</span> <span class="n">query</span> <span class="o">(</span><span class="n">input</span><span class="o">):</span> <span class="n">accounts</span><span class="o">(</span><span class="n">filter</span><span class="o">:</span> <span class="o">{</span> <span class="n">id</span><span class="o">:</span>
+  <span class="o">{</span> <span class="n">eq</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span> <span class="o">}</span> <span class="o">})</span>
+  <span class="o">{</span> <span class="n">id</span> <span class="n">acc_type_name</span> <span class="n">balance</span><span class="o">(</span><span class="n">format</span><span class="o">:</span> <span class="nc">DEC</span><span class="o">)</span> <span class="n">code_hash</span> <span class="o">}</span>
+<span class="nc">Server</span> <span class="n">replied</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;accounts&quot;</span><span class="o">:</span> <span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+    <span class="s2">&quot;acc_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Active&quot;</span><span class="o">,</span>
+    <span class="s2">&quot;balance&quot;</span><span class="o">:</span> <span class="s2">&quot;99834388127&quot;</span><span class="o">,</span>
+    <span class="s2">&quot;code_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82&quot;</span>
+  <span class="o">}</span>
+<span class="o">]</span>
+<span class="o">}</span>
+
+<span class="nc">ACCOUNT</span><span class="o">:</span> <span class="o">{</span>
+  <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;acc_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Active&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;balance&quot;</span><span class="o">:</span> <span class="s2">&quot;99834388127&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;code_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>We can increase the level of verbosity with options <code class="code docutils literal notranslate"><span class="pre">-2</span></code> or <code class="code docutils literal notranslate"><span class="pre">-3</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">--</span><span class="n">a</span> <span class="n">fabrice</span> <span class="o">-</span><span class="mi">2</span>
+<span class="nc">ACCOUNT</span><span class="o">:</span> <span class="o">{</span>
+  <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;acc_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Active&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;balance&quot;</span><span class="o">:</span> <span class="s2">&quot;99834388127&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;code_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82&quot;</span>
+<span class="o">}</span>
+
+<span class="nc">ACCOUNT</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+<span class="s2">&quot;acc_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Active&quot;</span><span class="o">,</span>
+<span class="s2">&quot;balance&quot;</span><span class="o">:</span> <span class="s2">&quot;99834388127&quot;</span><span class="o">,</span>
+<span class="s2">&quot;boc&quot;</span><span class="o">:</span> <span class="s2">&quot;te6ccgECTQEAE3[ ... ]DcIdcNH91TEd3BBCKCEP////28sdwB8AGA==&quot;</span><span class="o">,</span>
+<span class="s2">&quot;code&quot;</span><span class="o">:</span> <span class="s2">&quot;te6ccgECSgEAEqkAAib/[ ... ]NH91TEd3BBCKCEP////28sdwB8AGA==&quot;</span><span class="o">,</span>
+<span class="s2">&quot;code_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82&quot;</span><span class="o">,</span>
+<span class="s2">&quot;data&quot;</span><span class="o">:</span> <span class="s2">&quot;te6ccgEBAgEAmAAB30rKNy7ZaVq0LMi6f9f1bRHCQBYRwtUTu8KL61x/Q2OhAAABeByuyDOlZRuXbLStWhZkXT/r+raI4SALCOFqid3hRfWuP6Gx0IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAEBgBAEWgCVlG5dstK1aFmRdP+v6tojhIAsI4WqJ3eFF9a4/obHQgEA==&quot;</span><span class="o">,</span>
+<span class="s2">&quot;data_hash&quot;</span><span class="o">:</span> <span class="s2">&quot;45d6503b666bb3ddb9204acb43470d6a5e59cadc9f358acf8570d2166687edd9&quot;</span><span class="o">,</span>
+<span class="s2">&quot;last_paid&quot;</span><span class="o">:</span> <span class="mi">1618036237</span><span class="o">,</span>
+<span class="s2">&quot;workchain_id&quot;</span><span class="o">:</span> <span class="mi">0</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>It is possible to query all accounts by specifying <code class="code docutils literal notranslate"><span class="pre">-a</span> <span class="pre">all</span></code>, for
+example if you are using a local network for sandboxing.</p>
+</div>
+<div class="section" id="head-of-the-blockchain">
+<h2>Head of the blockchain<a class="headerlink" href="#head-of-the-blockchain" title="Permalink to this headline">¶</a></h2>
+<p>Let’s inspect the head (most recent block) of the blockchain:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">h</span>
+<span class="nc">BLOCK</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;a1a5c27d450556ff293a5f735e35b5f44a965f4a8396f88c95fdce690160e0ae&quot;</span><span class="o">,</span>
+<span class="s2">&quot;seq_no&quot;</span><span class="o">:</span> <span class="mi">11462705</span><span class="o">,</span>
+<span class="s2">&quot;gen_utime&quot;</span><span class="o">:</span> <span class="mi">1618086569</span><span class="o">,</span>
+<span class="s2">&quot;shard&quot;</span><span class="o">:</span> <span class="s2">&quot;b800000000000000&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;tr_count&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;workchain_id&quot;</span><span class="o">:</span> <span class="mi">0</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Actually, this is the most recent block of one of the shards, we may specify
+a specific shard using <code class="code docutils literal notranslate"><span class="pre">--shard</span> <span class="pre">SHARD</span></code> or <code class="code docutils literal notranslate"><span class="pre">--shard-block</span> <span class="pre">BLOCKID</span></code>,
+or better, using <code class="code docutils literal notranslate"><span class="pre">--shard-account</span> <span class="pre">ACCOUNT</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">h</span> <span class="o">--</span><span class="n">shard</span><span class="o">-</span><span class="n">account</span> <span class="mi">0</span><span class="o">:</span><span class="mi">24</span><span class="n">a444</span>
+<span class="nc">Querying</span> <span class="n">last</span> <span class="n">shard</span> <span class="n">blockid</span> <span class="k">for</span> <span class="n">address</span>
+<span class="nc">Querying</span> <span class="n">shard</span> <span class="k">of</span> <span class="n">block</span> <span class="s2">&quot;f1c99bcee306eb50714866d7a95676799f45b238ee803c119ff3d03febd148c6&quot;</span>
+<span class="n">shard</span> <span class="o">=</span> <span class="s2">&quot;2800000000000000&quot;</span>
+<span class="nc">BLOCK</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;f1c99bcee306eb50714866d7a95676799f45b238ee803c119ff3d03febd148c6&quot;</span><span class="o">,</span>
+<span class="s2">&quot;seq_no&quot;</span><span class="o">:</span> <span class="mi">11453515</span><span class="o">,</span>
+<span class="s2">&quot;gen_utime&quot;</span><span class="o">:</span> <span class="mi">1618086998</span><span class="o">,</span>
+<span class="s2">&quot;shard&quot;</span><span class="o">:</span> <span class="s2">&quot;2800000000000000&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;tr_count&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;workchain_id&quot;</span><span class="o">:</span> <span class="mi">0</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="block-information">
+<h2>Block Information<a class="headerlink" href="#block-information" title="Permalink to this headline">¶</a></h2>
+<p>To display information on a specific block knowing its block identifier:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">b</span> <span class="mi">4247</span><span class="n">b3b27205e336da1159474d0df8d0d00a552b1959671c81556a9bf953ae3f</span> <span class="o">-</span><span class="mi">2</span>
+
+<span class="nc">BLOCK</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;4247b3b27205e336da1159474d0df8d0d00a552b1959671c81556a9bf953ae3f&quot;</span><span class="o">,</span>
+<span class="s2">&quot;seq_no&quot;</span><span class="o">:</span> <span class="mi">7518515</span><span class="o">,</span>
+<span class="s2">&quot;gen_utime&quot;</span><span class="o">:</span> <span class="mi">1616521410</span><span class="o">,</span>
+<span class="s2">&quot;in_msg_descr&quot;</span><span class="o">:</span> <span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Immediately&quot;</span><span class="o">,</span>
+    <span class="s2">&quot;transaction_id&quot;</span><span class="o">:</span> <span class="s2">&quot;30407b122b1bd97bb77837343f645dbd1367035084f84ecaeb3e5bb7466b7ad2&quot;</span>
+  <span class="o">}</span>
+<span class="o">],</span>
+<span class="s2">&quot;out_msg_descr&quot;</span><span class="o">:</span> <span class="bp">[]</span><span class="o">,</span>
+<span class="s2">&quot;shard&quot;</span><span class="o">:</span> <span class="s2">&quot;8000000000000000&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;tr_count&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;workchain_id&quot;</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>To display information on a block knowing its number (without
+<code class="code docutils literal notranslate"><span class="pre">--shard</span></code>, blocks for all shards will be displayed)</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">--</span><span class="n">bn</span> <span class="mi">7518515</span> <span class="o">--</span><span class="n">shard</span> <span class="n">c800000000000000</span>
+<span class="nc">BLOCK</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;09dc90c72c038ac787027af6e058cd011fd6b76f1b419904625477ed890a49d0&quot;</span><span class="o">,</span>
+<span class="s2">&quot;seq_no&quot;</span><span class="o">:</span> <span class="mi">7518515</span><span class="o">,</span>
+<span class="s2">&quot;gen_utime&quot;</span><span class="o">:</span> <span class="mi">1608055824</span><span class="o">,</span>
+<span class="s2">&quot;shard&quot;</span><span class="o">:</span> <span class="s2">&quot;c800000000000000&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;tr_count&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;workchain_id&quot;</span><span class="o">:</span> <span class="mi">0</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="transaction-information">
+<h2>Transaction Information<a class="headerlink" href="#transaction-information" title="Permalink to this headline">¶</a></h2>
+<p>To display information on a specific transaction:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">t</span> <span class="mi">30407</span><span class="n">b122b1bd97bb77837343f645dbd1367035084f84ecaeb3e5bb7466b7ad2</span>
+
+<span class="nc">TRANSACTION</span><span class="o">:</span> <span class="o">{</span>
+ <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;30407b122b1bd97bb77837343f645dbd1367035084f84ecaeb3e5bb7466b7ad2&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;aborted&quot;</span><span class="o">:</span> <span class="bp">false</span><span class="o">,</span>
+ <span class="s2">&quot;account_addr&quot;</span><span class="o">:</span> <span class="s2">&quot;-1:3333333333333333333333333333333333333333333333333333333333333333&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;balance_delta&quot;</span><span class="o">:</span> <span class="s2">&quot;3137500000&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;block_id&quot;</span><span class="o">:</span> <span class="s2">&quot;4247b3b27205e336da1159474d0df8d0d00a552b1959671c81556a9bf953ae3f&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;in_msg&quot;</span><span class="o">:</span> <span class="s2">&quot;9e4ae0da4710d0d67e201bce55890921904dd8bb81a85e246ca9a6a5ff488496&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;out_msgs&quot;</span><span class="o">:</span> <span class="bp">[]</span><span class="o">,</span>
+ <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">3</span><span class="o">,</span>
+ <span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;total_fees&quot;</span><span class="o">:</span> <span class="s2">&quot;0&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;tr_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+ <span class="s2">&quot;tr_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Ordinary&quot;</span>
+ <span class="o">}</span>
+
+ <span class="nc">IN</span> <span class="nc">MESSAGE</span><span class="o">:</span> <span class="o">{</span>
+ <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;9e4ae0da4710d0d67e201bce55890921904dd8bb81a85e246ca9a6a5ff488496&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;-1:3333333333333333333333333333333333333333333333333333333333333333&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+ <span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;-1:0000000000000000000000000000000000000000000000000000000000000000&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+ <span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;value&quot;</span><span class="o">:</span> <span class="s2">&quot;3137500000&quot;</span>
+ <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="message-information">
+<h2>Message Information<a class="headerlink" href="#message-information" title="Permalink to this headline">¶</a></h2>
+<p>Messages information can be displayed, but not yet interpreted (method
+called, parameters) because it would require to know the ABI of the
+receiver.</p>
+<p>To display information on a specific message knowing its identifier:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">m</span> <span class="mf">9e4</span><span class="n">ae0da4710d0d67e201bce55890921904dd8bb81a85e246ca9a6a5ff488496</span>
+
+<span class="nc">MESSAGE</span><span class="o">:</span> <span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;9e4ae0da4710d0d67e201bce55890921904dd8bb81a85e246ca9a6a5ff488496&quot;</span><span class="o">,</span>
+<span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;-1:3333333333333333333333333333333333333333333333333333333333333333&quot;</span><span class="o">,</span>
+<span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span><span class="o">,</span>
+<span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;-1:0000000000000000000000000000000000000000000000000000000000000000&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;value&quot;</span><span class="o">:</span> <span class="s2">&quot;3137500000&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>To display the last messages received by an account (use <code class="code docutils literal notranslate"><span class="pre">-2</span></code> to display more information, such as transaction identifiers):</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">m</span> <span class="n">fabrice</span> <span class="o">--</span><span class="n">limit</span> <span class="mi">2</span>
+
+<span class="nc">MESSAGE</span><span class="o">:</span>
+<span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;37d6aa21f9b330e5ebd8a0ff9bfc75fa126d368146f0858e6549253161965ec1&quot;</span><span class="o">,</span>
+<span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+<span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span><span class="o">,</span>
+<span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;0:68ad5013a8fda69c4828602c5f9a42261eb03bcb5a1f71c764b159f8b50f0a7a&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;value&quot;</span><span class="o">:</span> <span class="s2">&quot;1&quot;</span>
+<span class="o">}</span>
+<span class="nc">MESSAGE</span><span class="o">:</span>
+<span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;f80202f96ffbfeaeb4f56ea7ba2f322ae5d1b5ca84526977d8d39a5be4636727&quot;</span><span class="o">,</span>
+<span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+<span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span><span class="o">,</span>
+<span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;0:02169cad26a640ff509200bd4c950373964c75ca3e3b7cacfcad967d84951763&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;value&quot;</span><span class="o">:</span> <span class="s2">&quot;1&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>To display the last messages sent by an account:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">-</span><span class="n">m</span> <span class="o">^</span><span class="n">fabrice</span> <span class="o">--</span><span class="n">limit</span> <span class="mi">2</span>                                    <span class="o">[</span><span class="mi">23</span><span class="o">:</span><span class="mi">47</span><span class="o">]</span>
+
+<span class="nc">MESSAGE</span><span class="o">:</span>
+<span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;2a5a828db238bc4ac757597b70e180d6f14e6740952eaa59a474d5d32610b3ea&quot;</span><span class="o">,</span>
+<span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;0:68ad5013a8fda69c4828602c5f9a42261eb03bcb5a1f71c764b159f8b50f0a7a&quot;</span><span class="o">,</span>
+<span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="o">,</span>
+<span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span><span class="o">,</span>
+<span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span><span class="o">,</span>
+<span class="s2">&quot;value&quot;</span><span class="o">:</span> <span class="s2">&quot;10900500000000&quot;</span>
+<span class="o">}</span>
+<span class="nc">MESSAGE</span><span class="o">:</span>
+<span class="o">{</span>
+<span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;7dde07cd436d80ab3b47146f3e36430a0b5de4764c4b1e1d57a9b01cb787a43c&quot;</span><span class="o">,</span>
+<span class="s2">&quot;dst&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="o">,</span>
+<span class="s2">&quot;msg_type&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="o">,</span>
+<span class="s2">&quot;msg_type_name&quot;</span><span class="o">:</span> <span class="s2">&quot;ExtOut&quot;</span><span class="o">,</span>
+<span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;0:24a44423bc7edc2598b50ae87267bd06bc53455328e837dae32b9b7592716de7&quot;</span><span class="o">,</span>
+<span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">5</span><span class="o">,</span>
+<span class="s2">&quot;status_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Finalized&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="watch.html" class="btn btn-neutral float-right" title="Watching an Account" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="substitutions.html" class="btn btn-neutral float-left" title="Calling Commands with Substitutions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright OCamlPro SAS
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

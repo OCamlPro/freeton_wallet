@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Calling Commands with Substitutions &mdash; freeton_wallet master
+ (84d796b
+) (2021/04/12 11:45) documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Exploring the Blockchain" href="explorer.html" />
+    <link rel="prev" title="Managing Multiple Networks" href="switches.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> freeton_wallet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+ (84d796b
+)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wallet.html">Managing Multiple Accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Calling Commands with Substitutions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#displaying-wallet-information">Displaying Wallet Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Calling Commands with substitutions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#existing-substitutions">Existing Substitutions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">freeton_wallet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Calling Commands with Substitutions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/substitutions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="calling-commands-with-substitutions">
+<h1>Calling Commands with Substitutions<a class="headerlink" href="#calling-commands-with-substitutions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="displaying-wallet-information">
+<h2>Displaying Wallet Information<a class="headerlink" href="#displaying-wallet-information" title="Permalink to this headline">¶</a></h2>
+<p>The sub-command <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">output</span></code> can be used to display wallet
+information, and save it into files.</p>
+<p>For example, to display the address associated with an address, you
+may use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">output</span> <span class="o">--</span><span class="n">addr</span> <span class="n">user0</span>
+<span class="mi">0</span><span class="o">:</span><span class="mi">108</span><span class="n">f6113fb0cad8c98b70e8ea3cfd12b52710ec20441d05ceb78cacb4f5566b7</span>
+</pre></div>
+</div>
+<p>You may save the output into a file:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">output</span> <span class="o">--</span><span class="n">addr</span> <span class="n">user0</span> <span class="o">-</span><span class="n">o</span> <span class="n">user0</span><span class="o">.</span><span class="n">addr</span>
+</pre></div>
+</div>
+<p>You may output the keyfile associated with an account:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">output</span> <span class="o">--</span><span class="n">keyfile</span> <span class="n">user0</span> <span class="o">-</span><span class="n">o</span> <span class="n">user0</span><span class="o">.</span><span class="n">keyfile</span>
+<span class="o">$</span> <span class="n">cat</span> <span class="n">user0</span><span class="o">.</span><span class="n">keyfile</span>
+<span class="o">{</span>
+<span class="s2">&quot;public&quot;</span><span class="o">:</span> <span class="s2">&quot;fd9ee2babfa35b65917f732316dbb3d31935ccacd2a0aa92e043f8c762e0da28&quot;</span><span class="o">,</span>
+<span class="s2">&quot;secret&quot;</span><span class="o">:</span> <span class="s2">&quot;7883b5b2962f1a2d4891f52a16f125b855b6be61f84b162a4476a2f240c9e2c9&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>And finally, you may just load a file and display it after performing
+some substitutions (see the last section here for a documentation of
+these substitutions):</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">cat</span> <span class="n">keyfile</span><span class="o">.</span><span class="k">in</span>
+<span class="o">{</span>
+<span class="s2">&quot;public-key&quot;</span><span class="o">:</span> <span class="s2">&quot;%{account:pubkey:%{env:FTUSER}}&quot;</span><span class="o">,</span>
+<span class="s2">&quot;private-key&quot;</span><span class="o">:</span> <span class="s2">&quot;%{account:seckey:%{env:FTUSER}}&quot;</span>
+<span class="o">}</span>
+<span class="o">$</span> <span class="nc">FTUSER</span><span class="o">=</span><span class="n">user0</span> <span class="n">ft</span> <span class="n">output</span> <span class="o">--</span><span class="n">file</span> <span class="n">keyfile</span><span class="o">.</span><span class="k">in</span>
+<span class="o">{</span>
+<span class="s2">&quot;public-key&quot;</span><span class="o">:</span> <span class="s2">&quot;fd9ee2babfa35b65917f732316dbb3d31935ccacd2a0aa92e043f8c762e0da28&quot;</span><span class="o">,</span>
+<span class="s2">&quot;private-key&quot;</span><span class="o">:</span> <span class="s2">&quot;7883b5b2962f1a2d4891f52a16f125b855b6be61f84b162a4476a2f240c9e2c9&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Calling Commands with substitutions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The sub-command <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">client</span></code> can be used to call external
+commands while performing substitutions on their arguments.</p>
+<p>By default, <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">client</span></code> will call <code class="code docutils literal notranslate"><span class="pre">tonos-cli</span></code>, passing its
+arguments:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>$ ft client -- genphrase
+Calling /home/lefessan/.ft/bin/tonos-cli --config \
+   /home/lefessan/.ft/sandbox1/tonos-cli.config genphrase
+Config: /home/lefessan/.ft/sandbox1/tonos-cli.config
+Succeeded.
+Seed phrase: &quot;fancy current bean dice pet gasp you swift \
+  balance unaware law fun&quot;
+</pre></div>
+</div>
+<p>Note that we must use <code class="code docutils literal notranslate"><span class="pre">--</span></code> before providing the arguments to the
+external commands, to prevent <code class="code docutils literal notranslate"><span class="pre">ft</span></code> from interpreting them.</p>
+<p>We can also call another command, using <code class="code docutils literal notranslate"><span class="pre">--exec</span></code> to prevent
+<code class="code docutils literal notranslate"><span class="pre">ft</span></code> from calling <code class="code docutils literal notranslate"><span class="pre">tonos-cli</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">client</span> <span class="o">--</span><span class="n">exec</span> <span class="o">--</span> <span class="n">echo</span> <span class="k">&#39;</span><span class="o">%{</span><span class="n">account</span><span class="o">:</span><span class="n">address</span><span class="o">:</span><span class="n">user0</span><span class="o">}</span><span class="k">&#39;</span>
+<span class="nc">Calling</span> <span class="n">echo</span> <span class="mi">0</span><span class="o">:</span><span class="mi">108</span><span class="n">f6113fb0cad8c98b70e8ea3cfd12b52710ec20441d05ceb78cacb4f5566b7</span>
+<span class="mi">0</span><span class="o">:</span><span class="mi">108</span><span class="n">f6113fb0cad8c98b70e8ea3cfd12b52710ec20441d05ceb78cacb4f5566b7</span>
+</pre></div>
+</div>
+<p>This feature can be use to script many commands, for example:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>$ ft client -- genaddr  &#39;%{contract:tvc:SetcodeMultisigWallet2}&#39; \
+  &#39;%{contract:abi:SetcodeMultisigWallet2}&#39; --genkey toto.surf
+</pre></div>
+</div>
+<p>This command will generate a new key-pair, saved it into file
+<code class="code docutils literal notranslate"><span class="pre">toto.surf</span></code>, which providing the command with the TVC and ABI
+files for the contract <code class="code docutils literal notranslate"><span class="pre">SetcodeMultisigWallet2</span></code> (the one used by
+the Surf web wallet).</p>
+</div>
+<div class="section" id="existing-substitutions">
+<h2>Existing Substitutions<a class="headerlink" href="#existing-substitutions" title="Permalink to this headline">¶</a></h2>
+<p>Substitutions are written as <code class="code docutils literal notranslate"><span class="pre">%{SUBST}</span></code>, and can be recursive
+(substitutions are allowed within SUBST itself). If the substitution
+is unknown (bad syntax) or cannot be resolved, an error is thrown.</p>
+<p>Here is a list of allowed expressions within SUBST:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">env:VARIABLE</span></code> :
+Replaced by environemnt (shell) variable <code class="code docutils literal notranslate"><span class="pre">VARIABLE</span></code></li>
+<li><code class="code docutils literal notranslate"><span class="pre">addr:zero</span></code> :
+For 0:0000000000000000000000000000000000000000000000000000000000000000</li>
+</ul>
+<p>On wallet accounts, for a known account <code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">account:address:ACCOUNT</span></code> :
+replaced by the raw address of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:wc:ACCOUNT</span></code> :
+replaced by the workchain ID of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:pubkey:ACCOUNT</span></code> :
+replaced by the pubkey of the account, without <code class="code docutils literal notranslate"><span class="pre">0x</span></code></li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:seckey:ACCOUNT</span></code> :
+replaced by the secret of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:passphrase:ACCOUNT</span></code> :
+replaced by the passphrase of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:keyfile:ACCOUNT</span></code> :
+Generates a JSON keyfile in <code class="code docutils literal notranslate"><span class="pre">$HOME/.ft/tmp/</span></code>, and
+replaced by the file name</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:contract:ACCOUNT</span></code> :
+replaced by the name of recorded contract of the account if known</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:contract:tvc:ACCOUNT</span></code> :
+replaced by the TVC file name for the contract of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:contract:abi:ACCOUNT</span></code> :
+replaced by the ABI file name of the contract of the account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">account:payload:ACCOUNT:METH:PARAMS</span></code> :
+replaced by the base64 encoding of the message payload, corresponding to
+calling <code class="code docutils literal notranslate"><span class="pre">METH</span></code> with JSON arguments <code class="code docutils literal notranslate"><span class="pre">PARAMS</span></code></li>
+</ul>
+<p>On contracts:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">contract:tvc:CONTRACT</span></code> :</li>
+<li><code class="code docutils literal notranslate"><span class="pre">contract:abi:CONTRACT</span></code> :</li>
+<li><code class="code docutils literal notranslate"><span class="pre">contract:payload:CONTRACT:METH:PARAMS</span></code> :
+Output payload base64</li>
+</ul>
+<p>Misc:</p>
+<ul>
+<li><p class="first"><code class="code docutils literal notranslate"><span class="pre">node:url</span></code> :
+Current node URL</p>
+</li>
+<li><p class="first"><code class="code docutils literal notranslate"><span class="pre">ton:NUMBER</span></code> :
+Convert NUMBER of tons to nanotons</p>
+</li>
+<li><p class="first"><code class="code docutils literal notranslate"><span class="pre">file:FILENAME</span></code> :
+Read content of filename</p>
+</li>
+<li><p class="first"><code class="code docutils literal notranslate"><span class="pre">now</span></code> :
+current Unix date</p>
+</li>
+<li><p class="first"><code class="code docutils literal notranslate"><span class="pre">now[:CORRECTION]*</span></code> :
+Current Unix date with corrections, given by:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">plus:NUM:PERDIODS</span></code> : add a delay</li>
+<li><code class="code docutils literal notranslate"><span class="pre">minus:NUM:PERIODS</span></code> : subtract a delay</li>
+</ul>
+<p>where <code class="code docutils literal notranslate"><span class="pre">PERIODS</span></code> is one of <code class="code docutils literal notranslate"><span class="pre">years</span></code>, <code class="code docutils literal notranslate"><span class="pre">days</span></code>, <code class="code docutils literal notranslate"><span class="pre">hours</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">mins</span></code> or <code class="code docutils literal notranslate"><span class="pre">secs</span></code>.</p>
+<p>Example: <code class="code docutils literal notranslate"><span class="pre">now:plus:3:days:plus:4:hours</span></code></p>
+</li>
+</ul>
+<p>Encoders, working on the rest of the substitution:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">string:SUBST</span></code>
+Take remaining SUBST without substituting, just as a string</li>
+<li><code class="code docutils literal notranslate"><span class="pre">read:SUBST</span></code> :
+Do SUBST, then read it as a filename</li>
+<li><code class="code docutils literal notranslate"><span class="pre">hex:SUBST</span></code> :
+Do SUBST, then convert to hex</li>
+<li><code class="code docutils literal notranslate"><span class="pre">base64:SUBST</span></code> :
+Do SUBST, then convert to base64</li>
+<li><code class="code docutils literal notranslate"><span class="pre">get-code:SUBST</span></code> :
+Do SUBST, interprete it as a TVC filename, whose code should be extracted
+using <code class="code docutils literal notranslate"><span class="pre">tvm_linker</span> <span class="pre">decode</span></code> and passed in base64</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="explorer.html" class="btn btn-neutral float-right" title="Exploring the Blockchain" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="switches.html" class="btn btn-neutral float-left" title="Managing Multiple Networks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright OCamlPro SAS
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

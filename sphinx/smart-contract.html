@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Deploying a Solidity Contract &mdash; freeton_wallet master
+ (84d796b
+) (2021/04/12 11:45) documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sub-commands and Arguments" href="commands.html" />
+    <link rel="prev" title="Watching an Account" href="watch.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> freeton_wallet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+ (84d796b
+)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wallet.html">Managing Multiple Accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">freeton_wallet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Deploying a Solidity Contract</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/smart-contract.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deploying-a-solidity-contract">
+<h1>Deploying a Solidity Contract<a class="headerlink" href="#deploying-a-solidity-contract" title="Permalink to this headline">¶</a></h1>
+<p>Let’s suppose that we have a simple Free TON Solidity smart contract:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">pragma</span> <span class="n">ton</span><span class="o">-</span><span class="n">solidity</span> <span class="o">^</span><span class="mi">0</span><span class="o">.</span><span class="mi">37</span><span class="o">.</span><span class="mi">0</span><span class="o">;</span>
+<span class="n">pragma</span> <span class="nc">AbiHeader</span> <span class="n">expire</span><span class="o">;</span>
+
+<span class="n">contract</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+
+  <span class="kt">string</span> <span class="n">variable</span> <span class="o">;</span>
+  <span class="n">constructor</span><span class="o">(</span><span class="kt">string</span> <span class="n">arg</span><span class="o">)</span> <span class="n">public</span> <span class="o">{</span> <span class="n">tvm</span><span class="o">.</span><span class="n">accept</span><span class="bp">()</span> <span class="o">;</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">arg</span> <span class="o">;</span> <span class="o">}</span>
+
+  <span class="k">function</span> <span class="n">get_var</span><span class="bp">()</span> <span class="n">public</span> <span class="n">view</span> <span class="n">returns</span> <span class="o">(</span><span class="kt">string</span> <span class="n">s</span><span class="o">)</span>
+  <span class="o">{</span> <span class="n">tvm</span><span class="o">.</span><span class="n">accept</span><span class="bp">()</span><span class="o">;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">variable</span> <span class="o">;</span> <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>First, let’s try to compile it:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract --build Basic.sol
+
+Calling /home/user/.ft/bin/solc Basic.sol
+Code was generated and saved to file Basic.code
+ABI was generated and saved to file Basic.abi.json
+Calling /home/user/.ft/bin/tvm_linker compile -o Basic.tvm Basic.code --abi-json Basic.abi.json --lib /home/user/.ft/bin/stdlib_sol.tvm
+TVM linker 0.1.0
+COMMIT_ID: 85973140d89b0da5c211b562be86fba5783815d1
+BUILD_DATE: 2021-03-04 16:02:46 +0100
+COMMIT_DATE: 2021-02-17 19:22:22 +0300
+GIT_BRANCH: master
+Calling cp -f Basic.sol Basic.abi.json /home/user/.ft/contracts
+Calling cp -f Basic.tvm /home/user/.ft/contracts/Basic.tvc
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+</pre></div>
+</div>
+<p>We can see that <code class="code docutils literal notranslate"><span class="pre">ft</span></code> called <code class="code docutils literal notranslate"><span class="pre">solc</span></code> and then
+<code class="code docutils literal notranslate"><span class="pre">tvm_linker</span></code> to compile and link the contract. The contract was
+then copied in the contract database of <code class="code docutils literal notranslate"><span class="pre">ft</span></code> under the name
+<code class="code docutils literal notranslate"><span class="pre">Basic</span></code> (as extracted from the filename).</p>
+<p>We will now try to run it locally. For that, let’s create a sandbox
+network on the current computer:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft switch --create sandbox1
+
+Config loaded from /home/user/.ft/config.json
+Network: mainnet
+Loading wallet file /home/user/.ft/mainnet/wallet.json
+Calling docker create --name local-node-7081 -e USER_AGREEMENT=yes -p7081:80 tonlabs/local-node
+274bcd1a5ab7190ad7cb91052b2870dce4bc301affda5eecf91a85791eb6ecde
+Saving wallet file /home/user/.ft/mainnet/wallet.json
+Saving wallet file /home/user/.ft/sandbox1/wallet.json
+Saving config file /home/user/.ft/config.json
+</pre></div>
+</div>
+<p>It is possible to create as many sandboxes as wanted, the only
+constraint is for the name to start with <code class="code docutils literal notranslate"><span class="pre">sandbox</span></code>.</p>
+<p>Now, let’s start the node:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node --start
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+Calling docker start local-node-7081
+local-node-7081
+</pre></div>
+</div>
+<p>It is possible to check that the node is running using:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node --web
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+Calling xdg-open http://0.0.0.0:7081/graphql
+</pre></div>
+</div>
+<p>That command will open the browser on the GraphQL Playground page of
+the server.</p>
+<p>Now, we also have a set of preconfigured users, but we will need some
+coins to be able to deploy the smart contract:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft account
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+Account &quot;giver&quot;: 4_999_999_999.975_350 TONs
+Account &quot;user9&quot;: not yet created
+Account &quot;user8&quot;: not yet created
+Account &quot;user7&quot;: not yet created
+Account &quot;user6&quot;: not yet created
+Account &quot;user5&quot;: not yet created
+Account &quot;user4&quot;: not yet created
+Account &quot;user3&quot;: not yet created
+Account &quot;user2&quot;: not yet created
+Account &quot;user1&quot;: not yet created
+Account &quot;user0&quot;: not yet created
+</pre></div>
+</div>
+<p>So, let’s ask the giver for some coins:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft node --give user1
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+For key user1
+Generating external inbound message...
+
+MessageId: 71fa31ea4a0c986a1bbbed1e5a0e06b3ab61c2142ac2e5e273d1e386b4ece810
+Expire at: unknown
+Succeeded.
+call returned {}
+node url: http://0.0.0.0:7081
+Contract deployed at 0:f89872394a383dc289f27ded48f02a6269e19d02be5821ba8081c67a1070588a
+Saving wallet file /home/user/.ft/sandbox1/wallet.json
+Saving config file /home/user/.ft/config.json
+</pre></div>
+</div>
+<p>We can now check the account of <code class="code docutils literal notranslate"><span class="pre">user1</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft account user1
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+Account &quot;user1&quot;: 1_000.944_105_999 TONs
+</pre></div>
+</div>
+<p>(note that we could have used <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">account</span> <span class="pre">user1</span> <span class="pre">-v</span></code> to get a
+complete view of the account, with all other fields)</p>
+<p>Now, let’s deploy the contract <code class="code docutils literal notranslate"><span class="pre">Basic</span></code>. For that, we will create
+an account <code class="code docutils literal notranslate"><span class="pre">basic</span></code> and call the constructor with the argument
+<code class="code docutils literal notranslate"><span class="pre">&quot;Hello</span> <span class="pre">World&quot;</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract --deploy Basic --create basic --params &#39;{ &quot;arg&quot;: &quot;%{hex:string:Hello World}&quot; }&#39;
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Loading wallet file /home/user/.ft/sandbox1/wallet.json
+
+       &lt;--------- key generation for basic ----------&gt;
+
+{ &quot;public&quot;: &quot;e017bc6792ee1c6cc6db8b4ee4edb00f2c958814a0f8aa46a7973b9493101c16&quot;,
+      &quot;secret&quot;: &quot;2e25b0c601725e447693b5a3a20c8b7b06da4d0ebb94bb8a4453d33b85a9453e&quot; }
+Key for user &quot;basic&quot; generated
+Account modified.
+{ &quot;name&quot;: &quot;basic&quot;,
+      &quot;passphrase&quot;:
+  &quot;bus turtle safe isolate surface fee later cream banner buffalo soul mom&quot;,
+      &quot;pair&quot;:
+  { &quot;public&quot;:
+      &quot;e017bc6792ee1c6cc6db8b4ee4edb00f2c958814a0f8aa46a7973b9493101c16&quot;,
+    &quot;secret&quot;:
+      &quot;2e25b0c601725e447693b5a3a20c8b7b06da4d0ebb94bb8a4453d33b85a9453e&quot; },
+&quot;account&quot;:
+  { &quot;address&quot;:
+      &quot;0:8a33da5fb4e623f796a33efeae19374cf8646ad050ebf3aac0c5d6766d76f969&quot;,
+    &quot;contract&quot;: &quot;Basic&quot; } }
+
+       &lt;--------- token transfer to credit account ----------&gt;
+
+Generating external inbound message...
+
+MessageId: 46fb33141f118e7d107f34875a9dc7341c05a4bab58c74248da4d302c29aa2ed
+Expire at: unknown
+Succeeded.
+call returned {
+      &quot;transId&quot;: &quot;0&quot;
+      }
+
+       &lt;--------- contract deployment ----------&gt;
+
+node url: http://0.0.0.0:7081
+Contract deployed at 0:8a33da5fb4e623f796a33efeae19374cf8646ad050ebf3aac0c5d6766d76f969
+Saving wallet file /home/user/.ft/sandbox1/wallet.json
+Saving config file /home/user/.ft/config.json
+</pre></div>
+</div>
+<p>Here, several things happened:</p>
+<ol class="arabic simple">
+<li>We used the <code class="code docutils literal notranslate"><span class="pre">--create</span> <span class="pre">basic</span></code> option to create a new address for the contract with a key pair, associated with the account name <code class="code docutils literal notranslate"><span class="pre">basic</span></code> (you can use <code class="code docutils literal notranslate"><span class="pre">--replace</span> <span class="pre">basic</span></code> to recreate an address, while keeping the same account name, for example if you changed the contract code and rebuilt it before redeploying). When the <code class="code docutils literal notranslate"><span class="pre">--create/replace</span></code> options are used, 1 TON is sent automatically from the deployer account (<code class="code docutils literal notranslate"><span class="pre">user1</span></code> by default), unless the <code class="code docutils literal notranslate"><span class="pre">--sign</span> <span class="pre">SOURCE</span></code> option is specified.</li>
+<li>We used an automatic substitution in the argument. Indeed, strings values must be passed as hexa, so we used the notation <code class="code docutils literal notranslate"><span class="pre">%{hex:string:STRING}</span></code> to convert the <code class="code docutils literal notranslate"><span class="pre">STRING</span></code> to hexa. Several substitutions are available, such as <code class="code docutils literal notranslate"><span class="pre">{base64:file:FILENAME}</span></code> to translate the content of a file to base64. See the substitutions section for more.</li>
+<li>The contract was deployed and the constructor called with the argument.</li>
+</ol>
+<p>We can now call the <code class="code docutils literal notranslate"><span class="pre">get_var</span></code> method:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft call basic get_var &#39;{}&#39;
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Generating external inbound message...
+
+MessageId: 276b0b4c0b479932f78fa34d4b2e66e5b2f2d91530240190b0409fec940afc31
+Expire at: unknown
+Succeeded.
+call returned {
+  &quot;s&quot;: &quot;48656c6c6f20576f726c64&quot;
+}
+</pre></div>
+</div>
+<p>Note that it is possible to use the <code class="code docutils literal notranslate"><span class="pre">--run</span></code> argument to run the
+method locally:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft call basic get_var --run
+
+Config loaded from /home/user/.ft/config.json
+Network: sandbox1
+Generating external inbound message...
+
+MessageId: a69e5049d7c4d44e3773bc245f988e7f929c57aa2a27a6542bcacd156fa7c36e
+Expire at: unknown
+Running get-method...
+Succeeded.
+call returned {
+  &quot;s&quot;: &quot;48656c6c6f20576f726c64&quot;
+}
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="commands.html" class="btn btn-neutral float-right" title="Sub-commands and Arguments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="watch.html" class="btn btn-neutral float-left" title="Watching an Account" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright OCamlPro SAS
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

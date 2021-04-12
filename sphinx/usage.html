@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to use ft &mdash; freeton_wallet master
+ (84d796b
+) (2021/04/12 11:45) documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> freeton_wallet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+ (84d796b
+)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wallet.html">Managing Multiple Accounts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">freeton_wallet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>How to use <code class="code docutils literal notranslate"><span class="pre">ft</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="how-to-use-ft">
+<h1>How to use <code class="code docutils literal notranslate"><span class="pre">ft</span></code><a class="headerlink" href="#how-to-use-ft" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-a-new-smart-contract">
+<h2>Creating a new Smart Contract<a class="headerlink" href="#creating-a-new-smart-contract" title="Permalink to this headline">¶</a></h2>
+<p>If you have a file <code class="code docutils literal notranslate"><span class="pre">Contract.sol</span></code>, you can use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">contract</span> <span class="o">--</span><span class="n">build</span> <span class="nn">Contract</span><span class="p">.</span><span class="n">sol</span>
+</pre></div>
+</div>
+<p>to build it and register in the contract database of <code class="code docutils literal notranslate"><span class="pre">ft</span></code>.
+<code class="code docutils literal notranslate"><span class="pre">ft</span></code> will perform the following calls:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">ft</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">solc</span> <span class="nn">Contract</span><span class="p">.</span><span class="n">sol</span>
+<span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">ft</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">tvm_linker</span> <span class="n">compile</span> <span class="o">--</span><span class="n">abi</span><span class="o">-</span><span class="n">json</span> <span class="nn">Contract</span><span class="p">.</span><span class="n">abi</span><span class="o">.</span><span class="n">json</span> <span class="nn">Contract</span><span class="p">.</span><span class="n">code</span> <span class="o">--</span><span class="n">lib</span> <span class="o">~/.</span><span class="n">ft</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">stdlib_sol</span><span class="o">.</span><span class="n">tvm</span>
+</pre></div>
+</div>
+<p>So, you must make sure that <code class="code docutils literal notranslate"><span class="pre">solc</span></code> and <code class="code docutils literal notranslate"><span class="pre">tvm_linker</span></code> are
+correctly installed for <code class="code docutils literal notranslate"><span class="pre">ft</span></code>:</p>
+<ol class="arabic simple">
+<li>Follow the steps in <a class="reference external" href="https://github.com/tonlabs/TON-Solidity-Compiler">https://github.com/tonlabs/TON-Solidity-Compiler</a>,
+and copy the resulting files (<code class="code docutils literal notranslate"><span class="pre">solc</span></code> from <code class="code docutils literal notranslate"><span class="pre">build/solc</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">stdlib_sol.tvm</span></code> from <code class="code docutils literal notranslate"><span class="pre">lib/stdlib_sol.tvm</span></code>) into
+<code class="code docutils literal notranslate"><span class="pre">$HOME/.ft/bin/</span></code></li>
+<li>Follow the steps from <a class="reference external" href="https://github.com/tonlabs/TVM-linker">https://github.com/tonlabs/TVM-linker</a>, and copy
+<code class="code docutils literal notranslate"><span class="pre">tvm_linker/target/release/tvm_linker</span></code> into  <code class="code docutils literal notranslate"><span class="pre">$HOME/.ft/bin/</span></code></li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright OCamlPro SAS
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
