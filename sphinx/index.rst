@@ -12,9 +12,14 @@ Welcome to Freeton OCaml Wallet
 
    Home <https://ocamlpro.github.io/freeton_wallet>
    about
-   quickstart
-   commands
    install
+   wallet
+   switches
+   substitutions
+   explorer
+   watch
+   smart-contract
+   commands
    license
 
    Devel and Issues on Github <https://github.com/ocamlpro/freeton_wallet>

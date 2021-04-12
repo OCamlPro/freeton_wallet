@@ -19,12 +19,32 @@ open Ez_subst.V1
 let rec date_now now rem =
   match rem with
   | [] -> now
-  | "plus" :: num :: ( "day" | "days" ) :: rem ->
-      let now = now + int_of_string num * 86400 in
-      date_now now rem
+  | "plus" :: rem ->
+      date_now_delay now (fun now delay -> now + delay) rem
+  | "minus" :: rem ->
+      date_now_delay now (fun now delay -> now - delay) rem
   | _ ->
       Error.raise "Bad substitution 'now:%s'"
         (String.concat ":" rem)
+
+and date_now_delay now f rem =
+  let delay, rem =
+  match rem with
+  | num :: ( "second" | "sec" | "seconds" | "secs" ) :: rem ->
+      int_of_string num * 60 , rem
+  | num :: ( "minute" | "min" | "minutes" | "mins" ) :: rem ->
+      int_of_string num * 60 , rem
+  | num :: ( "hour" | "hours" ) :: rem ->
+      int_of_string num * 3600, rem
+  | num :: ( "day" | "days" ) :: rem ->
+      int_of_string num * 86400, rem
+  | num :: ( "year" | "years" ) :: rem ->
+      int_of_string num * 365 * 86400, rem
+  | _ ->
+      Error.raise "Bad delay substitution '%s'"
+        (String.concat ":" rem)
+  in
+  date_now (f now delay) rem
 
 let get_code filename =
   let tvm_linker = Misc.binary_file "tvm_linker" in
@@ -71,6 +91,14 @@ let subst_string config =
           let key = Misc.find_key_exn net account in
           let key_pair = Misc.get_key_pair_exn key in
           key_pair.public
+      | [ "account" ; "seckey" ; account ] ->
+          let key = Misc.find_key_exn net account in
+          let key_pair = Misc.get_key_pair_exn key in
+          begin
+            match key_pair.secret with
+            | None -> Error.raise "No private key for %s" account
+            | Some seckey -> seckey
+          end
       | [ "account" ; "passphrase" ; account ] ->
           let key = Misc.find_key_exn net account in
           Misc.get_key_passphrase_exn key

@@ -2,17 +2,17 @@
 
 # hash of toml configuration files
 # used for generation of all files
-5ff9c78f99582b16c05db40d4d0e8d2c:.
+e85310897a8ffb7f6d3bf7a49a1d810c:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
 # file .github/workflows/doc-deploy.yml
-ff6085c3194f0d76a2b3e93a66af693d:.github/workflows/doc-deploy.yml
+9cf389bbe30ffc7e3e20acfc732556e1:.github/workflows/doc-deploy.yml
 # end context for .github/workflows/doc-deploy.yml
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-8216894ca2d67e31c8f4e611f927b27b:.github/workflows/workflow.yml
+6e6bb571e5085565f4fd858e866d23e1:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -37,7 +37,7 @@ a8d1bcd6f62c6b813b77d3ff8959d8d2:.ocamlformat-ignore
 
 # begin context for CHANGES.md
 # file CHANGES.md
-a7165eaa3da3f82ad89c94a7c9eb93bb:CHANGES.md
+3ad7f9477e27d2bca9238d28f992fcca:CHANGES.md
 # end context for CHANGES.md
 
 # begin context for LICENSE.md
@@ -47,7 +47,7 @@ a7165eaa3da3f82ad89c94a7c9eb93bb:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-acb774e346d4125fe13419742df17b44:Makefile
+956104a1d4c7151e0083c2b45fa5c1f4:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -97,17 +97,17 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-d29bd0e19b95c919e96b14a580241706:dune-project
+9a59e88c3b5cc2576c9df8037848c15f:dune-project
 # end context for dune-project
 
 # begin context for freeton_wallet_lib.opam
 # file freeton_wallet_lib.opam
-c69ac40618e7b3284e079f6ba3a27194:freeton_wallet_lib.opam
+929a8fc4585dd27f1503c28116a67663:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
 
 # begin context for ft.opam
 # file ft.opam
-7394c6085131e2a3ca8d9c4ddc939bd8:ft.opam
+7aa47a44f555e489e93c47a689eb7ae9:ft.opam
 # end context for ft.opam
 
 # begin context for scripts/after.sh
@@ -155,10 +155,30 @@ cb118e5d830d1ab79f56d384c97020b1:sphinx/install.rst
 8d984cbb854fe94fc5fa77b97b6ee046:sphinx/license.rst
 # end context for sphinx/license.rst
 
+# begin context for src/freeton_wallet_lib/dune
+# file src/freeton_wallet_lib/dune
+ece198ad5dd96bec6e54568c7e0b9dcb:src/freeton_wallet_lib/dune
+# end context for src/freeton_wallet_lib/dune
+
 # begin context for src/freeton_wallet_lib/package.toml
 # file src/freeton_wallet_lib/package.toml
 f7b7eb80bc9955aa99c18270989f64ea:src/freeton_wallet_lib/package.toml
 # end context for src/freeton_wallet_lib/package.toml
+
+# begin context for src/freeton_wallet_lib/version.mlt
+# file src/freeton_wallet_lib/version.mlt
+e2da0ad26588c78354cb83a5232b0210:src/freeton_wallet_lib/version.mlt
+# end context for src/freeton_wallet_lib/version.mlt
+
+# begin context for src/ft/dune
+# file src/ft/dune
+1c4b4ec8980345f4e221c22d75d2d8f4:src/ft/dune
+# end context for src/ft/dune
+
+# begin context for src/ft/main.ml
+# file src/ft/main.ml
+8d43a40919182fd8737f7f64bc470431:src/ft/main.ml
+# end context for src/ft/main.ml
 
 # begin context for src/ft/package.toml
 # file src/ft/package.toml

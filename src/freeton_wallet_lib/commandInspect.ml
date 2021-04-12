@@ -16,22 +16,40 @@ open EZCMD.TYPES
 (* open EzFile.OP *)
 open Ton_sdk (* REQUEST, ENCODING *)
 
-let query_message config ~level msg_id =
-  Utils.post config (match msg_id with
+let query_message config ~level ?limit msg_id =
+  Utils.post config (
+    let len = String.length msg_id in
+    if len = 64 then
+      REQUEST.messages ~level ~id:msg_id []
+    else
+    match msg_id with
       | "all" -> REQUEST.messages ~level []
-      | _ -> REQUEST.messages ~level ~id:msg_id [])
-
+      | _ ->
+          let field, address =
+            if len>0 && msg_id.[0] = '^' then
+              "src", String.sub msg_id 1 (len-1)
+            else
+              "dst", msg_id
+          in
+          let address = Utils.address_of_account config address in
+          let filter =
+            REQUEST.(aeq field (astring address))
+          in
+          let order =
+            ( "created_at" , None )
+          in
+          REQUEST.messages ~level ?limit ~order ~filter [])
 
 let query_messages config ~level ids =
   List.flatten ( List.map  ( query_message ~level config ) ids )
 
-let inspect_transaction ~level tr_id =
+let inspect_transaction ~level ?limit tr_id =
   let config = Config.config () in
 
   let trs =
     Utils.post config
       (match tr_id with
-       | "all" -> REQUEST.transactions ~level []
+       | "all" -> REQUEST.transactions ~level ?limit []
        | _ -> REQUEST.transaction ~level tr_id
       )
   in
@@ -54,11 +72,11 @@ let inspect_transaction ~level tr_id =
 
     ) trs
 
-let inspect_account ~level account =
+let inspect_account ~level ?limit account =
   let config = Config.config () in
   let request = match account with
     | "all" ->
-        REQUEST.accounts ~level []
+        REQUEST.accounts ~level ?limit []
     | _ ->
         let address = Utils.address_of_account config account in
         REQUEST.account ~level address
@@ -71,11 +89,11 @@ let inspect_account ~level account =
         (ENCODING.string_of_account account) ) accounts
 
 
-let inspect_message ~level id =
+let inspect_message ~level ?limit id =
   let config = Config.config () in
-  let messages = query_message config ~level id in
+  let messages = query_message config ~level ?limit id in
   List.iter (fun msg ->
-      Printf.printf "MESSAGE\n: %s\n%!"
+      Printf.printf "MESSAGE:\n %s\n%!"
         (ENCODING.string_of_message msg) ) messages
 
 type shard =
@@ -124,19 +142,19 @@ let filter_of_shard config shard =
       Some ( REQUEST.aeq "shard" ( REQUEST.astring shard ) @
              REQUEST.aeq "workchain_id" ( REQUEST.aint workchain_id ) )
 
-let inspect_block ~level ?shard id =
+let inspect_block ~level ?shard ?limit id =
   let config = Config.config () in
   let filter = filter_of_shard config shard in
   let blocks =
     Utils.post config (match id with
-        | `string "all" -> REQUEST.blocks ~level ?filter []
+        | `string "all" -> REQUEST.blocks ~level ?limit ?filter []
         | _ -> REQUEST.block ~level ?filter id)
   in
   List.iter (fun b ->
       Printf.printf "\nBLOCK: %s\n%!"
         (ENCODING.string_of_block b) ) blocks
 
-let inspect_head ~level ~shard () =
+let inspect_head ~level ~shard ?limit:_ () =
   let config = Config.config () in
   let filter = filter_of_shard config shard in
   let blocks =
@@ -157,57 +175,49 @@ type inspect =
 let cmd =
   let shard = ref None in
   let inspect = ref [] in
-  let to_inspect level kind x =
-    inspect := (level, kind, x) :: !inspect
+  let level = ref 1 in
+  let limit = ref None in
+  let to_inspect kind x =
+    inspect := (kind, x) :: !inspect
   in
   EZCMD.sub
     "inspect"
     (fun () ->
-       List.iter (fun (level, kind, s) ->
+       List.iter (fun (kind, s) ->
            match kind with
            | Transaction ->
-               inspect_transaction ~level:level s
+               inspect_transaction ~level:!level ?limit:!limit s
            | Account ->
-               inspect_account ~level:level s
+               inspect_account ~level:!level ?limit:!limit s
            | Message ->
-               inspect_message ~level:level s
+               inspect_message ~level:!level ?limit:!limit s
            | BlockId ->
-               inspect_block ~level:level (`string s)
+               inspect_block ~level:!level ?limit:!limit (`string s)
            | BlockN ->
-               inspect_block ~level:level ?shard:!shard
+               inspect_block ~level:!level ?shard:!shard ?limit:!limit
                  (`int (int_of_string s))
            | Head ->
-               inspect_head ~level:level ~shard:!shard ()
+               inspect_head ~level:!level ?limit:!limit ~shard:!shard ()
          ) (List.rev !inspect)
     )
     ~args:
       [
-        [ "t" ], Arg.String (to_inspect 1 Transaction),
-        EZCMD.info "TR_ID Inspect transaction TR_ID on blockchain";
-        [ "t2" ], Arg.String (to_inspect 2 Transaction),
-        EZCMD.info "TR_ID Inspect transaction TR_ID on blockchain";
-        [ "t3" ], Arg.String (to_inspect 3 Transaction),
+        [ "2" ], Arg.Unit (fun () -> level := 2),
+        EZCMD.info "Verbosity level 2";
+
+        [ "3" ], Arg.Unit (fun () -> level := 3),
+        EZCMD.info "Verbosity level 3";
+
+        [ "t" ], Arg.String (to_inspect Transaction),
         EZCMD.info "TR_ID Inspect transaction TR_ID on blockchain";
 
-        [ "a" ], Arg.String (to_inspect 1 Account),
-        EZCMD.info "ACCOUNT Inspect account TR_ID on blockchain";
-        [ "a2" ], Arg.String (to_inspect 2 Account),
-        EZCMD.info "ACCOUNT Inspect account TR_ID on blockchain";
-        [ "a3" ], Arg.String (to_inspect 3 Account),
+        [ "a" ], Arg.String (to_inspect Account),
         EZCMD.info "ACCOUNT Inspect account TR_ID on blockchain";
 
-        [ "m" ], Arg.String (to_inspect 1 Message),
-        EZCMD.info "MSG_ID Inspect message MSG_ID on blockchain";
-        [ "m2" ], Arg.String (to_inspect 2 Message),
-        EZCMD.info "MSG_ID Inspect message MSG_ID on blockchain";
-        [ "m3" ], Arg.String (to_inspect 3 Message),
+        [ "m" ], Arg.String (to_inspect Message),
         EZCMD.info "MSG_ID Inspect message MSG_ID on blockchain";
 
-        [ "b" ], Arg.String (to_inspect 1 BlockId),
-        EZCMD.info "BLOCK Inspect block TR_ID on blockchain";
-        [ "b2" ], Arg.String (to_inspect 2 BlockId),
-        EZCMD.info "BLOCK Inspect block TR_ID on blockchain";
-        [ "b3" ], Arg.String (to_inspect 3 BlockId),
+        [ "b" ], Arg.String (to_inspect BlockId),
         EZCMD.info "BLOCK Inspect block TR_ID on blockchain";
 
         (* The following queries require a shard, that is either provided
@@ -221,18 +231,13 @@ let cmd =
         [ "shard-account" ], Arg.String (fun s -> shard := Some (Account s) ),
         EZCMD.info "ACCOUNT Block info level/head for this shard";
 
-        [ "bn" ], Arg.String (to_inspect 1 BlockN),
-        EZCMD.info "LEVEL Inspect block at LEVEL on blockchain";
-        [ "bn2" ], Arg.String (to_inspect 2 BlockN),
-        EZCMD.info "LEVEL Inspect block at LEVEL on blockchain";
-        [ "bn3" ], Arg.String (to_inspect 3 BlockN),
+        [ "bn" ], Arg.String (to_inspect BlockN),
         EZCMD.info "LEVEL Inspect block at LEVEL on blockchain";
 
-        [ "h" ], Arg.Unit (fun () -> to_inspect 1 Head ""),
+        [ "h" ], Arg.Unit (fun () -> to_inspect Head ""),
         EZCMD.info "Inspect head";
-        [ "h2" ], Arg.Unit (fun () -> to_inspect 2 Head ""),
-        EZCMD.info "Inspect head";
-        [ "h3" ], Arg.Unit (fun () -> to_inspect 3 Head ""),
-        EZCMD.info "Inspect head";
+
+        [ "limit" ], Arg.Int (fun n -> limit := Some n),
+        EZCMD.info "LIMIT Limit the number of results to LIMIT";
       ]
     ~doc: "Monitor a given account"

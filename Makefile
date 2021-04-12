@@ -15,7 +15,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh freeton_wallet freeton_wallet_lib ft
+	./scripts/copy-bin.sh freeton_wallet_lib ft
 	./scripts/after.sh build
 
 build-deps:
