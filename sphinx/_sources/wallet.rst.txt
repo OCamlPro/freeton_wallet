@@ -88,8 +88,12 @@ The most used Multisig contracts are:
 To manage Multisig accounts, you should use the :code:`ft multisig`
 sub-command.
 
+**CREATE MULTISIG CONTRACTS**
 
-Then, to create a single-owner multisig:
+To create a Multisig account, the account address must already have
+some tokens on it to pay for the smart contract deployment.
+
+To create a single-owner multisig
 ::
   
   # ft multisig -a my-account --create

@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Managing Multiple Accounts &mdash; freeton_wallet master
- (84d796b
-) (2021/04/12 11:45) documentation</title>
+ (6857b0e
+) (2021/04/12 14:01) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (84d796b
+ (6857b0e
 )
               </div>
             
@@ -252,7 +252,10 @@ used by the <code class="code docutils literal notranslate"><span class="pre">TO
 </ul>
 <p>To manage Multisig accounts, you should use the <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">multisig</span></code>
 sub-command.</p>
-<p>Then, to create a single-owner multisig:</p>
+<p><strong>CREATE MULTISIG CONTRACTS</strong></p>
+<p>To create a Multisig account, the account address must already have
+some tokens on it to pay for the smart contract deployment.</p>
+<p>To create a single-owner multisig</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span>
 </pre></div>
 </div>
