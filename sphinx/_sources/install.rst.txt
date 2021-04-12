@@ -18,18 +18,12 @@ For now, these packages are available from https://github.com/OCamlPro/ocp-opam-
 You can use::
 
   $ opam repo add ocp git+https://github.com/OCamlPro/ocp-opam-repository
-  $ opam install ft
+  $ opam install ft --destdir $HOME/local
 
-To use :code:`ft`, you can then either everytime use::
+to get :code:`ft` installed as :code:`$HOME/local/bin/ft`.
 
-  $ eval `opam env`
-  # ft is now in your PATH:
-  $ ft --help
-
-or copy it permanently in some other location (here, we use 4.10.0 to build)::
-
-  $ sudo cp ~/.opam/4.10.0/bin/ft /usr/local/bin/ft
-  $ ft --help
+You can then either add :code:`$HOME/local/bin` to your :code:`PATH`
+or copy the binary in another directory in your :code:`PATH`.
 
 From Sources
 ------------
@@ -48,11 +42,14 @@ Then, you need to install all the dependencies::
   $ cd freeton_wallet/
   $ opam install --deps-only .
 
-Finally, you can build the package and install it::
+Finally, you can build the package it::
 
   $ eval $(opam env)
   $ dune build
-  $ dune install
+
+The :code:`ft` binary should be available in the top directory, you
+can copy it somewhere in your :code:`PATH`.
+  
 
 Initial Configuration
 ~~~~~~~~~~~~~~~~~~~~~
@@ -79,3 +76,6 @@ If it fails, you may have to do it manually:
 
 3. Follow the steps from https://github.com/tonlabs/TVM-linker, and copy
    :code:`tvm_linker/target/release/tvm_linker` into  :code:`$HOME/.ft/bin/`
+
+Note that you only need the steps (2) and (3) if you plan to build and
+deploy smart contracts.
