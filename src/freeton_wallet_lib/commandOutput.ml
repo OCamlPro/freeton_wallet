@@ -60,6 +60,7 @@ let get_code filename =
   | None -> Error.raise "Code not found in file %S" filename
   | Some code -> code
 
+
 let subst_string config =
   let net = Config.current_network config in
   let files = ref [] in
@@ -128,10 +129,7 @@ let subst_string config =
             | _ -> String.concat ":" rem in
           let abi_file = Misc.get_contract_abifile contract in
           let abi = EzFile.read_file abi_file in
-          Base64.encode_string (
-            Ton_sdk.ABI.encode_body ~abi ~meth ~params
-          )
-
+          Ton_sdk.ABI.encode_body ~abi ~meth ~params
       (* Contracts substitutions *)
       | [ "contract" ; "tvc" ; contract ] ->
           Misc.get_contract_tvcfile contract
@@ -267,6 +265,7 @@ Encoders, working on the rest of the substitution:
 * read:SUBST       Do SUBST, then read it as a filename
 * hex:SUBST        Do SUBST, then convert to hex
 * base64:SUBST     Do SUBST, then convert to base64
+* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it
 
 |}
   in
@@ -278,6 +277,16 @@ let with_substituted config params f =
   let params = subst params in
   match
     f params
+  with
+  | res -> clean (); res
+  | exception exn -> clean () ; raise exn
+
+let with_substituted_list config args f =
+  let (subst, files) = subst_string config in
+  let clean () = List.iter Sys.remove !files in
+  let args = List.map subst args in
+  match
+    f args
   with
   | res -> clean (); res
   | exception exn -> clean () ; raise exn

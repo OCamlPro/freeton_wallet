@@ -10,7 +10,7 @@ github-organization = "ocamlpro"
 license = "LGPL2"
 min-edition = "4.08.0"
 name = "freeton_wallet"
-version = "0.2.0"
+version = "0.2.1"
 
 # synopsis if different from project synopsis
 synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)"

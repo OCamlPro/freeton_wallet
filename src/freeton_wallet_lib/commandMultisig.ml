@@ -158,7 +158,7 @@ let create_multisig
 
   Utils.deploy_contract config ~key ~contract ~params ~wc ?client ()
 
-let send_transfer ~src ~dst ~bounce ~amount =
+let send_transfer ~src ~dst ~amount ?(bounce=false) ?(args=[]) () =
   let config = Config.config () in
   let net = Config.current_network config in
   let src_key = Misc.find_key_exn net src in
@@ -167,6 +167,21 @@ let send_transfer ~src ~dst ~bounce ~amount =
   let dst_key = Misc.find_key_exn net dst in
   let dst_addr = Misc.get_key_address_exn dst_key in
 
+  let args = match args with
+    | [ meth ; params ] -> Some ( meth, params )
+    | [ meth ] -> Some ( meth, "{}" )
+    | [] -> None
+    | _ ->
+        Error.raise "Too many params arguments"
+  in
+  let payload = match args with
+    | Some ( meth , params ) ->
+        let dst_contract = Misc.get_key_contract_exn dst_key in
+        let abi_file = Misc.get_contract_abifile dst_contract in
+        let abi = EzFile.read_file abi_file in
+        Ton_sdk.ABI.encode_body ~abi ~meth ~params
+    | None -> ""
+  in
 
   let params =
     let nanotokens, allBalance =
@@ -176,11 +191,12 @@ let send_transfer ~src ~dst ~bounce ~amount =
         Misc.nanotokens_of_string amount, false
     in
     Printf.sprintf
-      {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":""}|}
+      {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":"%s"}|}
       dst_addr
       nanotokens
       bounce
       allBalance
+      payload
   in
   let meth = "submitTransaction" in
   Utils.call_contract config ~contract
@@ -210,26 +226,35 @@ let send_confirm account ~tx_id =
     ~src:src_key
     ()
 
-let action account accounts ~create ~req ~not_owner ~custodians ~waiting
+let action account args ~create ~req ~not_owner ~custodians ~waiting
     ~transfer ~dst ~bounce ~confirm ?wc ~debot ~contract =
 
-  match account with
-  | None ->
-      if debot then
-        CommandClient.action
-          ~exec:false
-          [ "debot" ; "fetch" ; "%{addr:debot-multisig}" ]
-      else
+  let config = Config.config () in
+  if debot then begin
+    let account = match account with
+      | None -> "debot-multisig"
+      | Some account -> account in
+    let address = Utils.address_of_account config account in
+    CommandClient.action ~exec:false [ "debot" ; "fetch" ; address ] ;
+  end ;
+
+  let account = match account with
+    | None ->
         Error.raise "The argument --account ACCOUNT is mandatory"
-  | Some account ->
+    | Some account -> account
+  in
+
+  if create && transfer != None then
+    Error.raise "--create and --transfer cannot be used together";
+
+  CommandOutput.with_substituted_list config args (fun args ->
       if create then
-        create_multisig account ~accounts ~not_owner ~req ?wc ~contract ;
-      if custodians then
+        create_multisig account ~accounts:args ~not_owner ~req ?wc ~contract ;          if custodians then
         get_custodians account ;
       begin
         match transfer, dst with
         | Some amount, Some dst ->
-            send_transfer ~src:account ~dst ~bounce ~amount
+            send_transfer ~src:account ~dst ~bounce ~amount ~args ()
         | None, None ->
             ()
         | _ ->
@@ -244,9 +269,9 @@ let action account accounts ~create ~req ~not_owner ~custodians ~waiting
             send_confirm account ~tx_id
       end;
       ()
-
+    )
 let cmd =
-  let accounts = ref [] in
+  let args = ref [] in
   let contract = ref "SafeMultisigWallet" in
   let account = ref None in
 
@@ -266,7 +291,7 @@ let cmd =
   EZCMD.sub
     "multisig"
     (fun () ->
-       action !account !accounts
+       action !account !args
          ~create:!create
          ~req:!req
          ~not_owner:!not_owner
@@ -282,8 +307,8 @@ let cmd =
     )
     ~args:
       [
-        [], Arg.Anons (fun list -> accounts := list),
-        EZCMD.info "Owners of contract for --create" ;
+        [], Arg.Anons (fun list -> args := list),
+        EZCMD.info "Generic arguments" ;
 
         [ "a" ; "account" ], Arg.String (fun s -> account := Some s),
         EZCMD.info "ACCOUNT The multisig account";
@@ -292,13 +317,15 @@ let cmd =
         EZCMD.info "WORKCHAIN The workchain (default is 0)";
 
         [ "create" ], Arg.Set create,
-        EZCMD.info "Deploy multisig wallet on account";
+        EZCMD.info "Deploy multisig wallet on account (use generic arguments for owners)";
 
         [ "not-owner" ], Arg.Set not_owner,
         EZCMD.info " Initial account should not be an owner";
 
         [ "parrain" ], Arg.Clear bounce,
         EZCMD.info " Transfer to inactive account";
+        [ "bounce" ], Arg.Bool (fun b -> bounce := b),
+        EZCMD.info "BOOL Transfer to inactive account";
 
         [ "custodians" ], Arg.Set custodians,
         EZCMD.info "List custodians";

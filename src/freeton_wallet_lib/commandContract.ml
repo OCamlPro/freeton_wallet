@@ -144,8 +144,7 @@ let action ~todo ~force ~sign ~params ~wc ~create =
             CommandMultisig.send_transfer
               ~src:net.net_deployer
               ~dst:sign
-              ~bounce:false
-              ~amount:"1";
+              ~amount:"1" ();
             Config.save config;
             sign
         | ReplaceAccount _ -> assert false
