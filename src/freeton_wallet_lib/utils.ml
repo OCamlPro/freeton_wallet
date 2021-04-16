@@ -57,6 +57,7 @@ let call_contract
            | Some key -> Some (Misc.get_key_pair_exn key)
          in
          let abi = EzFile.read_file contract_abi in
+         Printf.eprintf "params: %s\n%!" params;
          let res =
            Ton_sdk.ACTION.call_run ?client ~server_url:node.node_url
              ~address
