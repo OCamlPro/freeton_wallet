@@ -469,15 +469,17 @@ Get the transaction ID from above, and use:
 Where options are:
 
 
-* :code:`ARGUMENTS`   Owners of contract for --create
+* :code:`ARGUMENTS`   Generic arguments
 
 * :code:`-a STRING` or :code:`--account STRING`   ACCOUNT The multisig account
+
+* :code:`--bounce BOOL`   BOOL Transfer to inactive account
 
 * :code:`--confirm STRING`   TX_ID Confirm transaction
 
 * :code:`--contract STRING`   CONTRACT Use this contract
 
-* :code:`--create`   Deploy multisig wallet on account
+* :code:`--create`   Deploy multisig wallet on account (use generic arguments for owners)
 
 * :code:`--custodians`   List custodians
 
