@@ -214,7 +214,9 @@ let post config req =
   let node = Config.current_node config in
   let url = node.node_url in
   let open Ton_sdk in
-  REQUEST.post_run url req
+  match REQUEST.post_run url req with
+  | Ok r -> r
+  | Error exn -> raise exn
 
 let address_of_account config account =
   let _wc, addr = EzString.cut_at account ':' in

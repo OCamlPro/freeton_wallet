@@ -188,7 +188,7 @@ let display_transaction tr =
 
   | _ -> assert false
 
-let action ~account ?blockid ?timeout ~level ~on_event () =
+let action ~account ?block_id ?timeout ~level ~on_event () =
   match account with
   | None -> assert false
   | Some account ->
@@ -198,27 +198,27 @@ let action ~account ?blockid ?timeout ~level ~on_event () =
       let abi = Utils.abi_of_account config account in
       let node = Config.current_node config in
       let client = CLIENT.create node.node_url in
-      let blockid = match blockid with
+      let block_id = match block_id with
         | None ->
             BLOCK.find_last_shard_block ~client ~address
-        | Some blockid -> blockid
+        | Some block_id -> block_id
       in
-      Printf.eprintf "initial blockid: %S\n%!" blockid ;
+      Printf.eprintf "initial block_id: %S\n%!" block_id ;
       begin
         match on_event with
         | None -> ()
         | Some cmd ->
-            Misc.call [ cmd ; blockid ; "start" ]
+            Misc.call [ cmd ; block_id ; "start" ]
       end ;
       let timeout = Option.map (fun t ->
           Int64.of_int ( t * 1000 )) timeout in (* in ms *)
       let ton = Ton_sdk.CLIENT.create node.node_url in
-      let rec iter blockid =
+      let rec iter block_id =
         let b = BLOCK.wait_next_block
-            ~client ~blockid ~address
+            ~client ~block_id ~address
             ?timeout () in
         let block_id = b.id in
-        Printf.eprintf "new blockid: %S\n%!" b.id;
+        Printf.eprintf "new block_id: %S\n%!" b.id;
         if !Globals.verbosity > 1 then
           Printf.eprintf "block = %s\n%!"
             (Ton_sdk.TYPES.string_of_block b) ;
@@ -256,11 +256,11 @@ let action ~account ?blockid ?timeout ~level ~on_event () =
         end;
         iter block_id
       in
-      iter blockid
+      iter block_id
 
 let cmd =
   let account = ref None in
-  let blockid = ref None in
+  let block_id = ref None in
   let timeout = ref (Some 2_000_000) in (* 25 days ? *)
   let level = ref 1 in
   let on_event = ref None in
@@ -269,7 +269,7 @@ let cmd =
     (fun () ->
        action
          ~account:!account
-         ?blockid:!blockid
+         ?block_id:!block_id
          ?timeout:!timeout
          ~level:!level
          ~on_event:!on_event
@@ -286,8 +286,8 @@ let cmd =
         [ "account" ], Arg.String (fun s -> account := Some s),
         EZCMD.info "ACCOUNT Output account of account";
 
-        [ "from" ], Arg.String (fun s -> blockid := Some s),
-        EZCMD.info "ID Start with blockid ID";
+        [ "from" ], Arg.String (fun s -> block_id := Some s),
+        EZCMD.info "ID Start with block_id ID";
 
         [ "timeout" ], Arg.Int (fun s ->
             if s > 2_000_000 then
@@ -296,7 +296,7 @@ let cmd =
         EZCMD.info "TIMEOUT Timeout in seconds";
 
         [ "on-event" ], Arg.String (fun cmd -> on_event := Some cmd),
-        EZCMD.info {|CMD Call CMD on event emitted. Called once on startup as `CMD <blockid> start` and after every emitted event as `CMD <blockid> <tr_id> <event_name> <args>`|};
+        EZCMD.info {|CMD Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`|};
 
       ]
     ~doc: "Monitor a given account"
