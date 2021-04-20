@@ -13,6 +13,7 @@
 (* These functions are 'misc' functions, except that they depend on
    the 'Config' module, so they cannot be in 'Misc'. *)
 
+open EzCompat
 open EzFile.OP
 open Types
 
@@ -44,10 +45,39 @@ let tonoscli config args =
   end;
   tonoscli binary config args
 
+let map_of_json json =
+  let json = Ezjsonm.from_string json in
+  let map = ref StringMap.empty in
+  let add path s =
+    let key = String.concat ":" ( List.rev path ) in
+    map := StringMap.add key s !map
+  in
+  let rec iter path json =
+    match json with
+      `O list ->
+        add path (Ezjsonm.value_to_string ~minify:true json);
+        List.iter (fun (s,v) ->
+            iter (s :: path) v
+          ) list
+    | `A list ->
+        add path (Ezjsonm.value_to_string ~minify:true json);
+        List.iteri (fun i v ->
+            iter (string_of_int i :: path) v
+          ) list
+    | `Bool b ->
+        add path @@ string_of_bool b
+    | `Null -> ()
+    | `Float f ->
+        add path @@ string_of_float f
+    | `String s ->
+        add path s
+  in
+  iter [ "res" ] json;
+  !map
 
 let call_contract
     config ~address ~contract ~meth ~params
-    ?client ?src ?(local=false) ?output () =
+    ?client ?src ?(local=false) ?output ?subst () =
   Misc.with_contract contract
     (fun ~contract_tvc:_ ~contract_abi ->
        if Globals.use_ton_sdk then
@@ -67,39 +97,63 @@ let call_contract
              ?keypair
              ()
          in
-         match output with
-         | Some "-" ->
-             Printf.eprintf "call returned, saved to stdout\n%!";
-             Printf.printf "%s\n%!" res
-         | None ->
-             Printf.eprintf "call returned:\n%s\n%!" res
-         | Some file ->
-             Printf.eprintf "call returned, saved to %s\n%!" file;
-             EzFile.write_file file res
-       else
-         match output with
-         | Some _ ->
-             Error.raise "--output FILE cannot be used with FT_USE_TONOS"
-         | None ->
-             let command = if local then "run" else "call" in
-             let args =
-               [
-                 command ; address ;
-                 meth ; params ;
-                 "--abi" ; contract_abi ;
-               ]
-             in
-             match src with
-             | None ->
-                 Misc.call @@ tonoscli config args
-             | Some key ->
-                 Misc.with_key_keypair key
-                   (fun ~keypair_file ->
-                      Misc.call @@ tonoscli config @@
-                      args @ [
-                        "--sign" ; keypair_file
-                      ]
+         let res =
+           match subst with
+           | None -> res
+           | Some file ->
+               let content = EzFile.read_file file in
+               let map = map_of_json res in
+               Subst.with_subst config (fun subst ->
+                   subst content)
+                 ~brace:(fun s ->
+                     match StringMap.find s map with
+                     | exception Not_found -> None
+                     | s -> Some s
                    )
+         in
+         begin
+           match output with
+           | Some "-" ->
+               Printf.eprintf "call returned, saved to stdout\n%!";
+               Printf.printf "%s\n%!" res
+           | None ->
+               Printf.eprintf "call returned:\n%s\n%!" res
+           | Some file ->
+               Printf.eprintf "call returned, saved to %s\n%!" file;
+               EzFile.write_file file res
+         end
+       else
+         let () =
+           match output with
+           | Some _ ->
+               Error.raise "--output FILE cannot be used with FT_USE_TONOS"
+           | None -> ()
+         in
+         let () =
+           match subst with
+           | Some _ ->
+               Error.raise "--subst FILE cannot be used with FT_USE_TONOS"
+           | None -> ()
+         in
+         let command = if local then "run" else "call" in
+         let args =
+           [
+             command ; address ;
+             meth ; params ;
+             "--abi" ; contract_abi ;
+           ]
+         in
+         match src with
+         | None ->
+             Misc.call @@ tonoscli config args
+         | Some key ->
+             Misc.with_key_keypair key
+               (fun ~keypair_file ->
+                  Misc.call @@ tonoscli config @@
+                  args @ [
+                    "--sign" ; keypair_file
+                  ]
+               )
     )
 
 let deploy_contract config ~key ~contract ~params ~wc ?client () =

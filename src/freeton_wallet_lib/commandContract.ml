@@ -161,7 +161,7 @@ let action ~todo ~force ~sign ~params ~wc ~create =
               Error.raise "Wrong contract %S for signer %S" acc_contract sign
         | _ -> ()
       end;
-      CommandOutput.with_substituted config params (fun params ->
+      Subst.with_substituted config params (fun params ->
           Printf.eprintf "Deploying contract %S to %s\n%!" contract sign;
           Utils.deploy_contract config ~key ~contract ~params ~wc ())
 

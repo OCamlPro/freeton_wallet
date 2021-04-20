@@ -75,18 +75,53 @@ let display_message ~out msg =
         (if out then " OUT" else "")
         (ENCODING.string_of_message msg)
 
-let check_message config ~abi client ?(out=false) msg_id =
+let arg_of_path path =
+  "--" ^ String.concat "-" ( List.rev path )
+
+let args_of_json json =
+  match json with
+  | None -> []
+  | Some json ->
+      let json = Ezjsonm.from_string json in
+      let rec map path json =
+        match json with
+          `O list ->
+            List.flatten (
+              List.map (fun (s,v) ->
+                  map (s :: path) v
+                ) list
+            )
+        | `A list ->
+            List.flatten (List.mapi (fun i v ->
+                map (string_of_int i :: path) v
+              ) list)
+        | `Bool b ->
+            [ arg_of_path path ; string_of_bool b ]
+        | `Null -> []
+        | `Float f ->
+            [ arg_of_path path ; string_of_float f ]
+        | `String s ->
+            [ arg_of_path path ; s ]
+      in
+      map [ "arg" ] json
+
+let check_message ~block_id ~tr_id
+    config ~abi client ?(out=false) ~level ~on_event msg_id =
   match abi with
   | None -> ()
   | Some abi ->
       match Utils.post config (REQUEST.messages ~level:3 ~id:msg_id []) with
         [ msg ] ->
-          if ! Globals.verbosity > 1 then
-            Printf.printf "  MESSAGE%s: %s\n%!"
-              (if out then " OUT" else "")
-              ( ENCODING.string_of_message msg )
-          else
-            display_message ~out msg ;
+          begin
+            match level with
+            | 0 -> ()
+            | 3 ->
+                Printf.printf "  MESSAGE%s: %s\n%!"
+                  (if out then " OUT" else "")
+                  ( ENCODING.string_of_message msg )
+            | _ ->
+                display_message ~out msg
+          end ;
           begin (* decode_message only works when there is a msg_body too *)
             match msg.msg_body with
             | None -> ()
@@ -97,21 +132,34 @@ let check_message config ~abi client ?(out=false) msg_id =
                     try
                       let decoded =
                         BLOCK.decode_message_boc ~client ~boc ~abi in
-                      Printf.printf "  CALL: %s %s %s\n%!"
-                        (match decoded.body_type with
-                         | 0 -> "Input"
-                         | 1 -> "Output"
-                         | 2 -> "InternalOutput"
-                         | 3 -> "Event"
-                         | _ -> assert false)
-                        decoded.body_name
-                        (match decoded.body_args with
-                         | None -> ""
-                         | Some args -> args)
-                    (*   ( TYPES.string_of_decoded_message_body decoded ) *)
-                      with exn ->
-                        Printf.eprintf "exn: %s for boc = %S\n%!"
-                          (Printexc.to_string exn) boc
+                      if level > 0 then
+                        Printf.printf "  CALL: %s %s %s\n%!"
+                          (match decoded.body_type with
+                           | 0 -> "Input"
+                           | 1 -> "Output"
+                           | 2 -> "InternalOutput"
+                           | 3 -> "Event"
+                           | _ -> assert false)
+                          decoded.body_name
+                          (match decoded.body_args with
+                           | None -> ""
+                           | Some args -> args) ;
+
+                      begin
+                        if decoded.body_type = 3 then
+                          match on_event with
+                          | None -> ()
+                          | Some cmd ->
+
+                              Misc.call
+                                ( [ cmd ; block_id ;
+                                    decoded.body_name ; tr_id ] @
+                                  args_of_json decoded.body_args )
+                      end ;
+
+                    with exn ->
+                      Printf.eprintf "exn: %s for boc = %S\n%!"
+                        (Printexc.to_string exn) boc
           end
       | _ -> assert false
 
@@ -140,12 +188,13 @@ let display_transaction tr =
 
   | _ -> assert false
 
-let action ~account ?blockid ~timeout =
+let action ~account ?blockid ?timeout ~level ~on_event () =
   match account with
   | None -> assert false
   | Some account ->
       let config = Config.config () in
       let address = Utils.address_of_account config account in
+      Printf.eprintf "Watching account %s\n%!" address;
       let abi = Utils.abi_of_account config account in
       let node = Config.current_node config in
       let client = CLIENT.create node.node_url in
@@ -155,12 +204,20 @@ let action ~account ?blockid ~timeout =
         | Some blockid -> blockid
       in
       Printf.eprintf "initial blockid: %S\n%!" blockid ;
-      let timeout = Int64.of_int ( timeout * 1000 ) in (* in ms *)
+      begin
+        match on_event with
+        | None -> ()
+        | Some cmd ->
+            Misc.call [ cmd ; blockid ; "start" ]
+      end ;
+      let timeout = Option.map (fun t ->
+          Int64.of_int ( t * 1000 )) timeout in (* in ms *)
       let ton = Ton_sdk.CLIENT.create node.node_url in
       let rec iter blockid =
         let b = BLOCK.wait_next_block
             ~client ~blockid ~address
-            ~timeout () in
+            ?timeout () in
+        let block_id = b.id in
         Printf.eprintf "new blockid: %S\n%!" b.id;
         if !Globals.verbosity > 1 then
           Printf.eprintf "block = %s\n%!"
@@ -170,42 +227,61 @@ let action ~account ?blockid ~timeout =
             Utils.post config
               (REQUEST.transactions
                  ~level:3
-                 ~block_id:b.id
+                 ~block_id
                  ~account_addr:address [])
           with
           | [] -> ()
           | trs ->
-              Printf.eprintf "In block with id: %S\n%!" b.id;
+              if level > 0 then
+                Printf.eprintf "In block with id: %S\n%!" b.id;
               List.iter (fun tr ->
-                  if !Globals.verbosity > 1 then
-                    Printf.eprintf "\nTRANSACTION: %s\n%!"
-                      (ENCODING.string_of_transaction tr)
-                  else
-                    display_transaction tr;
-                  check_message config ~abi ton tr.tr_in_msg ;
+                  begin match level with
+                    | 0 -> ()
+                    | 3 ->
+                        Printf.eprintf "\nTRANSACTION: %s\n%!"
+                          (ENCODING.string_of_transaction tr)
+                    | _ ->
+                        display_transaction tr
+                  end ;
+                  let tr_id = tr.tr_id in
+                  check_message ~block_id ~tr_id
+                    config ~abi ton tr.tr_in_msg ~level
+                    ~on_event:None;
                   List.iter (fun id ->
-                      check_message ~out:true config ~abi ton id)
+                      check_message ~block_id ~tr_id
+                        ~out:true config ~abi ton id ~level
+                        ~on_event)
                     tr.tr_out_msgs
                 ) trs
         end;
-        iter b.id
+        iter block_id
       in
       iter blockid
 
 let cmd =
   let account = ref None in
   let blockid = ref None in
-  let timeout = ref ( 15 * 60) in (* 15 minutes *)
+  let timeout = ref (Some 2_000_000) in (* 25 days ? *)
+  let level = ref 1 in
+  let on_event = ref None in
   EZCMD.sub
     "watch"
     (fun () ->
        action
          ~account:!account
          ?blockid:!blockid
-         ~timeout:!timeout
+         ?timeout:!timeout
+         ~level:!level
+         ~on_event:!on_event
+         ()
     )
     ~args:
       [
+        [ "0" ], Arg.Unit (fun () -> level := 0),
+        EZCMD.info "Verbosity level none";
+
+        [ "3" ], Arg.Unit (fun () -> level := 3),
+        EZCMD.info "Verbosity level 3";
 
         [ "account" ], Arg.String (fun s -> account := Some s),
         EZCMD.info "ACCOUNT Output account of account";
@@ -213,8 +289,14 @@ let cmd =
         [ "from" ], Arg.String (fun s -> blockid := Some s),
         EZCMD.info "ID Start with blockid ID";
 
-        [ "timeout" ], Arg.Int (fun s -> timeout := s),
+        [ "timeout" ], Arg.Int (fun s ->
+            if s > 2_000_000 then
+              Error.raise "--timeout cannot exceed 2_000_000 seconds";
+            timeout := Some s),
         EZCMD.info "TIMEOUT Timeout in seconds";
+
+        [ "on-event" ], Arg.String (fun cmd -> on_event := Some cmd),
+        EZCMD.info {|CMD Call CMD on event emitted. Called once on startup as `CMD <blockid> start` and after every emitted event as `CMD <blockid> <tr_id> <event_name> <args>`|};
 
       ]
     ~doc: "Monitor a given account"
