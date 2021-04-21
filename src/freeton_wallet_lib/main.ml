@@ -13,6 +13,12 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
+let echo () =
+  Printf.eprintf "CMD: \x1B[1;33m %s \x1B[0m \n%!"
+    ( String.concat " "
+        ( List.filter (fun s -> s <> "--echo")
+            ( Array.to_list Sys.argv )))
+
 let main () =
   let commands =
     [
@@ -59,6 +65,9 @@ let main () =
         []
     | "--switch" :: switch :: args ->
         Config.set_temporary_switch switch;
+        iter_initial_args args
+    | "--echo" :: args ->
+        echo () ;
         iter_initial_args args
     | [ "--version" ] ->
         Printf.printf "%s\n%!" Version.version;

@@ -20,6 +20,7 @@ val call_contract :
   ?src:Types.key ->
   ?local:bool ->
   ?output:string ->
+  ?subst:string ->
   unit -> unit
 
 val post :

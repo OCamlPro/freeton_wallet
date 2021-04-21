@@ -247,7 +247,7 @@ let action account args ~create ~req ~not_owner ~custodians ~waiting
   if create && transfer != None then
     Error.raise "--create and --transfer cannot be used together";
 
-  CommandOutput.with_substituted_list config args (fun args ->
+  Subst.with_substituted_list config args (fun args ->
       if create then
         create_multisig account ~accounts:args ~not_owner ~req ?wc ~contract ;          if custodians then
         get_custodians account ;

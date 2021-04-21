@@ -17,10 +17,10 @@ type account = {
 } [@@deriving json_encoding]
 
 type key = {
-  key_name : string ;                    [@key "name"]
-  mutable key_passphrase : string option ;       [@key "passphrase"]
-  mutable key_pair : Ton_types.keypair option ;    [@key "pair"]
-  mutable key_account : account option ; [@key "account"]
+  key_name : string ;                           [@key "name"]
+  mutable key_passphrase : string option ;      [@key "passphrase"]
+  mutable key_pair : Ton_types.keypair option ; [@key "pair"]
+  mutable key_account : account option ;        [@key "account"]
 } [@@deriving json_encoding]
 
 type local_node = {

@@ -248,8 +248,6 @@ let gen_passphrase config =
              (String.concat "|" stdout)
 
 let gen_keypair config passphrase =
-  let subst, _ = CommandOutput.subst_string config in
-  let passphrase = subst passphrase in
   if Globals.use_ton_sdk then
     Ton_sdk.CRYPTO.generate_keypair_from_mnemonic passphrase
   else
@@ -310,9 +308,12 @@ let add_account config
   let net = Config.current_network config in
   let key_name = name in
   Misc.check_new_key_exn net name;
-  let key_passphrase = passphrase in
+
+  let subst, _ = Subst.subst_string config in
+  let key_passphrase = Option.map subst passphrase in
+
   let key_pair =
-    match keyfile, passphrase with
+    match keyfile, key_passphrase with
     | Some _, Some _ ->
         Error.raise "--passphrase and --keyfile are incompatible"
     | None, None -> None
@@ -367,7 +368,8 @@ let change_account config
     let keyfile = match keyfile with
       | Some "" | Some "none" ->
           if key.key_passphrase <> None then
-            Error.raise "Cannot clear keyfile without clearing first passphrase";
+            Error.raise
+              "Cannot clear keyfile without clearing first passphrase";
           if key.key_pair <> None then begin
             key.key_pair <- None;
             config.modified <- true;
@@ -415,10 +417,12 @@ let change_account config
       | _ -> ()
     end;
 
-    match passphrase with
+    match passphrase, keyfile with
 
-    | Some passphrase ->
+    | Some _, Some _ ->
+        Error.raise "--passphrase and --keyfile are incomptible"
 
+    | Some passphrase, None ->
         if key.key_passphrase <> None then
           Error.raise
             "You cannot change the passphrase of an account. You must delete it and recreate it.";
@@ -481,99 +485,103 @@ let change_account config
         key.key_account <- key_account;
         config.modified <- true;
 
-    | None ->
+    | None, Some keyfile ->
 
-        match keyfile with
+        let key_pair = Misc.read_json_file Encoding.keypair keyfile in
 
-        | Some keyfile ->
+        if key.key_pair <> None then
+          Error.raise
+            "You cannot change the keyfile of an account whose keyfile is already set. You must delete it and recreate it.";
 
-            let key_pair = Misc.read_json_file Encoding.keypair keyfile in
+        let acc_contract = match contract, key.key_account with
+          | Some contract, _ -> Some contract
+          | None, None -> None
+          | None, Some { acc_contract ; _ } -> acc_contract
+        in
 
-            if key.key_pair <> None then
-              Error.raise
-                "You cannot change the keyfile of an account whose keyfile is already set. You must delete it and recreate it.";
-
-            let acc_contract = match contract, key.key_account with
-              | Some contract, _ -> Some contract
-              | None, None -> None
-              | None, Some { acc_contract ; _ } -> acc_contract
-            in
-
-            let wc = match wc with
-              | Some _ -> wc
-              | None ->
-                  match key.key_account with
-                  | None -> None
-                  | Some { acc_workchain ; _ } -> acc_workchain
-            in
-
-            let key_account =
-              match acc_contract with
+        let wc = match wc with
+          | Some _ -> wc
+          | None ->
+              match key.key_account with
               | None -> None
-              | Some contract ->
-                  let acc_address = gen_address config key_pair contract ~wc in
-                  Some { acc_address ;
-                         acc_contract = Some contract ;
-                         acc_workchain = wc }
-            in
+              | Some { acc_workchain ; _ } -> acc_workchain
+        in
 
-            begin
-              match key_account, key.key_account with
-              | Some _, None -> ()
-              | None, None -> ()
-              | None, Some _ ->
-                  Error.raise "Since account address was known, you must specify the contract to use or delete the address first.";
-              | Some { acc_address = new_address ; _ },
-                Some { acc_address = former_address ; _ }
-                ->
-                  if new_address <> former_address then
-                    Error.raise "New address %s is different from former address %s. You must delete it first."
-                      new_address former_address;
-            end;
+        let key_account =
+          match acc_contract with
+          | None -> None
+          | Some contract ->
+              let acc_address = gen_address config key_pair contract ~wc in
+              Some { acc_address ;
+                     acc_contract = Some contract ;
+                     acc_workchain = wc }
+        in
 
-            key.key_pair <- Some key_pair;
-            key.key_account <- key_account;
-            config.modified <- true;
+        begin
+          match key_account, key.key_account with
+          | Some _, None -> ()
+          | None, None -> ()
+          | None, Some _ ->
+              Error.raise "Since account address was known, you must specify the contract to use or delete the address first.";
+          | Some { acc_address = new_address ; _ },
+            Some { acc_address = former_address ; _ }
+            ->
+              if new_address <> former_address then
+                Error.raise "New address %s is different from former address %s. You must delete it first."
+                  new_address former_address;
+        end;
 
-        | None ->
+        key.key_pair <- Some key_pair;
+        key.key_account <- key_account;
+        config.modified <- true;
 
-            let acc_contract = match contract, key.key_account with
-              | Some contract, _ -> Some contract
-              | None, None -> None
-              | None, Some { acc_contract ; _ } -> acc_contract
-            in
+    | None, None ->
 
-            let wc = match wc with
-              | Some _ -> wc
+        let acc_contract = match contract, key.key_account with
+          | Some contract, _ -> Some contract
+          | None, None -> None
+          | None, Some { acc_contract ; _ } -> acc_contract
+        in
+
+        let wc = match wc with
+          | Some _ -> wc
+          | None ->
+              match key.key_account with
+              | None -> None
+              | Some { acc_workchain ; _ } -> acc_workchain
+        in
+
+        match address, acc_contract, key.key_pair with
+        | Some _,  _, Some _ ->
+            Error.raise
+              "--address is incompatible with known keyfile and contract";
+        | Some acc_address, acc_contract, None ->
+
+            key.key_account <- Some { acc_address ;
+                                      acc_contract ;
+                                      acc_workchain = wc };
+            config.modified <- true
+
+        | None, Some _, None ->
+            begin match key.key_account with
               | None ->
-                  match key.key_account with
-                  | None -> None
-                  | Some { acc_workchain ; _ } -> acc_workchain
-            in
+                  Error.raise
+                    "You cannot set the contract without keys or address"
+              | Some acc ->
+                  acc.acc_contract <- acc_contract;
+                  config.modified <- true
+            end
+        | None, None, _ -> ()
+        | None, Some contract, Some key_pair ->
+            if key.key_account <> None then
+              Error.raise "You must clear address before changing contract";
 
-            match address, acc_contract, key.key_pair with
-            | Some _, Some _, Some _ ->
-                Error.raise "--address is incompatible with known keyfile and contract";
-            | Some acc_address, acc_contract, _ ->
-
-                key.key_account <- Some { acc_address ;
-                                          acc_contract ;
-                                          acc_workchain = wc };
-                config.modified <- true
-
-            | None, Some _, None ->
-                Error.raise "You cannot set the contract without keys or address"
-            | None, None, _ -> ()
-            | None, Some contract, Some key_pair ->
-                if key.key_account <> None then
-                  Error.raise "You must clear address before changing contract";
-
-                let acc_address = gen_address config key_pair contract ~wc in
-                key.key_account <-
-                  Some { acc_address ;
-                         acc_contract = Some contract ;
-                         acc_workchain = wc };
-                config.modified <- true
+            let acc_address = gen_address config key_pair contract ~wc in
+            key.key_account <-
+              Some { acc_address ;
+                     acc_contract = Some contract ;
+                     acc_workchain = wc };
+            config.modified <- true
 
   end;
 
@@ -625,6 +633,7 @@ let genkey ?name ?contract config =
   in
 *)
   let keypair = gen_keypair config seed_phrase in
+  Printf.eprintf "Passphrase: %S\n%!" seed_phrase;
   Printf.eprintf "{ \"public\": \"%s\",\n%!" keypair.public;
   Printf.eprintf "  \"secret\": \"%s\" }\n%!"
     (match keypair.secret with None -> assert false | Some s -> s);

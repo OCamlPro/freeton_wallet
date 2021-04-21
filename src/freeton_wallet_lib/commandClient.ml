@@ -21,7 +21,7 @@ open EZCMD.TYPES
 
 let action ?(exec=false) ?stdout args =
   let config = Config.config () in
-  let (subst, files) = CommandOutput.subst_string config in
+  let (subst, files) = Subst.subst_string config in
   let args = List.map (fun arg ->
       subst arg
     ) args in
