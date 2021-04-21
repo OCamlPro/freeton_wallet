@@ -185,18 +185,20 @@ Manage contracts
 **USAGE**
 ::
   
-  drom call ARGUMENTS [OPTIONS]
+  drom call ACCOUNT METH [JSON_PARAMS] [OPTIONS]
 
 Where options are:
 
 
-* :code:`ARGUMENTS`   ACCOUNT METH [PARAMS] arguments
+* :code:`ACCOUNT METH [JSON_PARAMS]`   arguments
 
-* :code:`-o STRING` or :code:`--output STRING`   FILE Save result to FILE (use - for stdout)
+* :code:`-o FILE` or :code:`--output FILE`   Save result to FILE (use - for stdout)
 
 * :code:`--run`   Run locally
 
-* :code:`--sign STRING`   ACCOUNT Sign message with account
+* :code:`--sign ACCOUNT`   Sign message with account
+
+* :code:`--subst FILE`   Read FILE and substitute results in the content
 
 
 drom client
@@ -627,8 +629,14 @@ Monitor a given account
 Where options are:
 
 
+* :code:`-0`   Verbosity level none
+
+* :code:`-3`   Verbosity level 3
+
 * :code:`--account STRING`   ACCOUNT Output account of account
 
-* :code:`--from STRING`   ID Start with blockid ID
+* :code:`--from STRING`   ID Start with block_id ID
+
+* :code:`--on-event STRING`   CMD Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`
 
 * :code:`--timeout INT`   TIMEOUT Timeout in seconds
