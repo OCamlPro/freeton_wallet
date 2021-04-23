@@ -19,8 +19,7 @@ val call_contract :
   ?client:Ton_types.client ->
   ?src:Types.key ->
   ?local:bool ->
-  ?output:string ->
-  ?subst:string ->
+  ?subst:(msg:string -> Types.config -> string -> unit) ->
   unit -> unit
 
 val post :

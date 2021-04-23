@@ -10,8 +10,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* open Types *)
+open EzCompat
 open Ez_subst.V1
+open Ezcmd.V2
+open EZCMD.TYPES
 
 let rec date_now now rem =
   match rem with
@@ -296,3 +298,82 @@ let with_substituted_list ?brace config args f =
       let args = List.map subst args in
       f args
     )
+
+let map_of_json json =
+  let json = Ezjsonm.from_string json in
+  let map = ref StringMap.empty in
+  let add path s =
+    let key = String.concat ":" ( List.rev path ) in
+    map := StringMap.add key s !map
+  in
+  let rec iter path json =
+    match json with
+      `O list ->
+        add path (Ezjsonm.value_to_string ~minify:true json);
+        List.iter (fun (s,v) ->
+            iter (s :: path) v
+          ) list
+    | `A list ->
+        add path (Ezjsonm.value_to_string ~minify:true json);
+        List.iteri (fun i v ->
+            iter (string_of_int i :: path) v
+          ) list
+    | `Bool b ->
+        add path @@ string_of_bool b
+    | `Null -> ()
+    | `Float f ->
+        add path @@ string_of_float f
+    | `String s ->
+        add path s
+  in
+  iter [ "res" ] json;
+  !map
+
+
+
+let subst_or_output ~msg ?subst ?output config res =
+  let res =
+    match subst with
+    | None -> res
+    | Some file ->
+        let content =
+          let len = String.length file in
+          if len > 0 && file.[0] = '@' then
+            String.sub file 1 (len-1)
+          else
+            EzFile.read_file file
+        in
+        let map = map_of_json res in
+        with_subst config (fun subst ->
+            subst content)
+          ~brace:(fun s ->
+              match StringMap.find s map with
+              | exception Not_found -> None
+              | s -> Some s
+            )
+  in
+  match output with
+  | Some "-"
+  | None ->
+      Printf.eprintf "%s to stdout:\n%s\n%!" msg res
+  | Some file ->
+      Printf.eprintf "%s saved to file %s\n%!" msg file;
+      EzFile.write_file file res
+
+let make_args () =
+  let output = ref None in
+  let subst = ref None in
+  let args =
+    [
+      [ "o" ; "output"], Arg.String (fun s -> output := Some s),
+      EZCMD.info ~docv:"FILE" "Save result to FILE (use - for stdout)";
+
+      [ "subst" ], Arg.String (fun s -> subst := Some s),
+      EZCMD.info ~docv:"FILE"
+        "Read FILE and substitute results in the content";
+    ]
+  in
+  let subst_or_output ~msg config res =
+    subst_or_output ~msg config res ?subst:!subst ?output:!output
+  in
+  args, subst_or_output

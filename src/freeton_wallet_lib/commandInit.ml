@@ -28,8 +28,10 @@ let install_tonos_cli () =
   if not exists then
     Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/tonos-cli.git" ];
   Unix.chdir dir;
-  if exists then
+  if exists then begin
     Misc.call [ "git" ; "pull" ];
+    Misc.call [ "cargo" ; "update" ];
+  end;
   Misc.call [ "cargo"; "build" ];
 
   bin_install "tonos-cli" ;
@@ -65,6 +67,8 @@ let install_tvm_linker () =
   if exists then
     Misc.call [ "git" ; "pull" ];
   Unix.chdir "tvm_linker";
+  if exists then
+    Misc.call [ "cargo" ; "update" ];
   Misc.call [ "cargo"; "build" ];
 
   bin_install "target/debug/tvm_linker" ;

@@ -45,7 +45,7 @@ install: [
 depends: [
   "ocaml" {>= "4.08.0"}
   "dune" {>= "2.6.0"}
-  "freeton_ocaml_sdk" {>= "0.2.2" & < "1.0.0"}
+  "freeton_ocaml_sdk" {>= "0.2.3" & < "1.0.0"}
   "ezjsonm" {}
   "ez_subst" {>= "0.1"}
   "ez_file" {>= "0.2.0" & < "1.0.0"}
