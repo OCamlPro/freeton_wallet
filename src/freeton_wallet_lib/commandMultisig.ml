@@ -136,7 +136,7 @@ let create_multisig
           match acc.acc_contract with
           | None -> ()
           | Some c ->
-              if c <> contract then
+              if not (is_multisig_contract contract) then
                 Error.raise {|Account %s uses a different contract %S. Clear it with 'ft account %s --contract ""|} key.key_name c key.key_name
         end;
         match wc with

@@ -15,7 +15,7 @@ open EZCMD.TYPES
 open Types
 
 
-let action ~account ~meth ~params ~local ~sign ~output ~subst =
+let action ~account ~meth ~params ~local ~sign ~subst =
 
   let config = Config.config () in
   let net = Config.current_network config in
@@ -27,20 +27,22 @@ let action ~account ~meth ~params ~local ~sign ~output ~subst =
   | None -> Error.raise "You should set account's contract first"
   | Some contract ->
       let src = match sign with
-        | Some sign -> Misc.find_key_exn net sign
-        | None -> key
+        | Some sign -> Some (Misc.find_key_exn net sign )
+        | None ->
+            match key.key_pair with
+            | None -> None
+            | Some _ -> Some key
       in
       Subst.with_substituted config params (fun params ->
           Utils.call_contract config
-            ~address ~contract ~meth ~params ~local ~src ?output ?subst () )
+            ~address ~contract ~meth ~params ~local ?src ~subst () )
 
 let cmd =
   let args = ref [] in
   let local = ref false in
-  let output = ref None in
   let sign = ref None in
-  let subst = ref None in
-   EZCMD.sub
+  let subst_args, subst = Subst.make_args () in
+  EZCMD.sub
     "call"
     (fun () ->
        let account, meth, params =
@@ -55,25 +57,17 @@ let cmd =
        action ~account ~meth ~params
          ~local:!local
          ~sign:!sign
-         ~output:!output
-         ~subst:!subst
+         ~subst
     )
-    ~args:
-      [
-        [], Arg.Anons (fun l -> args := l),
-        EZCMD.info ~docv:"ACCOUNT METH [JSON_PARAMS]" "arguments" ;
+    ~args: (subst_args @
+            [
+              [], Arg.Anons (fun l -> args := l),
+              EZCMD.info ~docv:"ACCOUNT METH [JSON_PARAMS]" "arguments" ;
 
-        [ "run" ], Arg.Set local,
-        EZCMD.info "Run locally";
+              [ "run" ], Arg.Set local,
+              EZCMD.info "Run locally";
 
-        [ "sign"], Arg.String (fun s -> sign := Some s),
-        EZCMD.info ~docv:"ACCOUNT" "Sign message with account";
-
-        [ "o" ; "output"], Arg.String (fun s -> output := Some s),
-        EZCMD.info ~docv:"FILE" "Save result to FILE (use - for stdout)";
-
-        [ "subst" ], Arg.String (fun s -> subst := Some s),
-        EZCMD.info ~docv:"FILE"
-          "Read FILE and substitute results in the content";
-      ]
+              [ "sign"], Arg.String (fun s -> sign := Some s),
+              EZCMD.info ~docv:"ACCOUNT" "Sign message with account";
+            ] )
     ~doc: "Manage contracts"
