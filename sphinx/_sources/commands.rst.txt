@@ -350,11 +350,15 @@ Where options are:
 
 * :code:`-m STRING`   MSG_ID Inspect message MSG_ID on blockchain
 
+* :code:`-o FILE` or :code:`--output FILE`   Save result to FILE (use - for stdout)
+
 * :code:`--shard STRING`   SHARD Block info level/head for this shard
 
 * :code:`--shard-account STRING`   ACCOUNT Block info level/head for this shard
 
 * :code:`--shard-block STRING`   BLOCK_ID Block info level/head for this shard
+
+* :code:`--subst FILE`   Read FILE and substitute results in the content
 
 * :code:`-t STRING`   TR_ID Inspect transaction TR_ID on blockchain
 
