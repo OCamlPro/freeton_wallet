@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-b49f72bf06e6c427030a067bb49e024f:.
+a0f3637828eb460ab5b8091182c630db:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -97,12 +97,12 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-8b9b38a29efd09b020c336e129842fa3:dune-project
+d30f663822246ecbdc3bea6568b1cb18:dune-project
 # end context for dune-project
 
 # begin context for freeton_wallet_lib.opam
 # file freeton_wallet_lib.opam
-eeb6c807ca7bdfedc8ed81f2319eb931:freeton_wallet_lib.opam
+f57c1225052fbe17500bc919be538f81:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
 
 # begin context for ft.opam
@@ -157,7 +157,7 @@ cb118e5d830d1ab79f56d384c97020b1:sphinx/install.rst
 
 # begin context for src/freeton_wallet_lib/dune
 # file src/freeton_wallet_lib/dune
-b616c16db9429606f26e467c45475ec4:src/freeton_wallet_lib/dune
+fadba68c07894c1f6498f2da31d1681a:src/freeton_wallet_lib/dune
 # end context for src/freeton_wallet_lib/dune
 
 # begin context for src/freeton_wallet_lib/package.toml

@@ -53,6 +53,7 @@ ez_file = "0.2.0"
 ez_subst = ">=0.1"
 freeton_ocaml_sdk = "0.2.3"
 ezjsonm = ""
+lwt_ssl = "1.1"
 
 # package tools dependencies
 [tools]
