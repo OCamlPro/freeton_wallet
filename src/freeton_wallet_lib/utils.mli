@@ -37,3 +37,8 @@ val tonoscli : Types.config -> string list -> string list
 
 val address_of_account : Types.config -> string -> string
 val abi_of_account : Types.config -> string -> string option (* content *)
+
+(* returns Some (exists, balance) if exists, None otherwise *)
+val get_account_info : Types.config -> string -> ( bool * Z.t ) option
+
+val is_address : string -> string option

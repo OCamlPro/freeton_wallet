@@ -30,48 +30,48 @@ let ton_of_z z =
   Printf.sprintf "%s%s.%s%s" sign (Z.to_string tons)
     zeros nanotons
 
-let if_z s z_opt =
+let if_z ~oc s z_opt =
   match z_opt with
   | None -> ()
   | Some z ->
-      Printf.printf "    %s: %s\n%!" s ( ton_of_z z )
+      Printf.fprintf oc "    %s: %s\n%!" s ( ton_of_z z )
 
-let display_message ~out msg =
+let display_message ~oc ~out msg =
   match msg with
   | { msg_id ;
       msg_msg_type_name = Some msg_type_name ;
       msg_status_name = Some msg_status_name ;
       msg_created_at_string = Some msg_created_at_string ;
       _ } ->
-      Printf.printf "  MESSAGE%s %S\n%!"
+      Printf.fprintf oc "  MESSAGE%s %S\n%!"
         (if out then " OUT" else "")
         msg_id;
-      Printf.printf "    date: %s\n%!" msg_created_at_string;
+      Printf.fprintf oc "    date: %s\n%!" msg_created_at_string;
       (match msg.msg_bounce with
-       | Some true -> Printf.printf "    bounce: true\n%!" | _ -> ());
+       | Some true -> Printf.fprintf oc "    bounce: true\n%!" | _ -> ());
       (match msg.msg_bounced with
-       | Some true -> Printf.printf "    bounced: true\n%!" | _ -> ());
+       | Some true -> Printf.fprintf oc "    bounced: true\n%!" | _ -> ());
       ( match msg.msg_code_hash with
        | None -> ()
        | Some msg_code_hash ->
-           Printf.printf "   code_hash: %s\n%!" msg_code_hash );
+           Printf.fprintf oc "   code_hash: %s\n%!" msg_code_hash );
       ( match msg.msg_data_hash with
        | None -> ()
        | Some msg_data_hash ->
-           Printf.printf "   code_hash: %s\n%!" msg_data_hash );
-      Printf.printf "    type name: %s\n%!" msg_type_name;
-      Printf.printf "    status name: %s\n%!" msg_status_name;
+           Printf.fprintf oc "   code_hash: %s\n%!" msg_data_hash );
+      Printf.fprintf oc "    type name: %s\n%!" msg_type_name;
+      Printf.fprintf oc "    status name: %s\n%!" msg_status_name;
       if out then
-        Printf.printf "    dst: %s\n%!" msg.msg_dst
+        Printf.fprintf oc "    dst: %s\n%!" msg.msg_dst
       else
-        Printf.printf "    src: %s\n%!" msg.msg_src;
-      if_z "value" msg.msg_value;
-      if_z "ihr_fee" msg.msg_ihr_fee;
-      if_z "fwd_fee" msg.msg_fwd_fee;
-      if_z "import_fee" msg.msg_import_fee;
+        Printf.fprintf oc "    src: %s\n%!" msg.msg_src;
+      if_z ~oc "value" msg.msg_value;
+      if_z ~oc "ihr_fee" msg.msg_ihr_fee;
+      if_z ~oc "fwd_fee" msg.msg_fwd_fee;
+      if_z ~oc "import_fee" msg.msg_import_fee;
 
   | _ ->
-      Printf.printf "  MESSAGE%s %s\n%!"
+      Printf.fprintf oc "  MESSAGE%s %s\n%!"
         (if out then " OUT" else "")
         (ENCODING.string_of_message msg)
 
@@ -105,7 +105,7 @@ let args_of_json json =
       in
       map [ "arg" ] json
 
-let check_message ~block_id ~tr_id
+let check_message ~oc ~block_id ~tr_id
     config ~abi client ?(out=false) ~level ~on_event msg_id =
   match abi with
   | None -> ()
@@ -116,11 +116,11 @@ let check_message ~block_id ~tr_id
             match level with
             | 0 -> ()
             | 3 ->
-                Printf.printf "  MESSAGE%s: %s\n%!"
+                Printf.fprintf oc "  MESSAGE%s: %s\n%!"
                   (if out then " OUT" else "")
                   ( ENCODING.string_of_message msg )
             | _ ->
-                display_message ~out msg
+                display_message ~oc ~out msg
           end ;
           begin (* decode_message only works when there is a msg_body too *)
             match msg.msg_body with
@@ -133,7 +133,7 @@ let check_message ~block_id ~tr_id
                       let decoded =
                         BLOCK.decode_message_boc ~client ~boc ~abi in
                       if level > 0 then
-                        Printf.printf "  CALL: %s %s %s\n%!"
+                        Printf.fprintf oc "  CALL: %s %s %s\n%!"
                           (match decoded.body_type with
                            | 0 -> "Input"
                            | 1 -> "Output"
@@ -158,12 +158,12 @@ let check_message ~block_id ~tr_id
                       end ;
 
                     with exn ->
-                      Printf.eprintf "exn: %s for boc = %S\n%!"
+                      Printf.fprintf oc "exn: %s for boc = %S\n%!"
                         (Printexc.to_string exn) boc
           end
       | _ -> assert false
 
-let display_transaction tr =
+let display_transaction ~oc tr =
   match tr with
   | {
     tr_id ;
@@ -175,26 +175,30 @@ let display_transaction tr =
     tr_tr_type_name = Some tr_type_name ;
     _
   } ->
-      Printf.printf "\nTRANSACTION %S\n%!" tr_id ;
-      if tr_aborted then Printf.printf "  aborted: true\n%!";
-      if tr_destroyed then Printf.printf "  destroyed: true\n%!";
-      Printf.printf "  balance delta: %s\n%!"
+      Printf.fprintf oc "\nTRANSACTION %S\n%!" tr_id ;
+      if tr_aborted then Printf.fprintf oc "  aborted: true\n%!";
+      if tr_destroyed then Printf.fprintf oc "  destroyed: true\n%!";
+      Printf.fprintf oc "  balance delta: %s\n%!"
         (ton_of_z tr_balance_delta);
-      Printf.printf "  total fees: %s\n%!"
+      Printf.fprintf oc "  total fees: %s\n%!"
         (ton_of_z tr_total_fees);
-      Printf.printf "  end_status_name: %s\n%!" tr_end_status_name;
-      Printf.printf "  status_name: %s\n%!" tr_status_name;
-      Printf.printf "  type_name: %s\n%!" tr_type_name;
+      Printf.fprintf oc "  end_status_name: %s\n%!" tr_end_status_name;
+      Printf.fprintf oc "  status_name: %s\n%!" tr_status_name;
+      Printf.fprintf oc "  type_name: %s\n%!" tr_type_name;
 
   | _ -> assert false
 
-let action ~account ?block_id ?timeout ~level ~on_event () =
+let action ~account ?block_id ?timeout ~level ~on_event ?output () =
   match account with
   | None -> assert false
   | Some account ->
+      let oc = match output with
+        | None -> stdout
+        | Some file -> open_out file
+      in
       let config = Config.config () in
       let address = Utils.address_of_account config account in
-      Printf.eprintf "Watching account %s\n%!" address;
+      Printf.fprintf oc "Watching account %s\n%!" address;
       let abi = Utils.abi_of_account config account in
       let node = Config.current_node config in
       let client = CLIENT.create node.node_url in
@@ -203,7 +207,7 @@ let action ~account ?block_id ?timeout ~level ~on_event () =
             BLOCK.find_last_shard_block ~client ~address
         | Some block_id -> block_id
       in
-      Printf.eprintf "initial block_id: %S\n%!" block_id ;
+      Printf.fprintf oc "initial block_id: %S\n%!" block_id ;
       begin
         match on_event with
         | None -> ()
@@ -218,9 +222,9 @@ let action ~account ?block_id ?timeout ~level ~on_event () =
             ~client ~block_id ~address
             ?timeout () in
         let block_id = b.id in
-        Printf.eprintf "new block_id: %S\n%!" b.id;
+        Printf.fprintf oc "new block_id: %S\n%!" b.id;
         if !Globals.verbosity > 1 then
-          Printf.eprintf "block = %s\n%!"
+          Printf.fprintf oc "block = %s\n%!"
             (Ton_sdk.TYPES.string_of_block b) ;
         begin
           match
@@ -233,22 +237,22 @@ let action ~account ?block_id ?timeout ~level ~on_event () =
           | [] -> ()
           | trs ->
               if level > 0 then
-                Printf.eprintf "In block with id: %S\n%!" b.id;
+                Printf.fprintf oc "In block with id: %S\n%!" b.id;
               List.iter (fun tr ->
                   begin match level with
                     | 0 -> ()
                     | 3 ->
-                        Printf.eprintf "\nTRANSACTION: %s\n%!"
+                        Printf.fprintf oc "\nTRANSACTION: %s\n%!"
                           (ENCODING.string_of_transaction tr)
                     | _ ->
-                        display_transaction tr
+                        display_transaction ~oc tr
                   end ;
                   let tr_id = tr.tr_id in
-                  check_message ~block_id ~tr_id
+                  check_message ~oc ~block_id ~tr_id
                     config ~abi ton tr.tr_in_msg ~level
                     ~on_event:None;
                   List.iter (fun id ->
-                      check_message ~block_id ~tr_id
+                      check_message ~oc ~block_id ~tr_id
                         ~out:true config ~abi ton id ~level
                         ~on_event)
                     tr.tr_out_msgs
@@ -264,6 +268,7 @@ let cmd =
   let timeout = ref (Some 2_000_000) in (* 25 days ? *)
   let level = ref 1 in
   let on_event = ref None in
+  let output = ref None in
   EZCMD.sub
     "watch"
     (fun () ->
@@ -273,10 +278,14 @@ let cmd =
          ?timeout:!timeout
          ~level:!level
          ~on_event:!on_event
+         ?output:!output
          ()
     )
     ~args:
       [
+        [ "o" ; "output" ], Arg.String (fun s -> output := Some s),
+        EZCMD.info ~docv:"FILE" "Output to FILE";
+
         [ "0" ], Arg.Unit (fun () -> level := 0),
         EZCMD.info "Verbosity level none";
 
@@ -284,19 +293,20 @@ let cmd =
         EZCMD.info "Verbosity level 3";
 
         [ "account" ], Arg.String (fun s -> account := Some s),
-        EZCMD.info "ACCOUNT Output account of account";
+        EZCMD.info ~docv:"ACCOUNT" "Watch account ACCOUNT";
 
         [ "from" ], Arg.String (fun s -> block_id := Some s),
-        EZCMD.info "ID Start with block_id ID";
+        EZCMD.info ~docv:"BLOCKID" "Start with block identifier BLOCKID";
 
         [ "timeout" ], Arg.Int (fun s ->
             if s > 2_000_000 then
               Error.raise "--timeout cannot exceed 2_000_000 seconds";
             timeout := Some s),
-        EZCMD.info "TIMEOUT Timeout in seconds";
+        EZCMD.info ~docv:"TIMEOUT" "Timeout in seconds (default is 25 days)";
 
         [ "on-event" ], Arg.String (fun cmd -> on_event := Some cmd),
-        EZCMD.info {|CMD Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`|};
+        EZCMD.info ~docv:"CMD"
+          {|Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`|};
 
       ]
     ~doc: "Monitor a given account"

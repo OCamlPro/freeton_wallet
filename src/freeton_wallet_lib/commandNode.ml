@@ -77,30 +77,14 @@ let action ~todo =
                 if force then
                   Error.raise "Key %S has no address\n%!" key.key_name
             | Some { acc_address ; acc_contract ; _ } ->
-                let give, deploy =
-                  match
-                    Utils.post config
-                      (Ton_sdk.REQUEST.account acc_address)
-                  with
-                    [] -> true, true
-                  | [ acc ] ->
-                      let give =
-                        match acc.acc_balance with
-                        | None -> true
-                        | Some z ->
-                            z < Z.of_int amount
-                      in
-                      let deploy =
-                        match acc.acc_type_name with
-                        | Some "Uninit" (* 0 *) -> true
-                        | _ -> false
-                      in
-                      give, deploy
-                  | _ -> assert false
+                let exists, balance =
+                  match Utils.get_account_info config acc_address with
+                  | None -> false, Z.zero
+                  | Some ( exists, balance ) -> exists, balance
                 in
-                if give then
+                if balance < Z.of_int amount then
                   to_give := (acc_address, key) :: !to_give ;
-                if deploy then
+                if not exists then
                   to_deploy := (acc_contract, key) :: !to_deploy
           in
           let config = Config.config () in

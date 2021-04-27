@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.2.3)
+(version 0.2.4)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -25,6 +25,7 @@
  (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
  (depends
    (ocaml (>= 4.08.0))
+   (lwt_ssl ( >= 1.1 ))
    (freeton_ocaml_sdk (and (>= 0.2.3) (< 1.0.0)))
    ezjsonm
    (ez_subst ( >= 0.1 ))

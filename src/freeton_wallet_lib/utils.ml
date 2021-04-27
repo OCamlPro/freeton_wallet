@@ -155,15 +155,20 @@ let post config req =
   | Ok r -> r
   | Error exn -> raise exn
 
-let address_of_account config account =
+let is_address account =
   let _wc, addr = EzString.cut_at account ':' in
   let len = String.length addr in
   if len <> 0 then
-    account ^ String.make (64 - len) '0'
-  else
-    let net = Config.current_network config in
-    let key = Misc.find_key_exn net account in
-    Misc.get_key_address_exn key
+    Some ( account ^ String.make (64 - len) '0' )
+  else None
+
+let address_of_account config account =
+  match is_address account with
+  | Some address -> address
+  | None ->
+      let net = Config.current_network config in
+      let key = Misc.find_key_exn net account in
+      Misc.get_key_address_exn key
 
 
 let abi_of_account config account =
@@ -175,3 +180,23 @@ let abi_of_account config account =
     let contract = Misc.get_key_contract_exn key in
     let filename = Misc.get_contract_abifile contract in
     Some ( EzFile.read_file filename )
+
+let get_account_info config address =
+
+  let result = post config
+      (Ton_sdk.REQUEST.account ~level:1 address ) in
+  match result with
+  | [ acc ] ->
+      let balance =
+        match acc.acc_balance with
+        | None -> assert false
+        | Some z -> z
+      in
+      let exists =
+        match acc.acc_type_name with
+        | Some "Uninit" (* 0 *) -> false
+        | _ -> true
+      in
+      Some ( exists, balance )
+  | [] -> None
+  | _ -> assert false

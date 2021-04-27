@@ -43,7 +43,7 @@ let check_exists dirname file =
     else
       Error.raise "File %s was not generated" file
 
-let action ~todo ~force ~sign ~params ~wc ~create =
+let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
   match todo with
   | ListContracts ->
       CommandList.list_contracts ()
@@ -129,40 +129,44 @@ let action ~todo ~force ~sign ~params ~wc ~create =
       let net = Config.current_network config in
       let create =
         match create with
-        | ReplaceAccount sign ->
-            Misc.delete_account config net sign;
-            CreateAccount sign
+        | ReplaceAccount dst ->
+            Misc.delete_account config net dst;
+            CreateAccount dst
         | UseAccount | CreateAccount _ -> create
       in
-      let sign =
-        match create with
-        | CreateAccount sign ->
+      let dst =
+        match create, dst with
+        | CreateAccount _, Some _ ->
+            Error.raise "--create/--replace and --dst are incompatible"
+        | CreateAccount dst, None ->
             Printf.eprintf "Generating new key\n%!";
-            CommandAccount.genkey ~name:sign ~contract:contract config;
-            Printf.eprintf "Sending 1 TON from deployer %S\n%!"
-              net.net_deployer;
+            CommandAccount.genkey ~name:dst ~contract:contract config;
+            let deployer = match deployer with
+              | None -> net.net_deployer
+              | Some deployer -> deployer
+            in
+            Printf.eprintf "Sending 1 TON from deployer %S\n%!" deployer;
             CommandMultisig.send_transfer
-              ~src:net.net_deployer
-              ~dst:sign
+              ~account:deployer
+              ~dst
               ~amount:"1" ();
             Config.save config;
-            sign
-        | ReplaceAccount _ -> assert false
-        | UseAccount ->
-            match sign with
-            | None -> Error.raise "--deploy CONTRACT requires --sign SIGNER"
-            | Some sign -> sign
+            dst
+        | ReplaceAccount _, _ -> assert false
+        | UseAccount, None ->
+            Error.raise "--deploy requires --dst, --create or --replace"
+        | UseAccount, Some dst -> dst
       in
-      let key = Misc.find_key_exn net sign in
+      let key = Misc.find_key_exn net dst in
       begin
         match key.key_account with
         | Some { acc_contract = Some acc_contract ; _ } ->
             if acc_contract <> contract then
-              Error.raise "Wrong contract %S for signer %S" acc_contract sign
+              Error.raise "Wrong contract %S for dest %S" acc_contract dst
         | _ -> ()
       end;
       Subst.with_substituted config params (fun params ->
-          Printf.eprintf "Deploying contract %S to %s\n%!" contract sign;
+          Printf.eprintf "Deploying contract %S to %s\n%!" contract dst;
           Utils.deploy_contract config ~key ~contract ~params ~wc ())
 
 
@@ -284,10 +288,11 @@ let cmd =
   in
   let can_skip_todo = ref false in
   let force = ref false in
-  let signer = ref None in
+  let dst = ref None in
   let params = ref "{}" in
   let wc = ref None in
   let create = ref UseAccount in
+  let deployer = ref None in
   EZCMD.sub
     "contract"
     (fun () ->
@@ -295,10 +300,11 @@ let cmd =
          with_todo (fun todo ->
              action
                ~todo ~force:!force
-               ~sign:!signer
+               ~dst:!dst
                ~params:!params
                ~wc:!wc
                ~create:!create
+               ~deployer:!deployer
            )
     )
     ~args:
@@ -334,9 +340,12 @@ let cmd =
           ),
         EZCMD.info "CONTRACT Deploy contract CONTRACT";
 
-        [ "sign" ], Arg.String (fun s ->
-            signer := Some s),
-        EZCMD.info "ACCOUNT Sign with account ACCOUNT";
+        [ "dst" ; "sign" ], Arg.String (fun s ->
+            dst := Some s),
+        EZCMD.info "Deploy to this account, using the existing keypair";
+
+        [ "deployer" ], Arg.String (fun s -> deployer := Some s),
+        EZCMD.info "Deployer is this account (pays creation fees)";
 
         [ "params" ], Arg.String (fun s ->
             params := s),

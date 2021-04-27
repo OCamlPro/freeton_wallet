@@ -88,7 +88,7 @@ let create_multisig
     ?(not_owner=false)
     ?(req=1)
     ?wc
-    ?(contract="SafeMultisigWallet")
+    ?contract
     account
   =
   let config = Config.config () in
@@ -126,26 +126,41 @@ let create_multisig
       req
   in
   let key = Misc.find_key_exn net account in
-  let _contract = check_key_contract key in
 
-  begin
+  let contract =
     match key.key_account with
-    | None -> ()
+    | None ->
+        begin
+          match contract with
+          | None -> "SafeMultisigWallet"
+          | Some contract -> contract
+        end
     | Some acc ->
         begin
-          match acc.acc_contract with
+          match wc with
           | None -> ()
-          | Some c ->
-              if not (is_multisig_contract contract) then
-                Error.raise {|Account %s uses a different contract %S. Clear it with 'ft account %s --contract ""|} key.key_name c key.key_name
-        end;
-        match wc with
-        | None -> ()
-        | Some _ ->
-            if Misc.string_of_workchain wc <>
-               Misc.string_of_workchain  acc.acc_workchain then
-              Error.raise {|Account address uses a different workchain. Clear it with  'ft account %s --contract ""|} key.key_name
-  end;
+          | Some _ ->
+              if Misc.string_of_workchain wc <>
+                 Misc.string_of_workchain  acc.acc_workchain then
+                Error.raise {|Account address uses a different workchain. Clear it with  'ft account %s --contract ""|} key.key_name
+        end ;
+        match acc.acc_contract with
+        | None ->
+            begin
+              match contract with
+              | None -> "SafeMultisigWallet"
+              | Some contract -> contract
+            end
+        | Some acc_contract ->
+            match contract with
+            | None -> acc_contract
+            | Some contract ->
+                if contract <> acc_contract then
+                  Error.raise {|Account %s uses a different contract %S. Clear it with 'ft account %s --contract ""|} key.key_name acc_contract key.key_name ;
+                contract
+  in
+  if not (is_multisig_contract contract) then
+    Error.raise {|Contract %s is not a multisig contract|} contract;
 
   let wc = match wc with
     | Some _ -> wc
@@ -158,14 +173,52 @@ let create_multisig
 
   Utils.deploy_contract config ~key ~contract ~params ~wc ?client ()
 
-let send_transfer ~src ~dst ~amount ?(bounce=false) ?(args=[]) () =
+let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
   let config = Config.config () in
   let net = Config.current_network config in
+
+  let src = match src with
+      None -> account
+    | Some src -> src
+  in
   let src_key = Misc.find_key_exn net src in
-  let src_addr = Misc.get_key_address_exn src_key in
-  let contract = check_key_contract src_key in
-  let dst_key = Misc.find_key_exn net dst in
-  let dst_addr = Misc.get_key_address_exn dst_key in
+
+  let account_addr, account_contract =
+    match Utils.is_address account with
+    | Some address -> address, "SafeMultisigWallet"
+    | None ->
+        let account_key = Misc.find_key_exn net account in
+        let account_addr = Misc.get_key_address_exn account_key in
+        let account_contract = check_key_contract account_key in
+        ( account_addr, account_contract )
+  in
+  let dst_addr = Utils.address_of_account config dst in
+
+  let nanotokens, allBalance =
+    if amount = "all" then
+      0L, true
+    else
+      Misc.nanotokens_of_string amount, false
+  in
+
+  begin match Utils.get_account_info config account_addr with
+    | Some (account_exists, account_balance) ->
+        if not account_exists then
+          Error.raise "Account %s does not exist yet." account ;
+        if ( not allBalance ) && Z.of_int64 nanotokens >= account_balance then
+          Error.raise
+            "Balance %s nanotons of account %s is smaller than transferred amount %s"
+            (Z.to_string account_balance) account amount
+    | None ->
+        Error.raise "Account %s does not exist yet." account
+  end;
+
+  let dst_exists = match Utils.get_account_info config dst_addr with
+      Some (dst_exists, _ ) -> dst_exists
+    | None -> false
+  in
+  if bounce && not dst_exists then
+    Error.raise "Destination does not exist. Use --parrain option";
 
   let args = match args with
     | [ meth ; params ] -> Some ( meth, params )
@@ -176,6 +229,7 @@ let send_transfer ~src ~dst ~amount ?(bounce=false) ?(args=[]) () =
   in
   let payload = match args with
     | Some ( meth , params ) ->
+        let dst_key = Misc.find_key_exn net dst in
         let dst_contract = Misc.get_key_contract_exn dst_key in
         let abi_file = Misc.get_contract_abifile dst_contract in
         let abi = EzFile.read_file abi_file in
@@ -184,12 +238,6 @@ let send_transfer ~src ~dst ~amount ?(bounce=false) ?(args=[]) () =
   in
 
   let params =
-    let nanotokens, allBalance =
-      if amount = "all" then
-        0L, true
-      else
-        Misc.nanotokens_of_string amount, false
-    in
     Printf.sprintf
       {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":"%s"}|}
       dst_addr
@@ -199,19 +247,23 @@ let send_transfer ~src ~dst ~amount ?(bounce=false) ?(args=[]) () =
       payload
   in
   let meth = "submitTransaction" in
-  Utils.call_contract config ~contract
-    ~address:src_addr
+  Utils.call_contract config ~contract:account_contract
+    ~address:account_addr
     ~meth ~params
     ~local:false
     ~src:src_key
     ()
 
-let send_confirm account ~tx_id =
+let send_confirm ~account ?src ~tx_id () =
   let config = Config.config () in
   let net = Config.current_network config in
-  let src_key = Misc.find_key_exn net account in
-  let src_addr = Misc.get_key_address_exn src_key in
-  let contract = check_key_contract src_key in
+  let address = Utils.address_of_account config account in
+  let src = match src with
+      None -> account
+    | Some src -> src
+  in
+  let src = Misc.find_key_exn net src in
+  let contract = "SafeMultisigWallet" in
 
   let meth = "confirmTransaction" in
   let params =
@@ -220,14 +272,14 @@ let send_confirm account ~tx_id =
   in
 
   Utils.call_contract config ~contract
-    ~address:src_addr
+    ~address
     ~meth ~params
     ~local:false
-    ~src:src_key
+    ~src
     ()
 
 let action account args ~create ~req ~not_owner ~custodians ~waiting
-    ~transfer ~dst ~bounce ~confirm ?wc ~debot ~contract =
+    ~transfer ~dst ~bounce ~confirm ?wc ~debot ~contract ~src =
 
   let config = Config.config () in
   if debot then begin
@@ -249,12 +301,12 @@ let action account args ~create ~req ~not_owner ~custodians ~waiting
 
   Subst.with_substituted_list config args (fun args ->
       if create then
-        create_multisig account ~accounts:args ~not_owner ~req ?wc ~contract ;          if custodians then
+        create_multisig account ~accounts:args ~not_owner ~req ?wc ?contract ;          if custodians then
         get_custodians account ;
       begin
         match transfer, dst with
         | Some amount, Some dst ->
-            send_transfer ~src:account ~dst ~bounce ~amount ~args ()
+            send_transfer ~account ?src ~dst ~bounce ~amount ~args ()
         | None, None ->
             ()
         | _ ->
@@ -266,13 +318,14 @@ let action account args ~create ~req ~not_owner ~custodians ~waiting
         match confirm with
         | None -> ()
         | Some tx_id ->
-            send_confirm account ~tx_id
+            send_confirm ~account ~tx_id ?src ()
       end;
       ()
     )
+
 let cmd =
   let args = ref [] in
-  let contract = ref "SafeMultisigWallet" in
+  let contract = ref None in
   let account = ref None in
 
   let create = ref false in
@@ -283,6 +336,7 @@ let cmd =
 
   let wc = ref None in
 
+  let src = ref None in
   let transfer = ref None in
   let dst = ref None in
   let bounce = ref true in
@@ -301,6 +355,7 @@ let cmd =
          ~dst:!dst
          ~bounce:!bounce
          ~confirm:!confirm
+         ~src:!src
          ?wc:!wc
          ~debot:!debot
          ~contract:!contract
@@ -311,6 +366,9 @@ let cmd =
         EZCMD.info "Generic arguments" ;
 
         [ "a" ; "account" ], Arg.String (fun s -> account := Some s),
+        EZCMD.info "ACCOUNT The multisig account";
+
+        [ "src" ], Arg.String (fun s -> src := Some s),
         EZCMD.info "ACCOUNT The multisig account";
 
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
@@ -336,11 +394,11 @@ let cmd =
         [ "confirm" ], Arg.String (fun s -> confirm := Some s),
         EZCMD.info "TX_ID Confirm transaction";
 
-        [ "contract" ], Arg.String (fun s -> contract := s),
+        [ "contract" ], Arg.String (fun s -> contract := Some s),
         EZCMD.info "CONTRACT Use this contract";
 
         [ "surf" ], Arg.Unit (fun () ->
-            contract := "SetcodeMultisigWallet2"),
+            contract := Some "SetcodeMultisigWallet2"),
         EZCMD.info "Use Surf contract";
 
         [ "req" ], Arg.Int (fun s -> req := s),
