@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (918bcd2
-) (2021/04/23 22:24) documentation</title>
+ (aa6506b
+) (2021/04/27 16:12) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (918bcd2
+ (aa6506b
 )
               </div>
             
@@ -382,6 +382,8 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--build</span> <span class="pre">STRING</span></code>   Build a contract and remember it</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--create</span> <span class="pre">STRING</span></code>   ACCOUNT Create ACCOUNT by deploying contract (with –deploy)</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--deploy</span> <span class="pre">STRING</span></code>   CONTRACT Deploy contract CONTRACT</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--deployer</span> <span class="pre">STRING</span></code>   Deployer is this account (pays creation fees)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--dst</span> <span class="pre">STRING</span></code> or <code class="code docutils literal notranslate"><span class="pre">--sign</span> <span class="pre">STRING</span></code>   Deploy to this account, using the existing keypair</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--force</span></code>   Override existing contracts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--import</span> <span class="pre">STRING</span></code>   CONTRACT Deploy contract CONTRACT</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--list</span></code>   List known contracts</li>
@@ -389,7 +391,6 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--newi</span> <span class="pre">STRING</span></code>   NAME Create template file for interface NAME</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--params</span> <span class="pre">STRING</span></code>   PARAMS Constructor/call Arguments ({} by default)</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--replace</span> <span class="pre">STRING</span></code>   ACCOUNT Replace ACCOUNT when deploying contract (with –deploy)</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--sign</span> <span class="pre">STRING</span></code>   ACCOUNT Sign with account ACCOUNT</li>
 </ul>
 </div>
 <div class="section" id="drom-genaddr">
@@ -537,6 +538,7 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--not-owner</span></code>    Initial account should not be an owner</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--parrain</span></code>    Transfer to inactive account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--req</span> <span class="pre">INT</span></code>   REQ Number of confirmations required</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">STRING</span></code>   ACCOUNT The multisig account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--surf</span></code>   Use Surf contract</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--to</span> <span class="pre">STRING</span></code>   ACCOUNT Target of a transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--transfer</span> <span class="pre">STRING</span></code>   AMOUNT Transfer this amount</li>
@@ -628,10 +630,11 @@ Delete existing accounts</li>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">-0</span></code>   Verbosity level none</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-3</span></code>   Verbosity level 3</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--account</span> <span class="pre">STRING</span></code>   ACCOUNT Output account of account</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--from</span> <span class="pre">STRING</span></code>   ID Start with block_id ID</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--on-event</span> <span class="pre">STRING</span></code>   CMD Call CMD on event emitted. Called once on startup as <cite>CMD &lt;block_id&gt; start</cite> and after every emitted event as <cite>CMD &lt;block_id&gt; &lt;tr_id&gt; &lt;event_name&gt; &lt;args&gt;</cite></li>
-<li><code class="code docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">INT</span></code>   TIMEOUT Timeout in seconds</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--account</span> <span class="pre">ACCOUNT</span></code>   Watch account ACCOUNT</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--from</span> <span class="pre">BLOCKID</span></code>   Start with block identifier BLOCKID</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code>   Output to FILE</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--on-event</span> <span class="pre">CMD</span></code>   Call CMD on event emitted. Called once on startup as <cite>CMD &lt;block_id&gt; start</cite> and after every emitted event as <cite>CMD &lt;block_id&gt; &lt;tr_id&gt; &lt;event_name&gt; &lt;args&gt;</cite></li>
+<li><code class="code docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">TIMEOUT</span></code>   Timeout in seconds (default is 25 days)</li>
 </ul>
 </div>
 </div>
