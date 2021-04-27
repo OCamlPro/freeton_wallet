@@ -229,7 +229,8 @@ let whois address =
           | exception Not_found -> ()
           | _ ->
               Printf.printf "%s is %S\n%!" acc.acc_address key.key_name)
-    net.net_keys
+    net.net_keys ;
+  exit 0
 
 let gen_passphrase config =
   if Globals.use_ton_sdk then
