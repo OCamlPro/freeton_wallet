@@ -54,6 +54,7 @@ ez_subst = ">=0.1"
 freeton_ocaml_sdk = "0.2.3"
 ezjsonm = ""
 lwt_ssl = "1.1"
+calendar = "2"
 
 # package tools dependencies
 [tools]

@@ -93,8 +93,12 @@ let call_contract
                )
     )
 
-let deploy_contract config ~key ~contract ~params ~wc ?client () =
-  match key.key_pair with
+let deploy_contract config ~key ?sign ~contract ~params ~wc ?client () =
+  let sign = match sign with
+    | None -> key
+    | Some sign -> sign
+  in
+  match sign.key_pair with
   | None -> Error.raise "Key has no secret key"
   | Some keypair ->
       Misc.with_contract contract

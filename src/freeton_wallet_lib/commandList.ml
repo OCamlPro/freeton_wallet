@@ -26,7 +26,7 @@ let known_contracts () =
 
   Array.iter (fun file ->
       match EzString.split (Filename.basename file) '.' with
-      | [ name ; "tvm" ] ->
+      | [ name ; "tvc" ] ->
           contracts := StringMap.add name
               ( Globals.contracts_dir // file ) !contracts
       | _ -> ()

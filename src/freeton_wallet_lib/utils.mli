@@ -28,6 +28,7 @@ val post :
 val deploy_contract :
   Types.config ->
   key:Types.key ->
+  ?sign:Types.key ->
   contract:string -> params:string -> wc:int option ->
   ?client:Ton_types.client ->
   unit -> unit
