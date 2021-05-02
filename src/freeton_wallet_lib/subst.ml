@@ -15,6 +15,10 @@ open Ez_subst.V1
 open Ezcmd.V2
 open EZCMD.TYPES
 
+let date_of_int date =
+  let date = CalendarLib.Calendar.from_unixfloat (float_of_int date) in
+  CalendarLib.Printer.Calendar.sprint "%Y-%m-%dT%H:%M:%SZ" date
+
 let rec date_now now rem =
   match rem with
   | [] -> now
@@ -157,6 +161,9 @@ let subst_string ?brace config =
 
     | "now" :: rem ->
         string_of_int (
+          date_now (int_of_float (Unix.gettimeofday ())) rem )
+    | "date" :: rem ->
+        date_of_int (
           date_now (int_of_float (Unix.gettimeofday ())) rem )
 
 

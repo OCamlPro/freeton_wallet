@@ -17,7 +17,7 @@ open EzFile.OP
 open Types
 
 type create =
-  | UseAccount
+  | UseAccount of string
   | CreateAccount of string
   | ReplaceAccount of string
 
@@ -43,7 +43,7 @@ let check_exists dirname file =
     else
       Error.raise "File %s was not generated" file
 
-let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
+let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   match todo with
   | ListContracts ->
       CommandList.list_contracts ()
@@ -98,7 +98,6 @@ let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
         src, "sol";
         src, "cpp";
         src, "hpp";
-
       ] in
       List.iter (fun (kind, ext) ->
           let filename = Filename.concat dirname (name ^ "." ^ ext) in
@@ -128,19 +127,48 @@ let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
       let config = Config.config () in
       let net = Config.current_network config in
       let create =
-        match create with
-        | ReplaceAccount dst ->
+        match create, sign with
+        | None, _ -> CreateAccount contract
+        | Some ( ReplaceAccount dst ), _ ->
             Misc.delete_account config net dst;
             CreateAccount dst
-        | UseAccount | CreateAccount _ -> create
+        | Some ( UseAccount _ ), Some _ ->
+            Error.raise "--dst and --sign cannot be used together"
+        | Some ( UseAccount dst ), None -> UseAccount dst
+        | Some ( CreateAccount dst ), _ -> CreateAccount dst
       in
-      let dst =
-        match create, dst with
-        | CreateAccount _, Some _ ->
-            Error.raise "--create/--replace and --dst are incompatible"
-        | CreateAccount dst, None ->
-            Printf.eprintf "Generating new key\n%!";
-            CommandAccount.genkey ~name:dst ~contract:contract config;
+      let dst, sign =
+        match create with
+        | CreateAccount dst ->
+            Misc.check_new_key_exn net dst;
+            Printf.eprintf "Generating new key %S\n%!" dst;
+            let sign =
+              match sign with
+              | None ->
+                  CommandAccount.genkey ~name:dst ~contract config;
+                  None
+              | Some sign ->
+                  let sign = Misc.find_key_exn net sign in
+                  let key_pair = match sign.key_pair with
+                    | None ->
+                        Error.raise "--sign KEY where KEY has no key pair"
+                    | Some key_pair -> key_pair
+                  in
+                  let acc_address =
+                    CommandAccount.gen_address config key_pair contract ~wc:None
+                  in
+                  let key_account = Some {
+                      acc_address ;
+                      acc_contract = Some contract ;
+                      acc_workchain = None;
+                  } in
+                  let key = { key_name = dst ;
+                              key_account = key_account ;
+                              key_passphrase = None ;
+                              key_pair = None } in
+                  net.net_keys <- key :: net.net_keys ;
+                  Some sign
+            in
             let deployer = match deployer with
               | None -> net.net_deployer
               | Some deployer -> deployer
@@ -151,11 +179,9 @@ let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
               ~dst
               ~amount:"1" ();
             Config.save config;
-            dst
-        | ReplaceAccount _, _ -> assert false
-        | UseAccount, None ->
-            Error.raise "--deploy requires --dst, --create or --replace"
-        | UseAccount, Some dst -> dst
+            dst, sign
+        | ReplaceAccount _ -> assert false
+        | UseAccount dst -> dst, None
       in
       let key = Misc.find_key_exn net dst in
       begin
@@ -165,10 +191,13 @@ let action ~todo ~force ~dst ~params ~wc ~create ~deployer =
               Error.raise "Wrong contract %S for dest %S" acc_contract dst
         | _ -> ()
       end;
+      let sign = match sign with
+        | None -> key
+        | Some sign -> sign
+      in
       Subst.with_substituted config params (fun params ->
           Printf.eprintf "Deploying contract %S to %s\n%!" contract dst;
-          Utils.deploy_contract config ~key ~contract ~params ~wc ())
-
+          Utils.deploy_contract config ~key ~sign ~contract ~params ~wc ())
 
 let tab = '\t'
 
@@ -288,11 +317,11 @@ let cmd =
   in
   let can_skip_todo = ref false in
   let force = ref false in
-  let dst = ref None in
   let params = ref "{}" in
   let wc = ref None in
-  let create = ref UseAccount in
+  let create = ref None in
   let deployer = ref None in
+  let sign = ref None in
   EZCMD.sub
     "contract"
     (fun () ->
@@ -300,11 +329,12 @@ let cmd =
          with_todo (fun todo ->
              action
                ~todo ~force:!force
-               ~dst:!dst
                ~params:!params
                ~wc:!wc
-               ~create:!create
+               ?create:!create
+               ?sign:!sign
                ~deployer:!deployer
+               ()
            )
     )
     ~args:
@@ -320,10 +350,11 @@ let cmd =
             create_interface name),
         EZCMD.info "NAME Create template file for interface NAME";
 
-        [ "list" ], Arg.Unit (fun () -> set_todo "--list" ListContracts ),
+        [ "list" ], Arg.Unit (fun () ->
+            set_todo "--list" ListContracts ),
         EZCMD.info "List known contracts";
 
-        [ "force" ], Arg.Set force,
+        [ "force" ; "f" ], Arg.Set force,
         EZCMD.info "Override existing contracts";
 
         [ "build"], Arg.String (fun filename ->
@@ -333,16 +364,18 @@ let cmd =
         [ "deploy" ], Arg.String (fun contract ->
             set_todo "--deploy" (DeployContract contract)
           ),
-        EZCMD.info "CONTRACT Deploy contract CONTRACT";
+        EZCMD.info ~docv:"CONTRACT" "Deploy contract CONTRACT";
 
         [ "import" ], Arg.String (fun contract ->
             set_todo "--import" (ImportContract contract)
           ),
         EZCMD.info "CONTRACT Deploy contract CONTRACT";
 
-        [ "dst" ; "sign" ], Arg.String (fun s ->
-            dst := Some s),
+        [ "dst" ], Arg.String (fun s -> create := Some (UseAccount s) ),
         EZCMD.info "Deploy to this account, using the existing keypair";
+
+        [ "sign" ], Arg.String (fun s -> sign := Some s),
+        EZCMD.info "Deploy using this keypair";
 
         [ "deployer" ], Arg.String (fun s -> deployer := Some s),
         EZCMD.info "Deployer is this account (pays creation fees)";
@@ -351,11 +384,55 @@ let cmd =
             params := s),
         EZCMD.info "PARAMS Constructor/call Arguments ({} by default)";
 
-        [ "create" ], Arg.String (fun s -> create := CreateAccount s),
+        [ "create" ], Arg.String (fun s -> create := Some (CreateAccount s) ),
         EZCMD.info "ACCOUNT Create ACCOUNT by deploying contract (with --deploy)";
 
-        [ "replace" ], Arg.String (fun s -> create := ReplaceAccount s),
+        [ "replace" ], Arg.String (fun s -> create := Some (ReplaceAccount s) ),
         EZCMD.info "ACCOUNT Replace ACCOUNT when deploying contract (with --deploy)";
 
       ]
     ~doc: "Manage contracts"
+    ~man:[
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "This command can perform the following actions:";
+        `I ("1.", "Build a Solidity contract and store it in the contract database");
+        `I ("2.", "List known contracts in the contract database");
+        `I ("3.", "Import a contract into the contract database");
+        `I ("4.", "Deploy a known contract to the blockchain");
+      ];
+      `S "BUILD A CONTRACT";
+      `Blocks [
+        `P "Example:";
+        `Pre {|ft contract --build Foobar.sol|};
+        `P "After this command, the contract will be known as 'Foobar' in the contract database";
+      ];
+      `S "LIST KNOWN CONTRACTS";
+      `Blocks [
+        `P "Example:";
+        `Pre {|ft contract --list|};
+        `P "List all known contracts: embedded contracts are contracts that are natively known by 'ft', other contracts are stored in $HOME/.ft/contracts, and were either built or imported by 'ft'.";
+      ];
+      `S "IMPORT A CONTRACT";
+      `Blocks [
+        `P "Example:";
+        `Pre {|ft contract --import src/Foo.tvm|};
+        `P "Import the given contract into the contract database. Two files are mandatory: the ABI file and the TVM file. They should be stored in the same directory. The ABI file must use either a '.abi' or '.abi.json' extension, whereas the TVM file must use either '.tvc' or '.tvm. If a source file (.sol, .cpp, .hpp) is also present, it is copied in the database.";
+      ];
+      `S "DEPLOY A CONTRACT";
+      `Blocks [
+        `P "Examples:";
+        `Pre {|ft contract --deploy Forbar|};
+        `P "Create an account 'Foorbar', deploy a contract 'Foobar' to it.";
+        `Pre {|ft contract --deploy Forbar --create foo|};
+        `P "Create an account 'foo', deploy a contract 'Foobar' to it.";
+        `Pre {|ft contract --deploy Forbar --replace foo|};
+        `P "Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.";
+        `Pre {|ft contract --deploy Forbar --create foo --sign admin|};
+        `P "Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.";
+        `Pre {|ft contract --deploy Forbar --dst foo|};
+        `P "Deploy a contract 'Foobar' an existing account 'foo' using its keypair.";
+        `P "";
+        `P "With --create and --replace, 1 TON is transferred to the initial account using a 'deployer' multisig account. The deployer account can either be set switch wide (ft config --deployer 'account') or in the deploy command (using the --deployer 'account' argument)";
+      ];
+    ]

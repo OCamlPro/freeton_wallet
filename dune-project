@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.2.4)
+(version 0.2.5)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -32,6 +32,7 @@
    (ez_file (and (>= 0.2.0) (< 1.0.0)))
    (ez_config (and (>= 0.1.0) (< 1.0.0)))
    (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))
+   (calendar ( >= 2 ))
    ppx_deriving_encoding
    crunch
    ppx_inline_test
