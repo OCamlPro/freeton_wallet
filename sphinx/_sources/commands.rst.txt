@@ -245,6 +245,84 @@ drom contract
 Manage contracts
 
 
+
+**DESCRIPTION**
+
+
+This command can perform the following actions:
+
+* 1.
+  Build a Solidity contract and store it in the contract database
+
+* 2.
+  List known contracts in the contract database
+
+* 3.
+  Import a contract into the contract database
+
+* 4.
+  Deploy a known contract to the blockchain
+
+
+**BUILD A CONTRACT**
+
+
+Example:
+::
+  ft contract --build Foobar.sol
+
+After this command, the contract will be known as 'Foobar' in the contract database
+
+
+**LIST KNOWN CONTRACTS**
+
+
+Example:
+::
+  ft contract --list
+
+List all known contracts: embedded contracts are contracts that are natively known by 'ft', other contracts are stored in $HOME/.ft/contracts, and were either built or imported by 'ft'.
+
+
+**IMPORT A CONTRACT**
+
+
+Example:
+::
+  ft contract --import src/Foo.tvm
+
+Import the given contract into the contract database. Two files are mandatory: the ABI file and the TVM file. They should be stored in the same directory. The ABI file must use either a '.abi' or '.abi.json' extension, whereas the TVM file must use either '.tvc' or '.tvm. If a source file (.sol, .cpp, .hpp) is also present, it is copied in the database.
+
+
+**DEPLOY A CONTRACT**
+
+
+Examples:
+::
+  ft contract --deploy Forbar
+
+Create an account 'Foorbar', deploy a contract 'Foobar' to it.
+::
+  ft contract --deploy Forbar --create foo
+
+Create an account 'foo', deploy a contract 'Foobar' to it.
+::
+  ft contract --deploy Forbar --replace foo
+
+Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.
+::
+  ft contract --deploy Forbar --create foo --sign admin
+
+Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.
+::
+  ft contract --deploy Forbar --dst foo
+
+Deploy a contract 'Foobar' an existing account 'foo' using its keypair.
+
+
+
+With --create and --replace, 1 TON is transferred to the initial account using a 'deployer' multisig account. The deployer account can either be set switch wide (ft config --deployer 'account') or in the deploy command (using the --deployer 'account' argument)
+
 **USAGE**
 ::
   
@@ -257,13 +335,13 @@ Where options are:
 
 * :code:`--create STRING`   ACCOUNT Create ACCOUNT by deploying contract (with --deploy)
 
-* :code:`--deploy STRING`   CONTRACT Deploy contract CONTRACT
+* :code:`--deploy CONTRACT`   Deploy contract CONTRACT
 
 * :code:`--deployer STRING`   Deployer is this account (pays creation fees)
 
-* :code:`--dst STRING` or :code:`--sign STRING`   Deploy to this account, using the existing keypair
+* :code:`--dst STRING`   Deploy to this account, using the existing keypair
 
-* :code:`--force`   Override existing contracts
+* :code:`--force` or :code:`-f`   Override existing contracts
 
 * :code:`--import STRING`   CONTRACT Deploy contract CONTRACT
 
@@ -276,6 +354,8 @@ Where options are:
 * :code:`--params STRING`   PARAMS Constructor/call Arguments ({} by default)
 
 * :code:`--replace STRING`   ACCOUNT Replace ACCOUNT when deploying contract (with --deploy)
+
+* :code:`--sign STRING`   Deploy using this keypair
 
 
 drom genaddr
