@@ -26,7 +26,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt_ssl ( >= 1.1 ))
-   (freeton_ocaml_sdk (and (>= 0.2.3) (< 1.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.2.5) (< 1.0.0)))
    ezjsonm
    (ez_subst ( >= 0.1 ))
    (ez_file (and (>= 0.2.0) (< 1.0.0)))

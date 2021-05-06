@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-47262ef624cb2e72f6277964fb807e75:.
+eed640a86ed1307ff0add80c81c3d608:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -37,7 +37,7 @@ a8d1bcd6f62c6b813b77d3ff8959d8d2:.ocamlformat-ignore
 
 # begin context for CHANGES.md
 # file CHANGES.md
-b2d337637b57fdcd92c4149bf18ed082:CHANGES.md
+5f1308edf88b2ea66cb68483c307d60e:CHANGES.md
 # end context for CHANGES.md
 
 # begin context for LICENSE.md
@@ -97,12 +97,12 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-36bc1bd73ac8712b22a6feebb1a59698:dune-project
+3f7ede1df26ceed576ae41dc96660739:dune-project
 # end context for dune-project
 
 # begin context for freeton_wallet_lib.opam
 # file freeton_wallet_lib.opam
-5094691d77dc9f69e6d406d203126834:freeton_wallet_lib.opam
+abf9fe9c335ac15d37e02abea1c091be:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
 
 # begin context for ft.opam
