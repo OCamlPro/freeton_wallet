@@ -19,7 +19,13 @@ let echo () =
         ( List.filter (fun s -> s <> "--echo")
             ( Array.to_list Sys.argv )))
 
+let increase_verbosity ()=
+  if !Globals.verbosity = 1 then
+    Printexc.record_backtrace true;
+  incr Globals.verbosity
+
 let main () =
+  Printexc.record_backtrace false;
   let commands =
     [
       CommandSwitch.cmd;
@@ -43,7 +49,7 @@ let main () =
   let common_args =
     [
       [ "v"; "verbose" ],
-      Arg.Unit (fun () -> incr Globals.verbosity),
+      Arg.Unit increase_verbosity,
       EZCMD.info "Increase verbosity level" ;
       [ "q"; "quiet" ],
       Arg.Unit (fun () -> Globals.verbosity := 0),
@@ -55,7 +61,6 @@ let main () =
       EZCMD.info "Set switch" ;
     ]
   in
-  Printexc.record_backtrace true;
   let args = Array.to_list Sys.argv in
   let rec iter_initial_args args =
     match args with
@@ -76,7 +81,7 @@ let main () =
         Printf.printf "%s\n%!" Globals.about;
         exit 0
     | ( "-v" | "--verbose" ) :: args ->
-        incr Globals.verbosity;
+        increase_verbosity ();
         iter_initial_args args
     | ( "-q" | "--quiet" ) :: args ->
         Globals.verbosity := 0;

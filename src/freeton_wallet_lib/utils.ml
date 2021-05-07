@@ -57,7 +57,17 @@ let call_contract
            | Some key -> Some (Misc.get_key_pair_exn key)
          in
          let abi = EzFile.read_file contract_abi in
-         Printf.eprintf "params: %s\n%!" params;
+         if Misc.verbose 1 then begin
+           Printf.eprintf "call: %s\n%!" address;
+           Printf.eprintf "method: %s\n%!" meth;
+           Printf.eprintf "params: %s\n%!" params;
+           begin
+             match src with
+             | None -> ()
+             | Some key ->
+                 Printf.eprintf "signed: %s\n%!" key.key_name
+           end;
+         end;
          let res =
            Ton_sdk.ACTION.call_run ?client ~server_url:node.node_url
              ~address
@@ -157,6 +167,18 @@ let post config req =
   let open Ton_sdk in
   match REQUEST.post_run url req with
   | Ok r -> r
+  | Error exn -> raise exn
+
+
+let (let>) p f = Lwt.bind p f
+
+let post_lwt config req =
+  let node = Config.current_node config in
+  let url = node.node_url in
+  let open Ton_sdk in
+  let> res = REQUEST.post_lwt url req in
+  match res with
+  | Ok r -> Lwt.return r
   | Error exn -> raise exn
 
 let is_address account =

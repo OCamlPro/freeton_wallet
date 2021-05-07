@@ -196,7 +196,8 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
 
   let nanotokens, allBalance =
     if amount = "all" then
-      0L, true
+      2_000_000L, (* MIN_VALUE is 1e06 in SetcodeMultisigWallet2 *)
+      true
     else
       Misc.nanotokens_of_string amount, false
   in
@@ -237,16 +238,29 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
     | None -> ""
   in
 
-  let params =
-    Printf.sprintf
-      {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":"%s"}|}
-      dst_addr
-      nanotokens
-      bounce
-      allBalance
-      payload
+  let meth, params =
+    if allBalance then
+      let meth = "sendTransaction" in
+      let params = Printf.sprintf
+          {|{"dest":"%s","value":0,"bounce":%b,"flags":128,"payload":"%s"}|}
+          dst_addr
+          bounce
+          payload
+      in
+      Printf.eprintf "Warning: 'all' balance only works with one-custodian multisigs\n%!";
+      meth, params
+    else
+      let meth = "submitTransaction" in
+      let params = Printf.sprintf
+          {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":"%s"}|}
+          dst_addr
+          nanotokens
+          bounce
+          allBalance
+          payload
+      in
+      meth, params
   in
-  let meth = "submitTransaction" in
   Utils.call_contract config ~contract:account_contract
     ~address:account_addr
     ~meth ~params
@@ -450,6 +464,10 @@ let cmd =
       `Pre {|# ft multisig -a my-account --transfer 100.000 --to other-account --parrain|};
       `P "To send all the balance:";
       `Pre {|# ft multisig -a my-account --transfer all --to other-account|};
+
+      `S "CALL WITH TOKENS";
+      `P "Should be like that:";
+      `Pre {|# ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }|};
 
       `S "LIST WAITING TRANSACTIONS";
       `P "Display transactions waiting for confirmations:";
