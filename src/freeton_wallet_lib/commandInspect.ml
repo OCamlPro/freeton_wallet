@@ -15,9 +15,13 @@ open EZCMD.TYPES
 (* open Ez_subst.V1 *)
 (* open EzFile.OP *)
 open Ton_sdk (* REQUEST, ENCODING *)
+open Types
+
+
+let (let>) p f = Lwt.bind p f
 
 let query_message config ~level ?limit msg_id =
-  Utils.post config (
+  Utils.post_lwt config (
     let len = String.length msg_id in
     if len = 64 then
       REQUEST.messages ~level ~id:msg_id []
@@ -40,37 +44,167 @@ let query_message config ~level ?limit msg_id =
           in
           REQUEST.messages ~level ?limit ~order ~filter [])
 
-let query_messages config ~level ids =
-  List.flatten ( List.map  ( query_message ~level config ) ids )
+let query_messages ~client ~abis config ~level ids =
+  let> res = Lwt_list.map_s (fun msg_id ->
+      let> ms = query_message ~level config msg_id in
+      Lwt_list.map_s (fun m ->
+          match m.ENCODING.msg_boc with
+          | Some boc ->
+              begin
+                try
+                  let (_ , contract ) =
+                    Hashtbl.find abis m.msg_dst in
+                  match contract with
+                  | None -> Lwt.return ( m, None )
+                  | Some ( _ , abi ) ->
+                      let abi = Lazy.force abi in
+                      let decoded =
+                        BLOCK.decode_message_boc ~client ~boc ~abi in
+                      let body =
+                        Printf.sprintf "CALL: %s %s %s"
+                          (match decoded.body_type with
+                           | 0 -> "Input"
+                           | 1 -> "Output"
+                           | 2 -> "InternalOutput"
+                           | 3 -> "Event"
+                           | _ -> assert false)
+                          decoded.body_name
+                          (match decoded.body_args with
+                           | None -> ""
+                           | Some args -> args)
+                      in
+                      Lwt.return (
+                        { m with msg_body = None ;
+                                 msg_boc = None ;
+                        },
+                        Some body )
+                with _ ->
+                  Lwt.return ( m, None )
+              end
+          | _ -> Lwt.return ( m, None )
+        ) ms
+    ) ids in
+  Lwt.return (List.flatten res)
+
+let replace_addr ~abis addr =
+    match Hashtbl.find abis addr with
+    | ( name, contract ) ->
+        Printf.sprintf "%s (%s%s)" addr name
+          ( match contract with
+            | None -> ""
+            | Some (contract, _ ) -> " " ^ contract)
+    | exception Not_found -> addr
+
+let transaction ~abis ~level tr =
+  let tr_account_addr = replace_addr ~abis tr.ENCODING.tr_account_addr in
+  let tr_boc = if level = 4 then tr.tr_boc else None in
+  {
+    tr with
+    tr_boc ;
+    tr_account_addr
+  }
+
+let message ~abis ~level m =
+  let msg_boc, msg_body =
+    if level = 1 then None, None else
+      m.ENCODING.msg_boc, m.msg_body
+  in
+  let msg_src = replace_addr ~abis m.msg_src in
+  let msg_dst = replace_addr ~abis m.msg_dst in
+  { m with
+    msg_dst ;
+    msg_src ;
+    msg_boc ;
+    msg_body }
+
+
+let string_of_transactions_with_messages ~abis ~level trs =
+  String.concat ""
+    (List.map (fun ( tr, in_message , out_messages ) ->
+         Printf.sprintf "%s\n%s%s"
+           ( ENCODING.string_of_transaction ( transaction ~abis ~level tr ) )
+           (match in_message with
+            | None -> ""
+            | Some ( in_message, in_body ) ->
+                Printf.sprintf "  IN MESSAGE:\n%s%s"
+                  ( ENCODING.string_of_message
+                      ( message ~abis ~level in_message ))
+                  (match in_body with
+                   | None -> ""
+                   | Some body -> Printf.sprintf "\n    %s\n" body )
+           )
+           (match out_messages with
+            | [] -> ""
+            | _ ->
+                String.concat ""
+                      ( List.map (fun ( out_msg, out_body ) ->
+                            Printf.sprintf "  OUT MESSAGE:\n%s%s"
+                              ( ENCODING.string_of_message
+                                  ( message ~abis ~level out_msg ) )
+                              (match out_body with
+                               | None -> ""
+                               | Some body ->
+                                   Printf.sprintf "\n    %s\n" body )
+                          ) out_messages ))
+       ) trs)
+
+
+let abis_of_config config =
+  let net = Config.current_network config in
+  let t = Hashtbl.create 113 in
+    List.iter (fun key ->
+      match key.key_account with
+      | Some { acc_address ; acc_contract ; _ } ->
+          Hashtbl.add t acc_address
+            ( key.key_name ,
+              match acc_contract with
+              | None -> None
+              | Some contract ->
+                  Some (
+                    contract ,
+                    lazy (
+                      EzFile.read_file
+                        ( Misc.get_contract_abifile contract ) ) ) )
+      | _ -> ()
+      ) net.net_keys;
+    t
+
+let transaction_with_message ~client ~abis config tr =
+  let> res = query_messages ~client ~abis
+      ~level:2 config [ tr.ENCODING.tr_in_msg ] in
+  let in_message = match res with
+    | [] -> None
+    | [x] -> Some x
+    | _ -> assert false
+  in
+  let> out_messages = query_messages ~client ~abis
+      ~level:2 config tr.tr_out_msgs in
+  Lwt.return (
+    tr ,
+    in_message ,
+    out_messages
+  )
 
 let inspect_transaction ~level ?limit ~subst tr_id =
-  let config = Config.config () in
+  Lwt_main.run (
+    let config = Config.config () in
+    let abis = abis_of_config config in
 
-  let trs =
-    Utils.post config
-      (match tr_id with
-       | "all" -> REQUEST.transactions ~level ?limit []
-       | _ -> REQUEST.transaction ~level tr_id
-      )
-  in
-  let trs =
-    List.map (fun tr ->
-        let in_message = match
-            query_messages ~level:1 config [ tr.ENCODING.tr_in_msg ]
-          with
-          | [] -> None
-          | [x] -> Some x
-          | _ -> assert false
-        in
-        {
-          ENCODING.tr;
-          in_message ;
-          out_messages =
-            query_messages ~level:1 config tr.tr_out_msgs
-        }
-      ) trs in
-  subst ~msg:"TRANSACTION" config
-    (ENCODING.string_of_transactions_with_messages trs)
+    let> trs =
+      Utils.post_lwt config
+        (match tr_id with
+         | "all" -> REQUEST.transactions ~level ?limit []
+         | _ -> REQUEST.transaction ~level tr_id
+        )
+    in
+    let node = Config.current_node config in
+    let client = CLIENT.create node.node_url in
+    let> trs =
+      Lwt_list.map_s (transaction_with_message ~abis ~client config) trs in
+    subst ~msg:"TRANSACTION" config
+      (string_of_transactions_with_messages ~abis ~level trs);
+    Lwt.return_unit
+  )
 
 let inspect_account ~level ?limit ~subst account =
   let config = Config.config () in
@@ -87,12 +221,35 @@ let inspect_account ~level ?limit ~subst account =
   subst ~msg:"ACCOUNT" config
     (ENCODING.string_of_accounts accounts)
 
+let inspect_account_past ~level ?limit account =
+  let config = Config.config () in
+  let abis = abis_of_config config in
+  let address = Utils.address_of_account config account in
+  let node = Config.current_node config in
+  let client = CLIENT.create node.node_url in
+  let url = node.node_url in
+  let n = ref 0 in
+  Lwt_main.run @@
+    REQUEST.iter_past_transactions
+    ~address ~url ~level ?limit
+    (fun tr ->
+       incr n;
+       let> tr = transaction_with_message ~abis ~client config tr in
+       Printf.printf "Transaction: %s\n\n%!"
+         (string_of_transactions_with_messages ~abis ~level [tr]);
+       Lwt.return_unit
+    );
+  Printf.printf "%d transactions printed\n%!" !n
+
 
 let inspect_message ~level ?limit ~subst id =
-  let config = Config.config () in
-  let messages = query_message config ~level ?limit id in
-  subst ~msg:"MESSAGE" config
-    (ENCODING.string_of_messages messages)
+  Lwt_main.run (
+    let config = Config.config () in
+    let> messages = query_message config ~level ?limit id in
+    subst ~msg:"MESSAGE" config
+      (ENCODING.string_of_messages messages);
+    Lwt.return_unit
+  )
 
 type shard =
   | Shard of string
@@ -165,6 +322,7 @@ type inspect =
   | BlockId
   | BlockN
   | Head
+  | AccountPast
 
 let cmd =
   let shard = ref None in
@@ -193,6 +351,8 @@ let cmd =
                  (`int (int_of_string s))
            | Head ->
                inspect_head ~level:!level ?limit:!limit ~shard:!shard ~subst ()
+           | AccountPast ->
+               inspect_account_past ~level:!level ?limit:!limit s
          ) (List.rev !inspect)
     )
     ~args:
@@ -204,37 +364,52 @@ let cmd =
           [ "3" ], Arg.Unit (fun () -> level := 3),
           EZCMD.info "Verbosity level 3";
 
+          [ "4" ], Arg.Unit (fun () -> level := 4),
+          EZCMD.info "Verbosity level 4";
+
           [ "t" ], Arg.String (to_inspect Transaction),
-          EZCMD.info "TR_ID Inspect transaction TR_ID on blockchain";
+          EZCMD.info ~docv:"TR_ID"
+            "Inspect transaction with identifier TR_ID on blockchain";
+
+          [ "past" ], Arg.String (to_inspect AccountPast),
+          EZCMD.info ~docv:"ACCOUNT"
+            "Inspect past transactions on ACCOUNT on blockchain";
 
           [ "a" ], Arg.String (to_inspect Account),
-          EZCMD.info "ACCOUNT Inspect account TR_ID on blockchain";
+          EZCMD.info ~docv:"ACCOUNT"
+            "Inspect state of account ACCOUNT (or 'all') on blockchain";
 
           [ "m" ], Arg.String (to_inspect Message),
-          EZCMD.info "MSG_ID Inspect message MSG_ID on blockchain";
+          EZCMD.info ~docv:"MSG_ID"
+            "Inspect message with identifier MSG_ID on blockchain";
 
           [ "b" ], Arg.String (to_inspect BlockId),
-          EZCMD.info "BLOCK Inspect block TR_ID on blockchain";
+          EZCMD.info ~docv:"BLOCK"
+            "BLOCK Inspect block TR_ID on blockchain";
 
           (* The following queries require a shard, that is either provided
              directly with --shard SHARD, or indirectly with
              --blockid ID or --account ADDR *)
 
           [ "shard" ], Arg.String (fun s -> shard := Some (Shard s) ),
-          EZCMD.info "SHARD Block info level/head for this shard";
+          EZCMD.info ~docv:"SHARD"
+            "Block info level/head for this shard";
           [ "shard-block" ], Arg.String (fun s -> shard := Some (Blockid s) ),
-          EZCMD.info "BLOCK_ID Block info level/head for this shard";
+          EZCMD.info ~docv:"BLOCK_ID"
+            "Block info level/head for this shard";
           [ "shard-account" ], Arg.String (fun s -> shard := Some (Account s) ),
-          EZCMD.info "ACCOUNT Block info level/head for this shard";
+          EZCMD.info ~docv:"ACCOUNT"
+            "Block info level/head for this shard";
 
           [ "bn" ], Arg.String (to_inspect BlockN),
-          EZCMD.info "LEVEL Inspect block at LEVEL on blockchain";
+          EZCMD.info ~docv:"BLOCK_NUM"
+            "Inspect block at level BLOCK_NUM on blockchain";
 
           [ "h" ], Arg.Unit (fun () -> to_inspect Head ""),
           EZCMD.info "Inspect head";
 
           [ "limit" ], Arg.Int (fun n -> limit := Some n),
-          EZCMD.info "LIMIT Limit the number of results to LIMIT";
+          EZCMD.info ~docv:"NUM" "Limit the number of results to NUM";
         ]
         @ args)
     ~doc: "Monitor a given account"

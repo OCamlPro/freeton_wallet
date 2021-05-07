@@ -169,6 +169,18 @@ let post config req =
   | Ok r -> r
   | Error exn -> raise exn
 
+
+let (let>) p f = Lwt.bind p f
+
+let post_lwt config req =
+  let node = Config.current_node config in
+  let url = node.node_url in
+  let open Ton_sdk in
+  let> res = REQUEST.post_lwt url req in
+  match res with
+  | Ok r -> Lwt.return r
+  | Error exn -> raise exn
+
 let is_address account =
   let _wc, addr = EzString.cut_at account ':' in
   let len = String.length addr in

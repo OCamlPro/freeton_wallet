@@ -25,6 +25,9 @@ val call_contract :
 val post :
   Types.config -> 'a Ton_request.t -> 'a
 
+val post_lwt :
+  Types.config -> 'a Ton_request.t -> 'a Lwt.t
+
 val deploy_contract :
   Types.config ->
   key:Types.key ->

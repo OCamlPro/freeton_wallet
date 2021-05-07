@@ -128,9 +128,9 @@ let string_of_nanoton v =
 let get_account_info config ~name ~address =
     match get_account_info config address with
     | None ->
-        Printf.eprintf "Account %S: not yet created\n%!" name
+        Printf.printf "Account %S: not yet created\n%!" name
     | Some account ->
-        Printf.eprintf "Account %S: %s\n%!" name
+        Printf.printf "Account %S: %s\n%!" name
           (match account.acc_balance with
            | None -> "no balance"
            | Some n ->
@@ -294,7 +294,7 @@ let genaddr config contract key ~wc =
     | Some key_pair -> key_pair
   in
   let addr = gen_address config key_pair contract ~wc in
-  Printf.eprintf "Address (%s for %s=%s...): %s\n%!"
+  Printf.printf "Address (%s for %s=%s...): %s\n%!"
     contract key.key_name
     (String.sub key_pair.public 0 10) addr;
   key.key_account <- Some {
@@ -343,7 +343,7 @@ let add_account config
   let key = { key_name ; key_account ; key_passphrase ; key_pair } in
   net.net_keys <- key :: net.net_keys ;
   config.modified <- true;
-  Printf.eprintf "Account created.\n%!";
+  Printf.eprintf "Account %S created.\n%!" key_name;
   get_key_info config key ~info:true;
   ()
 
@@ -587,7 +587,7 @@ let change_account config
   end;
 
   if config.modified then begin
-    Printf.eprintf "Account modified.\n%!";
+    Printf.printf "Account %S modified.\n%!" key.key_name;
     get_key_info config key ~info:true
   end
 

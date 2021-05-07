@@ -465,6 +465,10 @@ let cmd =
       `P "To send all the balance:";
       `Pre {|# ft multisig -a my-account --transfer all --to other-account|};
 
+      `S "CALL WITH TOKENS";
+      `P "Should be like that:";
+      `Pre {|# ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }|};
+
       `S "LIST WAITING TRANSACTIONS";
       `P "Display transactions waiting for confirmations:";
       `Pre {|# ft multisig -a my-account --waiting|};
