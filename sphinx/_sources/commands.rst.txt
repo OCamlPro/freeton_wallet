@@ -420,29 +420,33 @@ Where options are:
 
 * :code:`-3`   Verbosity level 3
 
-* :code:`-a STRING`   ACCOUNT Inspect account TR_ID on blockchain
+* :code:`-4`   Verbosity level 4
 
-* :code:`-b STRING`   BLOCK Inspect block TR_ID on blockchain
+* :code:`-a ACCOUNT`   Inspect state of account ACCOUNT (or 'all') on blockchain
 
-* :code:`--bn STRING`   LEVEL Inspect block at LEVEL on blockchain
+* :code:`-b BLOCK`   BLOCK Inspect block TR_ID on blockchain
+
+* :code:`--bn BLOCK_NUM`   Inspect block at level BLOCK_NUM on blockchain
 
 * :code:`-h`   Inspect head
 
-* :code:`--limit INT`   LIMIT Limit the number of results to LIMIT
+* :code:`--limit NUM`   Limit the number of results to NUM
 
-* :code:`-m STRING`   MSG_ID Inspect message MSG_ID on blockchain
+* :code:`-m MSG_ID`   Inspect message with identifier MSG_ID on blockchain
 
 * :code:`-o FILE` or :code:`--output FILE`   Save result to FILE (use - for stdout)
 
-* :code:`--shard STRING`   SHARD Block info level/head for this shard
+* :code:`--past ACCOUNT`   Inspect past transactions on ACCOUNT on blockchain
 
-* :code:`--shard-account STRING`   ACCOUNT Block info level/head for this shard
+* :code:`--shard SHARD`   Block info level/head for this shard
 
-* :code:`--shard-block STRING`   BLOCK_ID Block info level/head for this shard
+* :code:`--shard-account ACCOUNT`   Block info level/head for this shard
+
+* :code:`--shard-block BLOCK_ID`   Block info level/head for this shard
 
 * :code:`--subst FILE`   Read FILE and substitute results in the content
 
-* :code:`-t STRING`   TR_ID Inspect transaction TR_ID on blockchain
+* :code:`-t TR_ID`   Inspect transaction with identifier TR_ID on blockchain
 
 
 drom list
@@ -532,6 +536,14 @@ If the target is not an active account:
 To send all the balance:
 ::
   # ft multisig -a my-account --transfer all --to other-account
+
+
+**CALL WITH TOKENS**
+
+
+Should be like that:
+::
+  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
 
 
 **LIST WAITING TRANSACTIONS**

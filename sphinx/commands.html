@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (615c2a6
-) (2021/05/02 16:14) documentation</title>
+ (07b20db
+) (2021/05/07 08:41) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (615c2a6
+ (07b20db
 )
               </div>
             
@@ -487,18 +487,20 @@ Deploy a known contract to the blockchain</li>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">-2</span></code>   Verbosity level 2</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-3</span></code>   Verbosity level 3</li>
-<li><code class="code docutils literal notranslate"><span class="pre">-a</span> <span class="pre">STRING</span></code>   ACCOUNT Inspect account TR_ID on blockchain</li>
-<li><code class="code docutils literal notranslate"><span class="pre">-b</span> <span class="pre">STRING</span></code>   BLOCK Inspect block TR_ID on blockchain</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--bn</span> <span class="pre">STRING</span></code>   LEVEL Inspect block at LEVEL on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-4</span></code>   Verbosity level 4</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-a</span> <span class="pre">ACCOUNT</span></code>   Inspect state of account ACCOUNT (or ‘all’) on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-b</span> <span class="pre">BLOCK</span></code>   BLOCK Inspect block TR_ID on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--bn</span> <span class="pre">BLOCK_NUM</span></code>   Inspect block at level BLOCK_NUM on blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-h</span></code>   Inspect head</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--limit</span> <span class="pre">INT</span></code>   LIMIT Limit the number of results to LIMIT</li>
-<li><code class="code docutils literal notranslate"><span class="pre">-m</span> <span class="pre">STRING</span></code>   MSG_ID Inspect message MSG_ID on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--limit</span> <span class="pre">NUM</span></code>   Limit the number of results to NUM</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-m</span> <span class="pre">MSG_ID</span></code>   Inspect message with identifier MSG_ID on blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code>   Save result to FILE (use - for stdout)</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--shard</span> <span class="pre">STRING</span></code>   SHARD Block info level/head for this shard</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--shard-account</span> <span class="pre">STRING</span></code>   ACCOUNT Block info level/head for this shard</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--shard-block</span> <span class="pre">STRING</span></code>   BLOCK_ID Block info level/head for this shard</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--past</span> <span class="pre">ACCOUNT</span></code>   Inspect past transactions on ACCOUNT on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--shard</span> <span class="pre">SHARD</span></code>   Block info level/head for this shard</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--shard-account</span> <span class="pre">ACCOUNT</span></code>   Block info level/head for this shard</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--shard-block</span> <span class="pre">BLOCK_ID</span></code>   Block info level/head for this shard</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--subst</span> <span class="pre">FILE</span></code>   Read FILE and substitute results in the content</li>
-<li><code class="code docutils literal notranslate"><span class="pre">-t</span> <span class="pre">STRING</span></code>   TR_ID Inspect transaction TR_ID on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TR_ID</span></code>   Inspect transaction with identifier TR_ID on blockchain</li>
 </ul>
 </div>
 <div class="section" id="drom-list">
@@ -563,6 +565,11 @@ Deploy a known contract to the blockchain</li>
 </div>
 <p>To send all the balance:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+</pre></div>
+</div>
+<p><strong>CALL WITH TOKENS</strong></p>
+<p>Should be like that:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span> <span class="o">--</span><span class="k">to</span> <span class="n">contract</span> <span class="n">set</span> <span class="k">&#39;</span><span class="o">{</span> <span class="s2">&quot;x&quot;</span><span class="o">:</span> <span class="s2">&quot;100&quot;</span> <span class="o">}</span>
 </pre></div>
 </div>
 <p><strong>LIST WAITING TRANSACTIONS</strong></p>
