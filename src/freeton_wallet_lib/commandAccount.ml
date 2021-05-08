@@ -134,7 +134,11 @@ let get_account_info config ~name ~address =
           (match account.acc_balance with
            | None -> "no balance"
            | Some n ->
-               Printf.sprintf "%s TONs" (string_of_nanoton (Z.to_int64 n)))
+               Printf.sprintf "%s TONs (%s)"
+                 (string_of_nanoton (Z.to_int64 n))
+                 (match account.acc_type_name with
+                  | None -> "Non Exists"
+                  | Some s -> s))
 
 let get_key_info config key ~info =
   if info then
@@ -745,15 +749,15 @@ let cmd =
 
         [ "passphrase"],
         Arg.String (fun s -> passphrase := Some s),
-        EZCMD.info "Passphrase for account";
+        EZCMD.info ~docv:"PASSPHRASE" "BIP39 Passphrase for account";
 
         [ "address"],
         Arg.String (fun s -> address := Some s),
-        EZCMD.info "Address for account";
+        EZCMD.info ~docv:"ADDRESS" "Address for account";
 
         [ "contract"],
         Arg.String (fun s -> contract := Some s),
-        EZCMD.info "Contract for account";
+        EZCMD.info ~docv:"CONTRACT" "Contract for account";
 
         [ "surf" ],
         Arg.Unit (fun () -> contract := Some "SetcodeMultisigWallet2"),
@@ -765,17 +769,17 @@ let cmd =
 
         [ "keyfile"],
         Arg.String (fun s -> keyfile := Some s),
-        EZCMD.info "Key file for account";
+        EZCMD.info ~docv:"KEYFILE" "Key file for account";
 
         [ "live" ],
         Arg.Set live,
         EZCMD.info "Open block explorer on address";
 
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
-        EZCMD.info "WORKCHAIN The workchain (default is 0)";
+        EZCMD.info ~docv:"WORKCHAIN" "The workchain (default is 0)";
 
         [ "whois" ], Arg.String whois,
-        EZCMD.info "ADDR Returns corresponding key name";
+        EZCMD.info ~docv:"ADDRESS" "Returns corresponding key name";
 
       ]
     ~man:[

@@ -210,7 +210,7 @@ let create_interface name =
       Printf.sprintf
         {|/* Interface %s */
 
-pragma ton-solidity ^0.37.0;
+pragma ton-solidity >= 0.37.0;
 
 interface %s {
 
@@ -236,7 +236,7 @@ let create_contract name =
   Implementation of contract %s
  */
 
-pragma ton-solidity ^0.37.0;
+pragma ton-solidity >= 0.37.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -343,12 +343,12 @@ let cmd =
         [ "new" ] , Arg.String (fun name ->
             can_skip_todo := true;
             create_contract name),
-        EZCMD.info "NAME Create template file for contract NAME";
+        EZCMD.info ~docv:"NAME" "Create template file for contract NAME";
 
         [ "newi" ] , Arg.String (fun name ->
             can_skip_todo := true ;
             create_interface name),
-        EZCMD.info "NAME Create template file for interface NAME";
+        EZCMD.info ~docv:"NAME" "Create template file for interface NAME";
 
         [ "list" ], Arg.Unit (fun () ->
             set_todo "--list" ListContracts ),
@@ -359,7 +359,7 @@ let cmd =
 
         [ "build"], Arg.String (fun filename ->
             set_todo "--build" (BuildContract filename)),
-        EZCMD.info "Build a contract and remember it";
+        EZCMD.info ~docv:"FILENAME" "Build a contract and remember it";
 
         [ "deploy" ], Arg.String (fun contract ->
             set_todo "--deploy" (DeployContract contract)
@@ -369,26 +369,30 @@ let cmd =
         [ "import" ], Arg.String (fun contract ->
             set_todo "--import" (ImportContract contract)
           ),
-        EZCMD.info "CONTRACT Deploy contract CONTRACT";
+        EZCMD.info ~docv:"CONTRACT" "Deploy contract CONTRACT";
 
         [ "dst" ], Arg.String (fun s -> create := Some (UseAccount s) ),
-        EZCMD.info "Deploy to this account, using the existing keypair";
+        EZCMD.info ~docv:"ACCOUNT"
+          "Deploy to this account, using the existing keypair";
 
         [ "sign" ], Arg.String (fun s -> sign := Some s),
-        EZCMD.info "Deploy using this keypair";
+        EZCMD.info ~docv:"ACCOUNT" "Deploy using this keypair";
 
         [ "deployer" ], Arg.String (fun s -> deployer := Some s),
-        EZCMD.info "Deployer is this account (pays creation fees)";
+        EZCMD.info ~docv:"ACCOUNT"
+          "Deployer is this account (pays creation fees)";
 
         [ "params" ], Arg.String (fun s ->
             params := s),
-        EZCMD.info "PARAMS Constructor/call Arguments ({} by default)";
+        EZCMD.info ~docv:"PARAMS" "Constructor/call Arguments ({} by default)";
 
         [ "create" ], Arg.String (fun s -> create := Some (CreateAccount s) ),
-        EZCMD.info "ACCOUNT Create ACCOUNT by deploying contract (with --deploy)";
+        EZCMD.info ~docv:"ACCOUNT"
+          "Create ACCOUNT by deploying contract (with --deploy)";
 
         [ "replace" ], Arg.String (fun s -> create := Some (ReplaceAccount s) ),
-        EZCMD.info "ACCOUNT Replace ACCOUNT when deploying contract (with --deploy)";
+        EZCMD.info ~docv:"ACCOUNT"
+          "Replace ACCOUNT when deploying contract (with --deploy)";
 
       ]
     ~doc: "Manage contracts"

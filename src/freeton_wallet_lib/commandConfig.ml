@@ -38,8 +38,6 @@ let cmd =
     ~args: (
       [
         ( [ "deployer" ], Arg.String ( fun s -> deployer := Some s ),
-          EZCMD.info "ACCOUNT Set deployer to account ACCOUNT" );
-
-
+          EZCMD.info ~docv:"ACCOUNT" "Set deployer to account ACCOUNT" );
       ] )
     ~doc: "Modify configuration"

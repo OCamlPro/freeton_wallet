@@ -13,26 +13,30 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-let of_base64 s =
-  let s = Base64.decode_exn s in
-  Printf.printf "string = %S\n" s;
-  ()
-
-let of_boc s =
-  (*  let s = Base64.decode_exn s in *)
-  let s = Ton_sdk.ACTION.parse_message s in
-  Printf.printf "boc = %S\n" s
-
 let cmd =
-   EZCMD.sub
-    "utils"
-    (fun () -> ())
+  let args = ref [] in
+  let stdout = ref None in
+  EZCMD.sub
+    "exec"
+    (fun () ->
+       CommandClient.action !args ~exec:true ?stdout:!stdout
+    )
     ~args:
-      [
-        [ "of-base64" ], Arg.String of_base64,
-        EZCMD.info ~docv:"STRING" "Translates from base64";
+      [ [],
+        Arg.Anons (fun list -> args := list),
+        EZCMD.info ~docv:"-- COMMAND ARGUMENTS" "Command and arguments" ;
 
-        [ "of-boc" ], Arg.String of_boc,
-        EZCMD.info ~docv:"STRING" "Parse boc in base64 format";
+        [ "stdout" ], Arg.String (fun s -> stdout := Some s),
+        EZCMD.info ~docv:"FILENAME" "Save command stdout to file FILENAME";
       ]
-    ~doc: "Some useful tools"
+    ~doc: "Call command with substitution on arguments, use -- before \
+           the command."
+    ~man:[
+      `S "DESCRIPTION";
+      `P "This command can be used to call external commands while performing substitutions on arguments.";
+      `P "The available substitutions on the arguments can be listed using:";
+      `Pre {|$ ft output --list-subst|};
+      `P "For example:";
+      `P {|$ ft exec -- echo %{account:address:giver}|};
+
+    ]

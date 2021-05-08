@@ -281,7 +281,7 @@ Encoders, working on the rest of the substitution:
 * read:SUBST       Do SUBST, then read it as a filename
 * hex:SUBST        Do SUBST, then convert to hex
 * base64:SUBST     Do SUBST, then convert to base64
-* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it
+* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
 
 |}
 

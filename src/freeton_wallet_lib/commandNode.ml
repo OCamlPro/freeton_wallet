@@ -162,9 +162,7 @@ let cmd =
       EZCMD.info "Open Node GraphQL webpage";
 
       [ "give" ], Arg.String (fun s -> set_todo "--give" (NodeGive s) ),
-      EZCMD.info "ACCOUNT Give 1000 TON from giver to ACCOUNT ('all' for user*)";
-
-
+      EZCMD.info ~docv:"ACCOUNT" "Give 1000 TON from giver to ACCOUNT ('all' for user*)";
 
     ]
     ~doc: "Manage local nodes"

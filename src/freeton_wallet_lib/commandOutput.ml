@@ -77,13 +77,30 @@ let cmd =
         EZCMD.info "FILE Output string after substitution";
 
         [ "keyfile" ], Arg.String (fun s -> keyfile := Some s ),
-        EZCMD.info "ACCOUNT Output key file of account";
+        EZCMD.info ~docv:"ACCOUNT" "Output key file of account";
 
         [ "addr" ], Arg.String (fun s -> addr := Some s),
-        EZCMD.info "ACCOUNT Output address of account";
+        EZCMD.info ~docv:"ACCOUNT" "Output address of account";
 
         [ "list-subst" ], Arg.Unit (fun () ->
               list_substitutions (); exit 0),
           EZCMD.info "List all substitutions";
       ]
-    ~doc: "Call tonos-cli, use -- to separate arguments"
+    ~doc: "Perform substitutions on the output"
+    ~man:[
+      `S "DESCRIPTION";
+      `P "This command performs substitutions on its input. By \
+          default, the output goes to stdout, unless the '-o' option \
+          is used.";
+      `P "Examples:";
+      `P "Load a file INPUT, substitute its content, and save to OUTPUT:";
+      `Pre {|$ ft output --file INPUT --o OUTPUT|};
+      `P "List available substitutions:";
+      `Pre {|$ ft output --list-subst|};
+      `P "Output address of account ACCOUNT:";
+      `Pre {|$ ft output --addr ACCOUNT|};
+      `P "or:";
+      `Pre {|$ ft output --string %{account:address:ACCOUNT}|};
+      `P "Output keyfile of account ACCOUNT to file KEYFILE:";
+      `Pre {| ft output --keyfile ACCOUNT -o KEYFILE|};
+    ]

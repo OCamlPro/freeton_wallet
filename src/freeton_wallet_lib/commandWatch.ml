@@ -40,7 +40,7 @@ let display_message ~oc ~out msg =
   match msg with
   | { msg_id ;
       msg_msg_type_name = Some msg_type_name ;
-      msg_status_name = Some msg_status_name ;
+      msg_status_name = msg_status_name ;
       msg_created_at_string = Some msg_created_at_string ;
       _ } ->
       Printf.fprintf oc "  MESSAGE%s %S\n%!"
@@ -60,7 +60,9 @@ let display_message ~oc ~out msg =
        | Some msg_data_hash ->
            Printf.fprintf oc "   code_hash: %s\n%!" msg_data_hash );
       Printf.fprintf oc "    type name: %s\n%!" msg_type_name;
-      Printf.fprintf oc "    status name: %s\n%!" msg_status_name;
+      (match msg_status_name with
+       | Some name -> Printf.fprintf oc "    status name: %s\n%!" name
+       | _ -> ());
       if out then
         Printf.fprintf oc "    dst: %s\n%!" msg.msg_dst
       else
@@ -171,7 +173,7 @@ let display_transaction ~oc tr =
     tr_end_status_name = Some tr_end_status_name ;
     tr_total_fees = tr_total_fees ;
     tr_destroyed = Some tr_destroyed ;
-    tr_status_name = Some tr_status_name ;
+    tr_status_name = tr_status_name ;
     tr_tr_type_name = Some tr_type_name ;
     _
   } ->
