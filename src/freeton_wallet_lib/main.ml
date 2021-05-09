@@ -39,12 +39,12 @@ let main () =
       CommandContract.cmd;
       CommandTest.cmd;
       CommandInit.cmd;
-      CommandNode.cmd;      (* man to do *)
-      CommandConfig.cmd;    (* man to do *)
-      CommandCall.cmd;      (* man to do *)
-      CommandUtils.cmd;     (* man to do *)
-      CommandWatch.cmd;     (* man to do *)
-      CommandInspect.cmd;   (* man to do *)
+      CommandNode.cmd;
+      CommandConfig.cmd;
+      CommandCall.cmd;
+      CommandUtils.cmd;
+      CommandWatch.cmd;
+      CommandInspect.cmd;
     ]
   in
   let common_args =

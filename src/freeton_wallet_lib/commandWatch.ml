@@ -294,6 +294,9 @@ let cmd =
         [ "3" ], Arg.Unit (fun () -> level := 3),
         EZCMD.info "Verbosity level 3";
 
+        [], Arg.Anon (0, fun s -> account := Some s),
+        EZCMD.info ~docv:"ACCOUNT" "Watch account ACCOUNT";
+
         [ "account" ], Arg.String (fun s -> account := Some s),
         EZCMD.info ~docv:"ACCOUNT" "Watch account ACCOUNT";
 
@@ -308,7 +311,18 @@ let cmd =
 
         [ "on-event" ], Arg.String (fun cmd -> on_event := Some cmd),
         EZCMD.info ~docv:"CMD"
-          {|Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`|};
+          "Call CMD on event emitted. Called once on startup as `CMD \
+           <block_id> start` and after every emitted event as `CMD \
+           <block_id> <tr_id> <event_name> <args>`";
 
       ]
-    ~doc: "Monitor a given account"
+    ~doc: "Monitor a given account for new transactions."
+    ~man: [
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "Wait for transactions happening on the given \
+            ACCOUNT. Transactions are immediately displayed on \
+            stdout. If the argument --on-event CMD is provided, a \
+            command is called for every event emitted by the contract.";
+      ]
+    ]

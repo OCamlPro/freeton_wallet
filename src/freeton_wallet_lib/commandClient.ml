@@ -74,7 +74,7 @@ let cmd =
         `P "The available substitutions on the arguments can be listed using:";
         `Pre {|$ ft output --list-subst|};
         `P "For example, to substitute the address of the account 'multisig-debot':";
-        `Pre {|$ ft client -- debot %{account:address:multisig-debot}|};
+        `Pre {|$ ft client -- debot fetch %{account:address:multisig-debot}|};
         `P "Note that it is also possible to ask 'ft' to call \
             'tonos-cli' instead of performing calls through TON-SDK \
             Rust binding for other commands, using the FT_USE_TONOS=1 \

@@ -35,9 +35,16 @@ let cmd =
        action
          ~deployer:!deployer
     )
-    ~args: (
+    ~args:
       [
-        ( [ "deployer" ], Arg.String ( fun s -> deployer := Some s ),
-          EZCMD.info ~docv:"ACCOUNT" "Set deployer to account ACCOUNT" );
-      ] )
+        [ "deployer" ], Arg.String ( fun s -> deployer := Some s ),
+        EZCMD.info ~docv:"ACCOUNT"
+          "Set deployer to account ACCOUNT. The deployer is the \
+           account used to credit the initial balance of an address \
+           before deploying a contract on it." ;
+      ]
     ~doc: "Modify configuration"
+    ~man:[
+      `S "DESCRIPTION";
+      `P "Change the global configuration or the network configuration.";
+    ]

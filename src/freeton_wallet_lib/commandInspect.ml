@@ -419,7 +419,7 @@ let cmd =
   let to_inspect kind x =
     inspect := (kind, x) :: !inspect
   in
-  let args, subst = Subst.make_args () in
+  let subst_args, subst = Subst.make_args () in
   EZCMD.sub
     "inspect"
     (fun () ->
@@ -444,69 +444,86 @@ let cmd =
          ) (List.rev !inspect)
     )
     ~args:
-      (
-        [
-          [ "2" ], Arg.Unit (fun () -> level := 2),
-          EZCMD.info "Verbosity level 2";
+      ( subst_args
+          [
+            [ "2" ], Arg.Unit (fun () -> level := 2),
+            EZCMD.info "Verbosity level 2";
 
-          [ "3" ], Arg.Unit (fun () -> level := 3),
-          EZCMD.info "Verbosity level 3";
+            [ "3" ], Arg.Unit (fun () -> level := 3),
+            EZCMD.info "Verbosity level 3";
 
-          [ "4" ], Arg.Unit (fun () -> level := 4),
-          EZCMD.info "Verbosity level 4";
+            [ "4" ], Arg.Unit (fun () -> level := 4),
+            EZCMD.info "Verbosity level 4";
 
-          [ "t" ], Arg.String (to_inspect Transaction),
-          EZCMD.info ~docv:"TR_ID"
-            "Inspect transaction with identifier TR_ID on blockchain";
+            [ "t"; "transaction" ], Arg.String (to_inspect Transaction),
+            EZCMD.info ~docv:"TR_ID"
+              "Inspect transaction with identifier TR_ID on blockchain";
 
-          [ "past" ], Arg.String (to_inspect AccountPast),
-          EZCMD.info ~docv:"ACCOUNT"
-            "Inspect past transactions on ACCOUNT on blockchain";
+            [ "past" ], Arg.String (to_inspect AccountPast),
+            EZCMD.info ~docv:"ACCOUNT"
+              "Inspect past transactions on ACCOUNT on blockchain";
 
-          [ "a" ], Arg.String (to_inspect Account),
-          EZCMD.info ~docv:"ACCOUNT"
-            "Inspect state of account ACCOUNT (or 'all') on blockchain";
+            [ "a"; "account" ], Arg.String (to_inspect Account),
+            EZCMD.info ~docv:"ACCOUNT"
+              "Inspect state of account ACCOUNT (or 'all') on blockchain";
 
-          [ "m" ], Arg.String (to_inspect Message),
-          EZCMD.info ~docv:"MSG_ID"
-            "Inspect message with identifier MSG_ID on blockchain";
+            [ "m"; "message" ], Arg.String (to_inspect Message),
+            EZCMD.info ~docv:"MSG_ID"
+              "Inspect message with identifier MSG_ID on blockchain";
 
-          [ "b" ], Arg.String (to_inspect BlockId),
-          EZCMD.info ~docv:"BLOCK"
-            "BLOCK Inspect block TR_ID on blockchain";
+            [ "b" ; "block" ], Arg.String (to_inspect BlockId),
+            EZCMD.info ~docv:"BLOCK"
+              "BLOCK Inspect block TR_ID on blockchain";
 
-          (* The following queries require a shard, that is either provided
-             directly with --shard SHARD, or indirectly with
-             --blockid ID or --account ADDR *)
+            (* The following queries require a shard, that is either provided
+               directly with --shard SHARD, or indirectly with
+               --blockid ID or --account ADDR *)
 
-          [ "shard" ], Arg.String (fun s -> shard := Some (Shard s) ),
-          EZCMD.info ~docv:"SHARD"
-            "Block info level/head for this shard";
-          [ "shard-block" ], Arg.String (fun s -> shard := Some (Blockid s) ),
-          EZCMD.info ~docv:"BLOCK_ID"
-            "Block info level/head for this shard";
-          [ "shard-account" ], Arg.String (fun s -> shard := Some (Account s) ),
-          EZCMD.info ~docv:"ACCOUNT"
-            "Block info level/head for this shard";
+            [ "shard" ], Arg.String (fun s -> shard := Some (Shard s) ),
+            EZCMD.info ~docv:"SHARD"
+              "Block info level/head for this shard";
 
-          [ "bn" ], Arg.String (to_inspect BlockN),
-          EZCMD.info ~docv:"BLOCK_NUM"
-            "Inspect block at level BLOCK_NUM on blockchain";
+            [ "shard-block" ],
+            Arg.String (fun s -> shard := Some (Blockid s) ),
+            EZCMD.info ~docv:"BLOCK_ID"
+              "Block info level/head for this shard";
 
-          [ "h" ], Arg.Unit (fun () -> to_inspect Head ""),
-          EZCMD.info "Inspect head";
+            [ "shard-account" ],
+            Arg.String (fun s -> shard := Some (Account s) ),
+            EZCMD.info ~docv:"ACCOUNT"
+              "Block info level/head for this shard";
 
-          [ "limit" ], Arg.Int (fun n -> limit := Some n),
-          EZCMD.info ~docv:"NUM" "Limit the number of results to NUM";
+            [ "bn"; "block-num" ], Arg.String (to_inspect BlockN),
+            EZCMD.info ~docv:"BLOCK_NUM"
+              "Inspect block at level BLOCK_NUM on blockchain";
 
-          ["with"], Arg.String (fun s -> queue := s :: !queue),
-          EZCMD.info ~docv:"ACCOUNT:CONTRACT"
-            "Define partner account automatically defined";
-        ]
-        @ args)
-    ~doc: "Monitor a given account"
+            [ "h" ; "head" ], Arg.Unit (fun () -> to_inspect Head ""),
+            EZCMD.info "Inspect head";
+
+            [ "limit" ], Arg.Int (fun n -> limit := Some n),
+            EZCMD.info ~docv:"NUM" "Limit the number of results to NUM";
+
+            ["with"], Arg.String (fun s -> queue := s :: !queue),
+            EZCMD.info ~docv:"ACCOUNT:CONTRACT"
+              "Define partner account automatically defined";
+          ]
+      )
+    ~doc: "Inspect information stored on the blockchain: display \
+           information on accounts, blocks, messages and transactions."
     ~man:[
       `S "DESCRIPTION";
-      `P "todo...";
+      `P  "Inspect information stored on the blockchain: display \
+           information on accounts, blocks, messages and transactions.";
+      `P "Examples:";
+      `P "Display all transactions that happened on the user1 account:";
+      `Pre {|$ ft inspect --past user1 --with deployed:Contract|};
+      `P "The --with argument is used to name the first unknown \
+          address, with the name 'deployed' and type \
+          'Contract'. Messages sent to known accounts with known \
+          contract types are automatically decoded.";
+      `P "Some operations (--block-num and --head) require to know the \
+          shard on which they apply. Arguments --shard SHARD, \
+          --shard-block BLOCK_ID and --shard-account ACCOUNT can be \
+          used to specify the shard.";
       `P "Use the FT_DEBUG_GRAPHQL=1 variable to show Graphql queries";
     ]

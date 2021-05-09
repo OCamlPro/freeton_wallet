@@ -162,7 +162,17 @@ let cmd =
       EZCMD.info "Open Node GraphQL webpage";
 
       [ "give" ], Arg.String (fun s -> set_todo "--give" (NodeGive s) ),
-      EZCMD.info ~docv:"ACCOUNT" "Give 1000 TON from giver to ACCOUNT ('all' for user*)";
-
+      EZCMD.info
+        ~docv:"ACCOUNT[:AMOUNT]"
+        "Give TONs from giver to ACCOUNT (use 'all' for user*). By \
+         default, transfer 1000 TONS (or AMOUNT) to the account if its \
+         balance is smaller, and deploy a contract if it is a multisig \
+         smart contract.";
     ]
     ~doc: "Manage local nodes"
+    ~man:[
+      `S "DESCRIPTION";
+      `P "This command performs operations on nodes running TONOS SE \
+          in sandbox networks. It can start and stop nodes, and send \
+          tokens to accounts.";
+    ]
