@@ -40,24 +40,44 @@ let action ?(exec=false) ?stdout args =
   | v -> v
 
 let cmd =
-  let exec = ref false in
   let args = ref [] in
   let stdout = ref None in
   EZCMD.sub
     "client"
     (fun () ->
-       action !args ~exec:!exec ?stdout:!stdout
+       action !args ~exec:false ?stdout:!stdout
     )
     ~args:
       [ [],
         Arg.Anons (fun list -> args := list),
-        EZCMD.info "Arguments to tonos-cli" ;
-
-        [ "exec" ], Arg.Set exec,
-        EZCMD.info "Do not call tonos-cli, the command is in the arguments";
+        EZCMD.info ~docv:"-- ARGUMENTS" "Arguments to tonos-cli" ;
 
         [ "stdout" ], Arg.String (fun s -> stdout := Some s),
-        EZCMD.info "FILE Save command stdout to file";
+        EZCMD.info ~docv:"FILE" "Save command stdout to file";
 
       ]
-    ~doc: "Call tonos-cli, use -- to separate arguments"
+    ~doc: "Call tonos-cli, use -- to separate arguments. Use 'ft exec \
+           -- CMD ARGS' for other commands."
+    ~man:[
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "This command calls the tonos-cli executable while \
+            performing substitutions on arguments, and using the node \
+            of the current network switch. It is useful for commands \
+            that 'ft' cannot perform directly (calling debots for \
+            example).";
+        `P "'ft' uses the executable stored in \
+            $HOME/.ft/bin/tonos-cli. To create this executable, use:";
+        `Pre {|$ ft init|};
+        `P "or:";
+        `Pre {|$ ft init client|};
+        `P "The available substitutions on the arguments can be listed using:";
+        `Pre {|$ ft output --list-subst|};
+        `P "For example, to substitute the address of the account 'multisig-debot':";
+        `Pre {|$ ft client -- debot fetch %{account:address:multisig-debot}|};
+        `P "Note that it is also possible to ask 'ft' to call \
+            'tonos-cli' instead of performing calls through TON-SDK \
+            Rust binding for other commands, using the FT_USE_TONOS=1 \
+            env. variable.";
+      ];
+    ]

@@ -380,16 +380,17 @@ let cmd =
         EZCMD.info "Generic arguments" ;
 
         [ "a" ; "account" ], Arg.String (fun s -> account := Some s),
-        EZCMD.info "ACCOUNT The multisig account";
+        EZCMD.info ~docv:"ACCOUNT" "The multisig account";
 
         [ "src" ], Arg.String (fun s -> src := Some s),
-        EZCMD.info "ACCOUNT The multisig account";
+        EZCMD.info ~docv:"ACCOUNT" "The multisig account";
 
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
-        EZCMD.info "WORKCHAIN The workchain (default is 0)";
+        EZCMD.info ~docv:"WORKCHAIN" "The workchain (default is 0)";
 
         [ "create" ], Arg.Set create,
-        EZCMD.info "Deploy multisig wallet on account (use generic arguments for owners)";
+        EZCMD.info "Deploy multisig wallet on account (use generic \
+                    arguments for owners)";
 
         [ "not-owner" ], Arg.Set not_owner,
         EZCMD.info " Initial account should not be an owner";
@@ -406,23 +407,23 @@ let cmd =
         EZCMD.info " List waiting transactions";
 
         [ "confirm" ], Arg.String (fun s -> confirm := Some s),
-        EZCMD.info "TX_ID Confirm transaction";
+        EZCMD.info ~docv:"TX_ID" "Confirm transaction";
 
         [ "contract" ], Arg.String (fun s -> contract := Some s),
-        EZCMD.info "CONTRACT Use this contract";
+        EZCMD.info ~docv:"CONTRACT" "Use this contract";
 
         [ "surf" ], Arg.Unit (fun () ->
             contract := Some "SetcodeMultisigWallet2"),
         EZCMD.info "Use Surf contract";
 
         [ "req" ], Arg.Int (fun s -> req := s),
-        EZCMD.info "REQ Number of confirmations required";
+        EZCMD.info ~docv:"REQ" "Number of confirmations required";
 
         [ "transfer" ], Arg.String (fun s -> transfer := Some s),
-        EZCMD.info "AMOUNT Transfer this amount";
+        EZCMD.info ~docv:"AMOUNT" "Transfer this amount";
 
         [ "to" ], Arg.String (fun s -> dst := Some s),
-        EZCMD.info "ACCOUNT Target of a transfer";
+        EZCMD.info ~docv:"ACCOUNT" "Target of a transfer";
 
         [ "debot" ], Arg.Set debot,
         EZCMD.info "Start the multisig debot";

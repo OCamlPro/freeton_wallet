@@ -66,4 +66,12 @@ let cmd =
         Arg.Set create,
         EZCMD.info "Create new key";
       ]
-    ~doc: "Generate new addr (default is for a SafeMultisigWallet, use 'ft list' for more)"
+    ~doc: "Generate new addr (default is for a SafeMultisigWallet, use \
+           'ft contract --list' for more)"
+    ~man:[
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "DEPRECATED";
+        `P "This command is deprecated and will distributed soon. Use 'ft account' instead."
+      ];
+    ]

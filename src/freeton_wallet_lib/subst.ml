@@ -281,7 +281,7 @@ Encoders, working on the rest of the substitution:
 * read:SUBST       Do SUBST, then read it as a filename
 * hex:SUBST        Do SUBST, then convert to hex
 * base64:SUBST     Do SUBST, then convert to base64
-* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it
+* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
 
 |}
 
@@ -370,17 +370,18 @@ let subst_or_output ~msg ?subst ?output config res =
 let make_args () =
   let output = ref None in
   let subst = ref None in
-  let args =
-    [
+  let add_args args =
+    (
       [ "o" ; "output"], Arg.String (fun s -> output := Some s),
-      EZCMD.info ~docv:"FILE" "Save result to FILE (use - for stdout)";
-
+      EZCMD.info ~docv:"FILE" "Save result to FILE (use - for stdout)"
+    ) ::
+    (
       [ "subst" ], Arg.String (fun s -> subst := Some s),
       EZCMD.info ~docv:"FILE"
         "Read FILE and substitute results in the content";
-    ]
+    ) :: args
   in
   let subst_or_output ~msg config res =
     subst_or_output ~msg config res ?subst:!subst ?output:!output
   in
-  args, subst_or_output
+  add_args, subst_or_output

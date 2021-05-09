@@ -29,10 +29,11 @@ let main () =
   let commands =
     [
       CommandSwitch.cmd;
-      CommandGenaddr.cmd;
-      CommandList.cmd;
+      CommandGenaddr.cmd; (* DEPRECATED *)
+      CommandList.cmd;    (* DEPRECATED *)
       CommandAccount.cmd;
       CommandClient.cmd;
+      CommandExec.cmd;
       CommandOutput.cmd;
       CommandMultisig.cmd;
       CommandContract.cmd;

@@ -40,7 +40,7 @@ let display_message ~oc ~out msg =
   match msg with
   | { msg_id ;
       msg_msg_type_name = Some msg_type_name ;
-      msg_status_name = Some msg_status_name ;
+      msg_status_name = msg_status_name ;
       msg_created_at_string = Some msg_created_at_string ;
       _ } ->
       Printf.fprintf oc "  MESSAGE%s %S\n%!"
@@ -60,7 +60,9 @@ let display_message ~oc ~out msg =
        | Some msg_data_hash ->
            Printf.fprintf oc "   code_hash: %s\n%!" msg_data_hash );
       Printf.fprintf oc "    type name: %s\n%!" msg_type_name;
-      Printf.fprintf oc "    status name: %s\n%!" msg_status_name;
+      (match msg_status_name with
+       | Some name -> Printf.fprintf oc "    status name: %s\n%!" name
+       | _ -> ());
       if out then
         Printf.fprintf oc "    dst: %s\n%!" msg.msg_dst
       else
@@ -171,7 +173,7 @@ let display_transaction ~oc tr =
     tr_end_status_name = Some tr_end_status_name ;
     tr_total_fees = tr_total_fees ;
     tr_destroyed = Some tr_destroyed ;
-    tr_status_name = Some tr_status_name ;
+    tr_status_name = tr_status_name ;
     tr_tr_type_name = Some tr_type_name ;
     _
   } ->
@@ -292,6 +294,9 @@ let cmd =
         [ "3" ], Arg.Unit (fun () -> level := 3),
         EZCMD.info "Verbosity level 3";
 
+        [], Arg.Anon (0, fun s -> account := Some s),
+        EZCMD.info ~docv:"ACCOUNT" "Watch account ACCOUNT";
+
         [ "account" ], Arg.String (fun s -> account := Some s),
         EZCMD.info ~docv:"ACCOUNT" "Watch account ACCOUNT";
 
@@ -306,7 +311,18 @@ let cmd =
 
         [ "on-event" ], Arg.String (fun cmd -> on_event := Some cmd),
         EZCMD.info ~docv:"CMD"
-          {|Call CMD on event emitted. Called once on startup as `CMD <block_id> start` and after every emitted event as `CMD <block_id> <tr_id> <event_name> <args>`|};
+          "Call CMD on event emitted. Called once on startup as `CMD \
+           <block_id> start` and after every emitted event as `CMD \
+           <block_id> <tr_id> <event_name> <args>`";
 
       ]
-    ~doc: "Monitor a given account"
+    ~doc: "Monitor a given account for new transactions."
+    ~man: [
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "Wait for transactions happening on the given \
+            ACCOUNT. Transactions are immediately displayed on \
+            stdout. If the argument --on-event CMD is provided, a \
+            command is called for every event emitted by the contract.";
+      ]
+    ]

@@ -12,39 +12,31 @@
 
 open Ezcmd.V2
 open EZCMD.TYPES
-open Types
-
-let action ~deployer =
-  let config = Config.config () in
-  let net = Config.current_network config in
-  begin
-    match deployer with
-    | None -> ()
-    | Some deployer ->
-        net.net_deployer <- deployer ;
-        Printf.eprintf "Deployer set to %S\n5!" deployer;
-        config.modified <- true
-  end;
-  ()
 
 let cmd =
-  let deployer = ref None in
+  let args = ref [] in
+  let stdout = ref None in
   EZCMD.sub
-    "config"
+    "exec"
     (fun () ->
-       action
-         ~deployer:!deployer
+       CommandClient.action !args ~exec:true ?stdout:!stdout
     )
     ~args:
-      [
-        [ "deployer" ], Arg.String ( fun s -> deployer := Some s ),
-        EZCMD.info ~docv:"ACCOUNT"
-          "Set deployer to account ACCOUNT. The deployer is the \
-           account used to credit the initial balance of an address \
-           before deploying a contract on it." ;
+      [ [],
+        Arg.Anons (fun list -> args := list),
+        EZCMD.info ~docv:"-- COMMAND ARGUMENTS" "Command and arguments" ;
+
+        [ "stdout" ], Arg.String (fun s -> stdout := Some s),
+        EZCMD.info ~docv:"FILENAME" "Save command stdout to file FILENAME";
       ]
-    ~doc: "Modify configuration"
+    ~doc: "Call command with substitution on arguments, use -- before \
+           the command."
     ~man:[
       `S "DESCRIPTION";
-      `P "Change the global configuration or the network configuration.";
+      `P "This command can be used to call external commands while performing substitutions on arguments.";
+      `P "The available substitutions on the arguments can be listed using:";
+      `Pre {|$ ft output --list-subst|};
+      `P "For example:";
+      `P {|$ ft exec -- echo %{account:address:giver}|};
+
     ]

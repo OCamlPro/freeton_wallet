@@ -59,15 +59,31 @@ let cmd =
          ~sign:!sign
          ~subst
     )
-    ~args: (subst_args @
-            [
-              [], Arg.Anons (fun l -> args := l),
-              EZCMD.info ~docv:"ACCOUNT METH [JSON_PARAMS]" "arguments" ;
+    ~args: (
+      subst_args
+        [
+          [], Arg.Anons (fun l -> args := l),
+          EZCMD.info ~docv:"ACCOUNT METH [JSON_PARAMS]" "arguments" ;
 
-              [ "run" ], Arg.Set local,
-              EZCMD.info "Run locally";
+          [ "run"; "local" ], Arg.Set local, EZCMD.info "Run locally";
 
-              [ "sign"], Arg.String (fun s -> sign := Some s),
-              EZCMD.info ~docv:"ACCOUNT" "Sign message with account";
-            ] )
-    ~doc: "Manage contracts"
+          [ "sign"], Arg.String (fun s -> sign := Some s),
+          EZCMD.info ~docv:"ACCOUNT" "Sign message with account";
+        ] )
+    ~doc: "Call contracts"
+    ~man:[
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "Call a method of a deployed contract. Use --local or --run \
+            to run the contract locally (only for get methods). If the \
+            params are not specified, {} is used instead. The message \
+            is signed if the --sign SIGNER argument is provided, or if \
+            the secret key of the account is known.";
+        `P "Examples:";
+        `Pre {|$ ft call giver sendGrams
+        '{ "dest":"%{account:address:user1}", "amount":"1000000000000"}'|};
+        `Pre {|$ ft --switch mainnet call msig confirmUpdate
+        '{  "updateId": "0x6092b3ee656aaa81" }' --sign mywallet|};
+      ];
+
+    ]

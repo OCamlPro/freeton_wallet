@@ -48,4 +48,12 @@ let cmd =
     "list"
     (fun () -> action ())
     ~args: []
-    ~doc: "List known contracts"
+    ~doc: "List known contracts (DEPRECATED). Use 'ft contract --list'"
+    ~man:[
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "DEPRECATED";
+        `P "This command is deprecated and will disappear soon. Use 'ft contract --list' instead."
+      ];
+
+    ]
