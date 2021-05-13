@@ -258,6 +258,8 @@ Where options are:
 
 * :code:`-- ARGUMENTS`   Arguments to tonos-cli
 
+* :code:`--exec`   (deprecated, use 'ft exec -- COMMAND' instead)
+
 * :code:`--stdout FILE`   Save command stdout to file
 
 
@@ -400,7 +402,11 @@ Where options are:
 
 * :code:`--replace ACCOUNT`   Replace ACCOUNT when deploying contract (with --deploy)
 
+* :code:`--show-abi CONTRACT`   Show ABI of contract CONTRACT
+
 * :code:`--sign ACCOUNT`   Deploy using this keypair
+
+* :code:`--sol-abi CONTRACT`   Output ABI of contract CONTRACT as Solidity 
 
 
 drom exec
