@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.3.0)
+(version 0.3.1)
 (formatting (enabled_for ocaml reason))
 
 (package

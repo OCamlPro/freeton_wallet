@@ -284,13 +284,15 @@ let save config =
                              let wallet_file = wallet_dir // "wallet.json" in
                              EzFile.make_dir ~p:true wallet_dir ;
                              Misc.write_json_file Encoding.wallet wallet_file keys;
-                             Printf.eprintf "Saving wallet file %s\n%!" wallet_file ;
+                             if !Globals.verbosity > 0 then
+                               Printf.eprintf "Saving wallet file %s\n%!" wallet_file ;
                        end ;
                        { net with net_keys = [] }
                      ) config.networks
                  }
     in
-    Printf.eprintf "Saving config file %s\n%!" Globals.config_file ;
+    if !Globals.verbosity > 0 then
+      Printf.eprintf "Saving config file %s\n%!" Globals.config_file ;
     Misc.write_json_file Encoding.config Globals.config_file config ;
   end;
   config.modified <- false ;
@@ -301,7 +303,8 @@ let load_wallet net =
   | [] ->
       let wallet_file = Globals.ft_dir // net.net_name // "wallet.json" in
       if Sys.file_exists wallet_file then begin
-        Printf.eprintf "Loading wallet file %s\n%!" wallet_file ;
+        if !Globals.verbosity > 0 then
+          Printf.eprintf "Loading wallet file %s\n%!" wallet_file ;
         net.net_keys <- Misc.read_json_file Encoding.wallet wallet_file
       end
   | _ -> ()
@@ -364,11 +367,13 @@ let load () =
   let config =
     if Sys.file_exists Globals.config_file then begin
       let config = Misc.read_json_file Encoding.config Globals.config_file in
-      Printf.eprintf "Config loaded from %s\n%!" Globals.config_file;
+      if !Globals.verbosity > 0 then
+        Printf.eprintf "Config loaded from %s\n%!" Globals.config_file;
       config.modified <- false ;
       config
     end else begin
-      Printf.eprintf "File %s does not exist\n%!" Globals.config_file ;
+      if !Globals.verbosity > 0 then
+        Printf.eprintf "File %s does not exist\n%!" Globals.config_file ;
       default_config
     end
   in
@@ -438,7 +443,8 @@ let load () =
     ) config.networks;
 
   let net = current_network config in
-  Printf.eprintf "Network: %s\n%!" net.net_name;
+  if !Globals.verbosity > 0 then
+    Printf.eprintf "Network: %s\n%!" net.net_name;
   load_wallet net ;
 
   if config.version < 1 then begin
