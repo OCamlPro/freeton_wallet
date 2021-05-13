@@ -26,6 +26,7 @@ type todo =
   | DeployContract of string
   | ImportContract of string
   | ShowABI of string
+  | SolABI of string
 
 let remove_files dirname files =
   List.iter (fun file ->
@@ -74,15 +75,16 @@ let show_abi contract =
     ) abi.functions
   in
 
-  let string_of_params params =
+  let printf_params params =
     match params with
-    | [] -> "{}"
+    | [] -> Format.printf "{}"
     | _ ->
-        Printf.sprintf "'{ %s}'"
-          ( String.concat ", "
-              (List.map (fun p ->
-                  Printf.sprintf "%S: %S" p.param_name p.param_type
-                ) params))
+        Format.printf "'{@[<1>@ ";
+        List.iteri (fun i p ->
+            if i > 0 then Format.printf ",@ ";
+            Format.printf "%S:@ %S" p.param_name p.param_type
+          ) params ;
+        Format.printf "@ @]}'"
   in
 
   let print_functions msg list =
@@ -91,14 +93,18 @@ let show_abi contract =
     | _ ->
         Printf.printf "\n%s:\n%!" msg;
         List.iter (fun f ->
-            Printf.printf "  * %s %s%s\n%!"
-              f.fun_name
-              ( string_of_params f.fun_inputs )
-              (match f.fun_outputs with
-               | [] -> ""
-               | outputs ->
-                   Printf.sprintf " -> %s"
-                     ( string_of_params outputs ))
+            Format.printf "  * @[<1>%s@ "
+              f.fun_name;
+
+            printf_params f.fun_inputs ;
+            begin
+              match f.fun_outputs with
+              | [] -> ()
+              | outputs ->
+                   Format.printf "@ ->@ ";
+                   printf_params outputs;
+            end;
+            Format.printf "@]@."
           ) list
   in
 
@@ -111,19 +117,146 @@ let show_abi contract =
     | events ->
         Printf.printf "\nEvents:\n%!";
         List.iter (fun ev ->
-            Printf.printf " * %s %s\n%!" ev.ev_name
-              ( string_of_params ev.ev_inputs )
+            Format.printf " * %s " ev.ev_name ;
+            printf_params ev.ev_inputs ;
+            Format.printf "@."
           ) events
   end;
 
   ()
 
+let sol_abi contract =
+  let _config = Config.config () in
+  let contract_abi = Misc.get_contract_abifile contract in
+  let abi = Ton_sdk.ABI.read contract_abi in
+  let filename = contract ^ "_impl.sol" in
+  Printf.eprintf "Generating %S\n%!" filename;
+  let oc = open_out filename  in
+  let ppf = Format.formatter_of_out_channel oc in
+
+  Format.fprintf ppf "pragma ton-solidity >= 0.32.0;@.";
+
+  let open Ton_sdk.TYPES.ABI in
+
+  begin
+    match abi.header with
+    | [] -> () | headers ->
+        Format.fprintf ppf "@.// Headers:@.";
+        List.iter (fun header ->
+            Format.fprintf ppf "pragma AbiHeader %s;@." header
+          ) headers ;
+  end;
+  Format.fprintf ppf "@.contract %s {@[<1>@.@." contract ;
+
+  begin
+    match abi.data with
+    | [] -> ()
+    | data ->
+        List.iter (fun d ->
+            Format.fprintf ppf "  %s static %s;@." d.data_type d.data_name
+          ) data;
+  end;
+
+  let constructors, functions = List.partition (fun f ->
+      f.fun_name = "constructor"
+    ) abi.functions
+  in
+  let variables, functions = List.partition (fun f ->
+      match EzString.chop_prefix ~prefix:"g_" f.fun_name with
+      | Some _ -> true
+      | None -> false
+    ) functions
+  in
+
+  let fprintf_params params =
+    match params with
+    | [] -> Format.fprintf ppf "()"
+    | _ ->
+        Format.fprintf ppf "(@[<1>@ ";
+        List.iteri (fun i p ->
+            if i > 0 then Format.fprintf ppf ",@ ";
+            Format.fprintf ppf "%s@ %s" p.param_type p.param_name
+          ) params ;
+        Format.fprintf ppf "@ @])"
+  in
+
+  let fprintf_functions list =
+    match list with
+    | [] -> ()
+    | _ ->
+        List.iter (fun f ->
+            let is_viewer =
+              match EzString.chop_prefix f.fun_name ~prefix:"get" with
+              | Some "" -> true
+              | None -> false
+              | Some x -> Char.uppercase x.[0] = x.[0]
+            in
+            Format.fprintf ppf "@.  %s @[<1>@ "
+              ( match f.fun_name with
+               | "constructor" -> "constructor"
+               | name -> Printf.sprintf "function %s" name );
+
+            fprintf_params f.fun_inputs ;
+            Format.fprintf ppf "@ public";
+            if is_viewer then
+              Format.fprintf ppf "@ view";
+            begin
+              match f.fun_outputs with
+              | [] -> ()
+              | outputs ->
+                   Format.fprintf ppf "@ returns@ ";
+                   fprintf_params outputs;
+            end;
+            Format.fprintf ppf "@.  {@.";
+            if not is_viewer then begin
+              Format.fprintf ppf
+                "    // require( tvm.pubkey() == msg.pubkey, EXN_AUTH_FAILED)@.";
+              Format.fprintf ppf "    // tvm.accept()@.";
+            end;
+            Format.fprintf ppf "    // TOOO@.";
+
+            Format.fprintf ppf "  }@.";
+            Format.fprintf ppf "@]@."
+          ) list
+  in
+
+
+  begin
+    match abi.events with
+    | [] -> ()
+    | events ->
+        Format.fprintf ppf "@.";
+        List.iter (fun ev ->
+            Format.fprintf ppf "  event %s " ev.ev_name ;
+            fprintf_params ev.ev_inputs ;
+            Format.fprintf ppf "@."
+          ) events
+  end;
+
+  begin
+    match variables with
+    | [] -> ()
+    | _ ->
+        Format.fprintf ppf "@.";
+        List.iter (fun f ->
+            Format.fprintf ppf "  %s public %s;@."
+              ( match f.fun_outputs with
+                  [ p ] -> p.param_type
+                | _ -> "// UNKNOWN " ) f.fun_name
+          ) variables ;
+  end;
+  fprintf_functions constructors ;
+  fprintf_functions functions ;
+
+  Format.fprintf ppf "@]}@.";
+  close_out oc;
+  ()
+
 let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   match todo with
-  | ListContracts ->
-      CommandList.list_contracts ()
-  | ShowABI contract ->
-      show_abi contract
+  | ListContracts -> CommandList.list_contracts ()
+  | ShowABI contract -> show_abi contract
+  | SolABI contract -> sol_abi contract
   | BuildContract filename ->
       (* TODO: check that no account is using this contract,
          otherwise, these accounts will become unreachable, i.e. we
@@ -455,6 +588,13 @@ let cmd =
             set_todo "--show-abi" (ShowABI contract)
           ),
         EZCMD.info ~docv:"CONTRACT" "Show ABI of contract CONTRACT";
+
+        [ "sol-abi" ], Arg.String (fun contract ->
+            Globals.verbosity := 0;
+            set_todo "--sol-abi" (SolABI contract)
+          ),
+        EZCMD.info ~docv:"CONTRACT"
+          "Output ABI of contract CONTRACT as Solidity ";
 
         [ "dst" ], Arg.String (fun s -> create := Some (UseAccount s) ),
         EZCMD.info ~docv:"ACCOUNT"
