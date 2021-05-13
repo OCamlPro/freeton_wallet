@@ -101,6 +101,9 @@ let check_new_key_exn net name =
         Error.raise "Key %S already exists" name
     ) net.net_keys
 
+let key_exists net name =
+  List.exists (fun key -> key.key_name = name) net.net_keys
+
 let find_line ?(succeeded=false) f lines =
   let v = ref None in
   let succes = ref false in

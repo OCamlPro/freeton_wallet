@@ -19,13 +19,13 @@ open Types
 type create =
   | UseAccount of string
   | CreateAccount of string
-  | ReplaceAccount of string
 
 type todo =
     ListContracts
   | BuildContract of string
   | DeployContract of string
   | ImportContract of string
+  | ShowABI of string
 
 let remove_files dirname files =
   List.iter (fun file ->
@@ -43,10 +43,87 @@ let check_exists dirname file =
     else
       Error.raise "File %s was not generated" file
 
+let show_abi contract =
+  let _config = Config.config () in
+  let contract_abi = Misc.get_contract_abifile contract in
+  let abi = Ton_sdk.ABI.read contract_abi in
+
+  Printf.printf "ABI of contract %S\n%!" contract ;
+  Printf.printf "  File: %s\n%!" contract_abi ;
+
+  let open Ton_sdk.TYPES.ABI in
+
+  begin
+    match abi.header with
+    | [] -> () | headers ->
+        Printf.printf "Headers: %s\n%!"
+          ( String.concat " " headers );
+  end;
+  begin
+    match abi.data with
+    | [] -> ()
+    | data ->
+        Printf.printf "\nStatic variables:\n%!";
+        List.iter (fun d ->
+            Printf.printf "  %s: %s\n%!" d.data_name d.data_type
+          ) data;
+  end;
+
+  let constructors, functions = List.partition (fun f ->
+      f.fun_name = "constructor"
+    ) abi.functions
+  in
+
+  let string_of_params params =
+    match params with
+    | [] -> "{}"
+    | _ ->
+        Printf.sprintf "'{ %s}'"
+          ( String.concat ", "
+              (List.map (fun p ->
+                  Printf.sprintf "%S: %S" p.param_name p.param_type
+                ) params))
+  in
+
+  let print_functions msg list =
+    match list with
+    | [] -> ()
+    | _ ->
+        Printf.printf "\n%s:\n%!" msg;
+        List.iter (fun f ->
+            Printf.printf "  * %s %s%s\n%!"
+              f.fun_name
+              ( string_of_params f.fun_inputs )
+              (match f.fun_outputs with
+               | [] -> ""
+               | outputs ->
+                   Printf.sprintf " -> %s"
+                     ( string_of_params outputs ))
+          ) list
+  in
+
+  print_functions "Constructors" constructors ;
+  print_functions "Methods" functions ;
+
+  begin
+    match abi.events with
+    | [] -> ()
+    | events ->
+        Printf.printf "\nEvents:\n%!";
+        List.iter (fun ev ->
+            Printf.printf " * %s %s\n%!" ev.ev_name
+              ( string_of_params ev.ev_inputs )
+          ) events
+  end;
+
+  ()
+
 let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   match todo with
   | ListContracts ->
       CommandList.list_contracts ()
+  | ShowABI contract ->
+      show_abi contract
   | BuildContract filename ->
       (* TODO: check that no account is using this contract,
          otherwise, these accounts will become unreachable, i.e. we
@@ -129,9 +206,6 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
       let create =
         match create, sign with
         | None, _ -> CreateAccount contract
-        | Some ( ReplaceAccount dst ), _ ->
-            Misc.delete_account config net dst;
-            CreateAccount dst
         | Some ( UseAccount _ ), Some _ ->
             Error.raise "--dst and --sign cannot be used together"
         | Some ( UseAccount dst ), None -> UseAccount dst
@@ -140,7 +214,14 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
       let dst, sign =
         match create with
         | CreateAccount dst ->
-            Misc.check_new_key_exn net dst;
+
+            if Misc.key_exists net dst then begin
+              if force then
+                Misc.delete_account config net dst
+              else
+                Error.raise "Key %s already exists. Use -f to override" dst
+            end;
+
             Printf.eprintf "Generating new key %S\n%!" dst;
             let sign =
               match sign with
@@ -180,7 +261,6 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
               ~amount:"1" ();
             Config.save config;
             dst, sign
-        | ReplaceAccount _ -> assert false
         | UseAccount dst -> dst, None
       in
       let key = Misc.find_key_exn net dst in
@@ -210,7 +290,7 @@ let create_interface name =
       Printf.sprintf
         {|/* Interface %s */
 
-pragma ton-solidity >= 0.37.0;
+pragma ton-solidity >= 0.32.0;
 
 interface %s {
 
@@ -236,26 +316,26 @@ let create_contract name =
   Implementation of contract %s
  */
 
-pragma ton-solidity >= 0.37.0;
+pragma ton-solidity >= 0.32.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
 import "./I%s.sol";
 
+contract %s is I%s {
+
 /*
   Exception codes:
   100 - message sender is not a custodian;
 */
-contract %s is I%s {
-
-  uint64 constant EXPIRATION_TIME = 86400; // lifetime is 24 hours
+  uint64 constant EXN_AUTH_FAILED = 100 ;
 
   uint8 g_nvals ;                      // required number of ...
   mapping(uint256 => uint8) g_vals ;   // pubkey -> value_index
 
   constructor( uint256[] values ) public {
-    require( msg.pubkey() == tvm.pubkey(), 100 );
+    require( msg.pubkey() == tvm.pubkey(), EXN_AUTH_FAILED );
     tvm.accept();
     // TODO
     g_vals[ values[0] ] = 1;
@@ -371,6 +451,11 @@ let cmd =
           ),
         EZCMD.info ~docv:"CONTRACT" "Deploy contract CONTRACT";
 
+        [ "show-abi" ], Arg.String (fun contract ->
+            set_todo "--show-abi" (ShowABI contract)
+          ),
+        EZCMD.info ~docv:"CONTRACT" "Show ABI of contract CONTRACT";
+
         [ "dst" ], Arg.String (fun s -> create := Some (UseAccount s) ),
         EZCMD.info ~docv:"ACCOUNT"
           "Deploy to this account, using the existing keypair";
@@ -390,7 +475,8 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT"
           "Create ACCOUNT by deploying contract (with --deploy)";
 
-        [ "replace" ], Arg.String (fun s -> create := Some (ReplaceAccount s) ),
+        [ "replace" ], Arg.String (fun s ->
+            create := Some (CreateAccount s) ; force := true ),
         EZCMD.info ~docv:"ACCOUNT"
           "Replace ACCOUNT when deploying contract (with --deploy)";
 

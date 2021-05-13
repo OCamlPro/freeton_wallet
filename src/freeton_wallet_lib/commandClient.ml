@@ -28,7 +28,11 @@ let action ?(exec=false) ?stdout args =
   let clean () =
     List.iter Sys.remove !files
   in
-  let cmd = if exec then args else Utils.tonoscli config args in
+  let cmd = if exec then
+      match args with
+      | [] -> Error.raise "You must provide a command to execute"
+      | _ -> args
+    else Utils.tonoscli config args in
   match
     match stdout with
     | None -> Misc.call cmd
@@ -40,12 +44,13 @@ let action ?(exec=false) ?stdout args =
   | v -> v
 
 let cmd =
+  let exec = ref false in
   let args = ref [] in
   let stdout = ref None in
   EZCMD.sub
     "client"
     (fun () ->
-       action !args ~exec:false ?stdout:!stdout
+       action !args ~exec:!exec ?stdout:!stdout
     )
     ~args:
       [ [],
@@ -54,6 +59,9 @@ let cmd =
 
         [ "stdout" ], Arg.String (fun s -> stdout := Some s),
         EZCMD.info ~docv:"FILE" "Save command stdout to file";
+
+        [ "exec" ], Arg.Set exec,
+        EZCMD.info "(deprecated, use 'ft exec -- COMMAND' instead)";
 
       ]
     ~doc: "Call tonos-cli, use -- to separate arguments. Use 'ft exec \
