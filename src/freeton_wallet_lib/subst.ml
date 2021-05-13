@@ -171,8 +171,17 @@ let subst_string ?brace config =
     | "read" :: rem -> EzFile.read_file ( iter rem )
     | "hex" :: rem ->
         let `Hex s = Hex.of_string ( iter rem ) in s
+    | "of-hex" :: rem ->
+        let s = Hex.to_string ( `Hex (iter rem) ) in s
     | "base64" :: rem ->
         Base64.encode_string ( iter rem )
+    | "of-base64" :: rem ->
+        begin
+          let s = iter rem in
+          match Base64.decode s with
+          | Ok s -> s
+          | Error _ -> Error.raise "of-base64: %s" s
+        end
     | "get-code" :: rem ->
         get_code ( iter rem )
 
@@ -281,6 +290,8 @@ Encoders, working on the rest of the substitution:
 * read:SUBST       Do SUBST, then read it as a filename
 * hex:SUBST        Do SUBST, then convert to hex
 * base64:SUBST     Do SUBST, then convert to base64
+* of-hex:SUBST        Do SUBST, then convert from hex
+* of-base64:SUBST     Do SUBST, then convert from base64
 * get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
 
 |}
