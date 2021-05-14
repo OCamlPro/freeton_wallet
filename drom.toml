@@ -39,7 +39,7 @@ and C++ with asynchonous external calls.
 """
 
 [project]
-skip = [ "sphinx/index.rst", "sphinx/install.rst", "sphinx/conf.py", "sphinx/about.rst" ]
+skip = [ "sphinx/index.rst", "sphinx/install.rst", "sphinx/conf.py", "sphinx/about.rst" , "dune", "@test" ]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
@@ -88,3 +88,19 @@ dir = "src/freeton_wallet_lib"
 dir = "src/ft"
 # edit 'src/ft/package.toml' for package-specific options
 
+
+[[package]]
+dir = "src/freeton_crawler_lib"
+# edit 'src/freeton_crawler_lib/package.toml' for package-specific options
+
+[[package]]
+dir = "src/freeton_crawler_db"
+# edit 'src/freeton_crawler_db/package.toml' for package-specific options
+
+[[package]]
+dir = "src/freeton_crawler_updater"
+# edit 'src/freeton_crawler_updater/package.toml' for package-specific options
+
+[[package]]
+dir = "src/freeton_crawler_db_versions"
+# edit 'src/freeton_crawler_db_versions/package.toml' for package-specific options

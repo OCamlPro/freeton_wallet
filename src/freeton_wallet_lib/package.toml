@@ -55,6 +55,7 @@ freeton_ocaml_sdk = "0.3.0"
 ezjsonm = ""
 lwt_ssl = "1.1"
 calendar = "2"
+freeton_crawler_lib = { version = "version", opt = true }
 
 # package tools dependencies
 [tools]
@@ -73,3 +74,10 @@ dune-trailer = """(rule
       (run %{bin:ocaml-crunch} -m plain -o files.ml files/))
 )
 """
+dune-libraries = """
+  (select commandCrawler.ml from
+  (freeton_crawler_lib -> commandCrawler.present.ml)
+  (-> commandCrawler.absent.ml)
+  )
+"""
+

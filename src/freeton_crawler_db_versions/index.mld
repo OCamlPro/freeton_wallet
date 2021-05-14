@@ -1,0 +1,15 @@
+{1 Library freeton_crawler_db_versions}
+
+The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.
+
+The FreeTON blockchain is the open-source version of the Telegram Open
+Network. FreeTON is one of the only blockchains with dynamic sharding
+for unlimited scalability and immediate finality for real-time
+applications. It also uses Proof-of-Stake with delegation through
+smart contracts. Smart contracts are written in dialects of Solidity
+and C++ with asynchonous external calls.
+
+
+
+The entry point of this library is the module: {!Freeton_crawler_db_versions}.
+
