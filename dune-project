@@ -67,25 +67,11 @@
  (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
  (depends
    (ocaml (>= 4.08.0))
-   (freeton_ocaml_sdk (and (>= 0.3.0) (< 1.0.0)))
-   (freeton_crawler_db (= version))
-   (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))
-   ppx_inline_test
-   ppx_expect
-   odoc
-   ocamlformat
-  )
- )
-
-(package
- (name freeton_crawler_db)
- (synopsis "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)")
- (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
- (depends
-   (ocaml (>= 4.08.0))
    (lwt (and (>= 5.0.0) (< 6.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.3.0) (< 1.0.0)))
    (freeton_crawler_db_versions (= version))
    ez_pgocaml
+   (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))
    (freeton_crawler_updater (= version))
    ppx_inline_test
    ppx_expect
@@ -114,6 +100,21 @@
  (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
  (depends
    (ocaml (>= 4.08.0))
+   ez_pgocaml
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name ft-crawler)
+ (synopsis "ft with subcommand 'crawler' to store events of an account in a psql database")
+ (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
+ (depends
+   (ocaml (>= 4.08.0))
+   (ft (= version))
    ez_pgocaml
    ppx_inline_test
    ppx_expect

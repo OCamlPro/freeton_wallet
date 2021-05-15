@@ -11,5 +11,6 @@ and C++ with asynchonous external calls.
 
 
 
-The entry point of this library is the module: {!Freeton_crawler_lib}.
+This library exposes the following toplevel modules:
+{!modules:Db Db_utils Freeton_crawler Lwt_utils Main PGOCaml_lwt}
 

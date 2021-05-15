@@ -10,10 +10,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-(* If you delete or rename this file, you should add
-   'src/freeton_crawler_db/main.ml' to the 'skip' field in "drom.toml" *)
-
-let init = Updated.init
-
-let main () = Printf.printf "Hello world!\n"
+val main : url:string -> address:string -> abi:string -> 'a Lwt.t

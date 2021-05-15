@@ -20,4 +20,4 @@ let cmd =
          "Unavailable. You must install ez_pgocaml and recompile.\n%!";
        exit 2
     )
-    ~doc: "Unavailable. You must install ez_pgocaml and recompile"
+    ~doc: "Unavailable. You must install 'freeton_crawler' with opam."

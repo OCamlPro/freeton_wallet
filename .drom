@@ -2,17 +2,17 @@
 
 # hash of toml configuration files
 # used for generation of all files
-6086e181f98f9f9c3f0eed55d10db8e6:.
+fb3b41a73787d3f07008524927cc76c1:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
 # file .github/workflows/doc-deploy.yml
-425a8e9d3e27947f6866d2d18c29965a:.github/workflows/doc-deploy.yml
+2ccf2e5e20e62aba37403148f4b29016:.github/workflows/doc-deploy.yml
 # end context for .github/workflows/doc-deploy.yml
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-5c9c10970980df008193d8ea5aafedfe:.github/workflows/workflow.yml
+b443b6267e8ad879ccdbf8b3445ac8b3:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -47,7 +47,7 @@ bb203bd782edcf9a04631b76387df826:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-56c528cc2f3bb5a126a5c6aaa4ba19ea:Makefile
+22d46583a6bedaa7f9b8f0b73a926efe:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -97,13 +97,13 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-bf2f06eaec552a6e93fb7129cf649d08:dune-project
+205b864fe9928206794dac6941192c56:dune-project
 # end context for dune-project
 
-# begin context for freeton_crawler_db.opam
-# file freeton_crawler_db.opam
-fb061a1f6020e695f674d79369091c17:freeton_crawler_db.opam
-# end context for freeton_crawler_db.opam
+# begin context for freeton_crawler.opam
+# file freeton_crawler.opam
+cc31589fd0ac1aa5e856bd7e4aff5cee:freeton_crawler.opam
+# end context for freeton_crawler.opam
 
 # begin context for freeton_crawler_db_versions.opam
 # file freeton_crawler_db_versions.opam
@@ -112,7 +112,7 @@ fb061a1f6020e695f674d79369091c17:freeton_crawler_db.opam
 
 # begin context for freeton_crawler_lib.opam
 # file freeton_crawler_lib.opam
-2ae21a739d8ae4d78d678ece7654a8ba:freeton_crawler_lib.opam
+fac889599f5a56f1284468ab7ca9e54f:freeton_crawler_lib.opam
 # end context for freeton_crawler_lib.opam
 
 # begin context for freeton_crawler_updater.opam
@@ -124,6 +124,11 @@ e6a04a3e19b0bbb0d15b827831a5a986:freeton_crawler_updater.opam
 # file freeton_wallet_lib.opam
 18a115763256fb8b8af1a9c531507b68:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
+
+# begin context for ft-crawler.opam
+# file ft-crawler.opam
+a1c9c5ad75fd82dc897b73b86c20d988:ft-crawler.opam
+# end context for ft-crawler.opam
 
 # begin context for ft.opam
 # file ft.opam
@@ -175,11 +180,6 @@ cb118e5d830d1ab79f56d384c97020b1:sphinx/install.rst
 8d984cbb854fe94fc5fa77b97b6ee046:sphinx/license.rst
 # end context for sphinx/license.rst
 
-# begin context for src/freeton_crawler_db/dune
-# file src/freeton_crawler_db/dune
-a3d7641caf60c984120270e41b407b37:src/freeton_crawler_db/dune
-# end context for src/freeton_crawler_db/dune
-
 # begin context for src/freeton_crawler_db/index.mld
 # file src/freeton_crawler_db/index.mld
 5e6f9dfd2f5ef14c0a472e8444f7f954:src/freeton_crawler_db/index.mld
@@ -207,13 +207,18 @@ a3d7641caf60c984120270e41b407b37:src/freeton_crawler_db/dune
 
 # begin context for src/freeton_crawler_lib/dune
 # file src/freeton_crawler_lib/dune
-59def2b29c7e358c718b4e68c754e9ea:src/freeton_crawler_lib/dune
+509c055ce45a1057b8daaf67d0bc9822:src/freeton_crawler_lib/dune
 # end context for src/freeton_crawler_lib/dune
 
 # begin context for src/freeton_crawler_lib/index.mld
 # file src/freeton_crawler_lib/index.mld
-ba969bf78af6b025ce063e20de2a0697:src/freeton_crawler_lib/index.mld
+c4103e0ca05c966408fcc2e64b180fe7:src/freeton_crawler_lib/index.mld
 # end context for src/freeton_crawler_lib/index.mld
+
+# begin context for src/freeton_crawler_lib/main.ml
+# file src/freeton_crawler_lib/main.ml
+04afee240d16dd3a70a66038de73615b:src/freeton_crawler_lib/main.ml
+# end context for src/freeton_crawler_lib/main.ml
 
 # begin context for src/freeton_crawler_lib/version.mlt
 # file src/freeton_crawler_lib/version.mlt

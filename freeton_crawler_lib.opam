@@ -45,9 +45,12 @@ install: [
 depends: [
   "ocaml" {>= "4.08.0"}
   "dune" {>= "2.6.0"}
+  "lwt" {>= "5.0.0" & < "6.0.0"}
   "freeton_ocaml_sdk" {>= "0.3.0" & < "1.0.0"}
-  "freeton_crawler_db" {= version}
+  "freeton_crawler_db_versions" {= version}
+  "ez_pgocaml" {}
   "ez_cmdliner" {>= "0.2.0" & < "1.0.0"}
+  "freeton_crawler_updater" {= version}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}

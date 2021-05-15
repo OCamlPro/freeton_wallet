@@ -36,7 +36,7 @@ let action_crawler ~url ~account ~address ~contract =
     let> () = ProcessManager.set_worker
         ( Printf.sprintf "crawler_%s" account )
     in
-    Freeton_crawler_lib.Main.main ~url ~address ~abi)
+    Freeton_crawler.main ~url ~address ~abi)
 
 let check_database database dropdb =
   Db_utils.database := database ;
