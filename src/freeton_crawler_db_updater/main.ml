@@ -17,6 +17,15 @@ let () =
 
   if Array.length Sys.argv > 1 then
     let filename = Sys.argv.(1) in
+    let hash =
+      Digest.string
+        ( String.concat "+"
+            (List.map (fun (version, up, down) ->
+                 Printf.sprintf "%d|%s|%s" version
+                   ( String.concat "\n" up )
+                   ( String.concat "\n" down )
+               ) Freeton_crawler_db_versions.Main.versions) )
+    in
     let oc = open_out filename in
-    Printf.fprintf oc "let init () = ()\n%!";
+    Printf.fprintf oc "let db_versions_hash = %S\n%!" hash;
     close_out oc

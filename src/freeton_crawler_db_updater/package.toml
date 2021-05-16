@@ -1,6 +1,6 @@
 
 # name of package
-name = "freeton_crawler_updater"
+name = "freeton_crawler_db_updater"
 skeleton = "program"
 
 # version if different from project version
@@ -28,11 +28,18 @@ gen-version = "version.ml"
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
 
+# whether the package can be silently skipped if missing deps (default is false)
+optional = true
+
 # module name used to pack modules (if pack-modules is true)
 # pack = "Mylib"
 
+# preprocessing options
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+# preprocess = "pps ppx_deriving_encoding"
+
 # files to skip while updating at package level
-skip = [ "main.ml" ]
+skip = ["main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -53,5 +60,6 @@ freeton_crawler_db_versions = "version"
 #  opam-trailer = "pin-depends: [..]" 
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
+#  gen-opam = "some" | "all" 
 [fields]
-dune-stanzas = "(optional)"
+# ...

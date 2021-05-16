@@ -28,8 +28,15 @@ gen-version = "version.ml"
 # whether all modules should be packed/wrapped (default is true)
 pack-modules = false
 
+# whether the package can be silently skipped if missing deps (default is false)
+optional = true
+
 # module name used to pack modules (if pack-modules is true)
 # pack = "Mylib"
+
+# preprocessing options
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+preprocess = "pps pgocaml_ppx"
 
 # files to skip while updating at package level
 # skip = []
@@ -41,13 +48,13 @@ pack-modules = false
 [dependencies]
 ez_cmdliner = "0.2.0"
 ez_pgocaml = ""
-lwt = "5.0.0"
 freeton_crawler_db_versions = "version"
 freeton_ocaml_sdk = "0.3.0"
+lwt = "5.0.0"
 
 # package tools dependencies
 [tools]
-freeton_crawler_updater = "version"
+freeton_crawler_db_updater = "version"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -57,16 +64,22 @@ freeton_crawler_updater = "version"
 #  opam-trailer = "pin-depends: [..]" 
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
+#  gen-opam = "some" | "all" 
 [fields]
-dune-stanzas = """ (preprocess (pps pgocaml_ppx))
- (preprocessor_deps (env_var PGDATABASE) (env_var PGCUSTOM_CONVERTERS_CONFIG))
- (optional)
+dune-libraries = "lwt.unix"
+dune-stanzas = """ 
+ (preprocessor_deps
+   (env_var PGDATABASE)
+   (env_var PGCUSTOM_CONVERTERS_CONFIG)
+   (file updated.ml)
+ )
 """
 dune-trailer = """(rule
   (targets updated.ml)
-  (deps ../freeton_crawler_db_versions/main.ml)
+  (deps
+    ../freeton_crawler_db_versions/main.ml
+    %{bin:freeton_crawler_db_updater})
   (action
-      (run %{bin:freeton_crawler_updater} updated.ml))
+      (run %{bin:freeton_crawler_db_updater} updated.ml))
 )
 """
-dune-libraries= "lwt.unix"

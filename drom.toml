@@ -10,10 +10,8 @@ github-organization = "ocamlpro"
 license = "LGPL2"
 min-edition = "4.08.0"
 name = "freeton_wallet"
-version = "0.3.1"
-
-# synopsis if different from project synopsis
 synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)"
+version = "0.3.1"
 
 # keys that you could also define:
 # odoc-target = "...odoc-target..."
@@ -26,8 +24,6 @@ synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON bl
 # homepage = "...homepage..."
 
 [project]
-
-# description if different from project description
 description = """The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.
 
 The FreeTON blockchain is the open-source version of the Telegram Open
@@ -39,7 +35,7 @@ and C++ with asynchonous external calls.
 """
 
 [project]
-skip = [ "sphinx/index.rst", "sphinx/install.rst", "sphinx/conf.py", "sphinx/about.rst" , "dune", "@test", "CHANGES.md" ]
+skip = ["sphinx/index.rst", "sphinx/install.rst", "sphinx/conf.py", "sphinx/about.rst", "dune", "@test", "CHANGES.md"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
@@ -88,14 +84,13 @@ dir = "src/freeton_wallet_lib"
 dir = "src/ft"
 # edit 'src/ft/package.toml' for package-specific options
 
-
 [[package]]
 dir = "src/freeton_crawler_lib"
 # edit 'src/freeton_crawler_lib/package.toml' for package-specific options
 
 [[package]]
-dir = "src/freeton_crawler_updater"
-# edit 'src/freeton_crawler_updater/package.toml' for package-specific options
+dir = "src/freeton_crawler_db_updater"
+# edit 'src/freeton_crawler_db_updater/package.toml' for package-specific options
 
 [[package]]
 dir = "src/freeton_crawler_db_versions"
@@ -103,4 +98,5 @@ dir = "src/freeton_crawler_db_versions"
 
 [[package]]
 dir = "src/ft-crawler"
+# edit 'src/ft-crawler/package.toml' for package-specific options
 

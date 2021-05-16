@@ -55,7 +55,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_updater freeton_crawler_db_versions
+      - run: opam depext -y freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_db_updater freeton_crawler_db_versions
         if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y ./*.opam --deps-only --with-test

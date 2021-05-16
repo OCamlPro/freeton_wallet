@@ -50,7 +50,7 @@ depends: [
   "freeton_crawler_db_versions" {= version}
   "ez_pgocaml" {}
   "ez_cmdliner" {>= "0.2.0" & < "1.0.0"}
-  "freeton_crawler_updater" {= version}
+  "freeton_crawler_db_updater" {= version}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}

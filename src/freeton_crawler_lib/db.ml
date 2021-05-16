@@ -1,10 +1,22 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (c) 2021 OCamlPro SAS                                       *)
+(*                                                                        *)
+(*  All rights reserved.                                                  *)
+(*  This file is distributed under the terms of the GNU Lesser General    *)
+(*  Public License version 2.1, with the special exception on linking     *)
+(*  described in the LICENSE.md file in the root directory.               *)
+(*                                                                        *)
+(*                                                                        *)
+(**************************************************************************)
+
 open Db_utils
 
 let int32_of_string = Int32.of_string
 let string_of_string s = s
 let int64_of_string = Int64.of_string
 
-let init = Updated.init
+let init = Updated.db_versions_hash
 
 let with_dbh f x =
   let>>> dbh = () in

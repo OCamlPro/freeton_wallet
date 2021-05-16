@@ -5,10 +5,14 @@
   (public_name freeton_crawler_lib)
   (wrapped false)
   (libraries lwt freeton_ocaml_sdk freeton_crawler_db_versions ez_pgocaml ez_cmdliner lwt.unix)
-  
-   (preprocess (pps pgocaml_ppx))
- (preprocessor_deps (env_var PGDATABASE) (env_var PGCUSTOM_CONVERTERS_CONFIG))
- (optional)
+  (preprocess (pps pgocaml_ppx))
+  (optional)
+   
+ (preprocessor_deps
+   (env_var PGDATABASE)
+   (env_var PGCUSTOM_CONVERTERS_CONFIG)
+   (file updated.ml)
+ )
 
   )
 
@@ -23,8 +27,10 @@
 
 (rule
   (targets updated.ml)
-  (deps ../freeton_crawler_db_versions/main.ml)
+  (deps
+    ../freeton_crawler_db_versions/main.ml
+    %{bin:freeton_crawler_db_updater})
   (action
-      (run %{bin:freeton_crawler_updater} updated.ml))
+      (run %{bin:freeton_crawler_db_updater} updated.ml))
 )
 

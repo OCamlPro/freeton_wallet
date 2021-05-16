@@ -12,5 +12,5 @@ and C++ with asynchonous external calls.
 
 
 This library exposes the following toplevel modules:
-{!modules:Db Db_utils Freeton_crawler Lwt_utils Main PGOCaml_lwt}
+{!modules:Db Db_utils Freeton_crawler Lwt_utils Main PGOCaml_lwt ProcessManager}
 

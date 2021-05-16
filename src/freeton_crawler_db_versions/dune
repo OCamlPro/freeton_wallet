@@ -5,8 +5,8 @@
   (public_name freeton_crawler_db_versions)
   (wrapped true)
   (libraries ez_pgocaml )
-  
   (optional)
+  
   )
 
 
