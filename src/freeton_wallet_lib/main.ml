@@ -1,4 +1,4 @@
- (**************************************************************************)
+(**************************************************************************)
 (*                                                                        *)
 (*  Copyright (c) 2021 OCamlPro SAS                                       *)
 (*                                                                        *)
@@ -45,6 +45,7 @@ let main () =
       CommandUtils.cmd;
       CommandWatch.cmd;
       CommandInspect.cmd;
+      CommandCrawler.cmd;
     ]
   in
   let common_args =

@@ -1,33 +1,25 @@
 
 # name of package
-name = "ft"
-skeleton = "driver"
+name = "freeton_crawler_db_versions"
+skeleton = "library"
 
 # version if different from project version
 # version = "0.1.0"
 
 # synopsis if different from project synopsis
-synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (executable)"
+# synopsis = ...
 
 # description if different from project description
-description = """The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.
-
-The FreeTON blockchain is the open-source version of the Telegram Open
-Network. FreeTON is one of the only blockchains with dynamic sharding
-for unlimited scalability and immediate finality for real-time
-applications. It also uses Proof-of-Stake with delegation through
-smart contracts. Smart contracts are written in dialects of Solidity
-and C++ with asynchonous external calls.
-"""
+# description = ...
 
 # kind is either "library", "program" or "virtual"
-kind = "program"
+kind = "library"
 
 # authors if different from project authors
 # authors = [ "Me <me@metoo.org>" ]
 
 # name of a file to generate with the current version
-# gen-version = "version.ml"
+gen-version = "version.ml"
 
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
@@ -37,7 +29,7 @@ kind = "program"
 # pack-modules = false
 
 # whether the package can be silently skipped if missing deps (default is false)
-# optional = true
+optional = true
 
 # module name used to pack modules (if pack-modules is true)
 # pack = "Mylib"
@@ -47,18 +39,18 @@ kind = "program"
 # preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
-skip = ["index.mld"]
+skip = ["main.ml"]
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-freeton_wallet_lib = "version"
+ez_pgocaml = ""
 
 # package tools dependencies
 [tools]
-conf-libssl = ""
+# ...
 
 # package fields (depends on package skeleton)
 #Examples:
