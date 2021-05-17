@@ -1,5 +1,5 @@
 
-## v0.3.1
+## v0.4.0
 
 * Add 'ft crawler ACCOUNT' to crawle transactions on ACCOUNT and store
   corresponding events in a PostgresQL database. Use --start/status/stop
