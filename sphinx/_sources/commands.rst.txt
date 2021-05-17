@@ -27,6 +27,9 @@ Overview of sub-commands::
   contract
     Manage contracts
   
+  crawler
+    Unavailable. You must install 'freeton_crawler' with opam.
+  
   exec
     Call command with substitution on arguments, use -- before the command.
   
@@ -407,6 +410,21 @@ Where options are:
 * :code:`--sign ACCOUNT`   Deploy using this keypair
 
 * :code:`--sol-abi CONTRACT`   Output ABI of contract CONTRACT as Solidity 
+
+
+drom crawler
+~~~~~~~~~~~~~~
+
+Unavailable. You must install 'freeton_crawler' with opam.
+
+
+**USAGE**
+::
+  
+  drom crawler [OPTIONS]
+
+Where options are:
+
 
 
 drom exec
