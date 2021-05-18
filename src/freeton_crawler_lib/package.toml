@@ -55,6 +55,7 @@ lwt = "5.0.0"
 # package tools dependencies
 [tools]
 freeton_crawler_db_updater = "version"
+pgocaml_ppx = ""
 
 # package fields (depends on package skeleton)
 #Examples:

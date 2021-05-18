@@ -10,9 +10,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ezcmd.V2
-open EZCMD.TYPES
-
 let (let>) = Db_utils.(let>)
 
 let action_start ~account =
@@ -53,12 +50,6 @@ let check_database database dropdb =
     dbh;
   PGOCaml.close dbh
 
-type action =
-  | Crawler
-  | Start
-  | Status
-  | Stop
-
 let get ~account =
   match account with
   | None -> Error.raise "You must specify an account to crawl"
@@ -77,44 +68,25 @@ let get ~account =
       | _ ->
           Error.raise "Contract for address is not known"
 
-let cmd =
 
-  let dropdb = ref false in
-  let account = ref None in
-  let action = ref Crawler in
-  EZCMD.sub
-    "crawler"
-    (fun () ->
-       let ( account, address, contract, url ) = get ~account:!account in
-       match !action with
-       | Crawler ->
-           check_database account !dropdb ;
-           action_crawler ~account ~address ~contract ~url
-       | Start ->
-           check_database account !dropdb ;
-           Lwt_main.run ( action_start ~account )
-       | Status ->
-           Db_utils.database := account ;
-           Lwt_main.run ( action_status ~account )
-       | Stop ->
-           Db_utils.database := account ;
-           Lwt_main.run ( action_stop ~account )
-    )
-    ~doc: "Crawl all transactions to an address and fill a psql database"
-    ~args:[
-      [], Arg.Anon (0, fun addr -> account := Some addr),
-      EZCMD.info ~docv:"ACCOUNT" "Account to crawl" ;
+type action =
+  | Crawler
+  | Start
+  | Status
+  | Stop
 
-      [ "start" ], Arg.Unit (fun () -> action := Start),
-      EZCMD.info "Start with a manager process to restart automatically" ;
-
-      [ "status" ], Arg.Unit (fun () -> action := Status),
-      EZCMD.info "Check if a manager process and crawler are running" ;
-
-      [ "stop" ], Arg.Unit (fun () -> action := Stop),
-      EZCMD.info "Stop the manager process and the crawler" ;
-
-      [ "dropdb" ], Arg.Set dropdb,
-      EZCMD.info "Drop the previous database" ;
-
-    ]
+let action ~dropdb ~account ~action =
+  let ( account, address, contract, url ) = get ~account in
+  match action with
+  | Crawler ->
+      check_database account dropdb ;
+      action_crawler ~account ~address ~contract ~url
+  | Start ->
+      check_database account dropdb ;
+      Lwt_main.run ( action_start ~account )
+  | Status ->
+      Db_utils.database := account ;
+      Lwt_main.run ( action_status ~account )
+  | Stop ->
+      Db_utils.database := account ;
+      Lwt_main.run ( action_stop ~account )

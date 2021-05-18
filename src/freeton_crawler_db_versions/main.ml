@@ -23,13 +23,14 @@ CREATE TABLE freeton_events(
     msg_id VARCHAR NOT NULL UNIQUE,
     event_name VARCHAR NOT NULL,
     event_args VARCHAR NOT NULL,
-    time BIGINT NOT NULL
+    time BIGINT NOT NULL,
+    tr_lt BIGINT NOT NULL
     )|};
 
     {|
 CREATE TABLE freeton_transactions(
-    lt BIGINT PRIMARY KEY,
-    id VARCHAR NOT NULL,
+    tr_lt BIGINT PRIMARY KEY,
+    tr_id VARCHAR NOT NULL,
     block_id VARCHAR NOT NULL,
     json VARCHAR NOT NULL
     )|};

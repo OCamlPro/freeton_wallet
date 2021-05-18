@@ -10,14 +10,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ezcmd.V2
+type action =
+  | Crawler
+  | Start
+  | Status
+  | Stop
 
-let cmd =
-  EZCMD.sub
-    "crawler"
-    (fun () ->
-       Printf.eprintf
-         "Unavailable. You must install ez_pgocaml and recompile.\n%!";
-       exit 2
-    )
-    ~doc: "Unavailable. You must install 'freeton_crawler' with opam."
+let action ~dropdb:_ ~account:_ ~action:_ =
+  Printf.eprintf
+    "This sub-command is currently not built-in. You must install \
+     ez_pgocaml and pgocaml_ppx.\n%!";
+  exit 2
