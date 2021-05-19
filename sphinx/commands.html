@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (5e687e4
-) (2021/05/17 09:34) documentation</title>
+ (f30d91e
+) (2021/05/19 16:26) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (5e687e4
+ (f30d91e
 )
               </div>
             
@@ -102,24 +102,24 @@
 <li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#drom-account">drom account</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-call">drom call</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-client">drom client</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-config">drom config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-contract">drom contract</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-crawler">drom crawler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-exec">drom exec</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-genaddr">drom genaddr</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-init">drom init</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-inspect">drom inspect</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-list">drom list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-multisig">drom multisig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-node">drom node</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-output">drom output</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-switch">drom switch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-test">drom test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-utils">drom utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drom-watch">drom watch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-account">ft account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-call">ft call</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-client">ft client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-config">ft config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-contract">ft contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-crawler">ft crawler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-exec">ft exec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-genaddr">ft genaddr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-init">ft init</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-inspect">ft inspect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-list">ft list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-multisig">ft multisig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-node">ft node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-output">ft output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-switch">ft switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-test">ft test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-utils">ft utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-watch">ft watch</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
@@ -213,7 +213,7 @@
   <span class="nc">Manage</span> <span class="n">contracts</span>
 
 <span class="n">crawler</span>
-  <span class="nn">Unavailable</span><span class="p">.</span> <span class="nc">You</span> <span class="n">must</span> <span class="n">install</span> <span class="k">&#39;</span><span class="n">freeton_crawler&#39;</span> <span class="k">with</span> <span class="n">opam</span><span class="o">.</span>
+  <span class="nc">Crawl</span> <span class="n">all</span> <span class="n">transactions</span> <span class="k">to</span> <span class="n">an</span> <span class="n">address</span> <span class="ow">and</span> <span class="n">fill</span> <span class="n">a</span> <span class="n">psql</span> <span class="n">database</span>
 
 <span class="n">exec</span>
   <span class="nc">Call</span> <span class="n">command</span> <span class="k">with</span> <span class="n">substitution</span> <span class="n">on</span> <span class="n">arguments</span><span class="o">,</span> <span class="n">use</span> <span class="o">--</span> <span class="n">before</span> <span class="n">the</span> <span class="n">command</span><span class="o">.</span>
@@ -252,8 +252,8 @@
   <span class="nc">Monitor</span> <span class="n">a</span> <span class="n">given</span> <span class="n">account</span> <span class="k">for</span> <span class="k">new</span> <span class="n">transactions</span><span class="o">.</span>
 </pre></div>
 </div>
-<div class="section" id="drom-account">
-<h2>drom account<a class="headerlink" href="#drom-account" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-account">
+<h2>ft account<a class="headerlink" href="#ft-account" title="Permalink to this headline">¶</a></h2>
 <p>Get account info (local or from blockchain), or create/modify/delete accounts.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command can perform the following actions:</p>
@@ -272,37 +272,32 @@ Delete existing accounts</li>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="kt">list</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>::</dt>
-<dd>ft account my-account –info</dd>
-</dl>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">info</span>
+</pre></div>
+</div>
 <p><strong>DISPLAY BLOCKCHAIN INFORMATION</strong></p>
 <p>Accounts must have an address on the blockchain.</p>
 <p>Examples:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>::</dt>
-<dd>ft account</dd>
-</dl>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span>
+</pre></div>
+</div>
 <p><strong>CREATE NEW ACCOUNTS</strong></p>
 <p>Examples:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">account1</span> <span class="n">account2</span> <span class="n">account3</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>::</dt>
-<dd>ft account –create new-account –passphrase “some known passphrase”</dd>
-</dl>
-<dl class="docutils">
-<dt>::</dt>
-<dd>ft account –create new-account –contract SafeMultisigWallet</dd>
-</dl>
-<dl class="docutils">
-<dt>::</dt>
-<dd>ft account –create new-address –address 0:1234…</dd>
-</dl>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="k">new</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">passphrase</span> <span class="s2">&quot;some known passphrase&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="k">new</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">contract</span> <span class="nc">SafeMultisigWallet</span>
+</pre></div>
+</div>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="k">new</span><span class="o">-</span><span class="n">address</span> <span class="o">--</span><span class="n">address</span> <span class="mi">0</span><span class="o">:</span><span class="mi">1234</span><span class="o">...</span>
+</pre></div>
+</div>
 <p>Only the last one will compute an address on the blockchain, since the contract must be known.</p>
 <p><strong>COMPLETE EXISTING ACCOUNTS</strong></p>
 <p>Examples:</p>
@@ -315,7 +310,7 @@ Delete existing accounts</li>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">account</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -336,8 +331,8 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--whois</span> <span class="pre">ADDRESS</span></code>   Returns corresponding key name</li>
 </ul>
 </div>
-<div class="section" id="drom-call">
-<h2>drom call<a class="headerlink" href="#drom-call" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-call">
+<h2>ft call<a class="headerlink" href="#ft-call" title="Permalink to this headline">¶</a></h2>
 <p>Call contracts</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Call a method of a deployed contract. Use –local or –run to run the contract locally (only for get methods). If the params are not specified, {} is used instead. The message is signed if the –sign SIGNER argument is provided, or if the secret key of the account is known.</p>
@@ -346,16 +341,12 @@ Delete existing accounts</li>
         <span class="k">&#39;</span><span class="o">{</span> <span class="s2">&quot;dest&quot;</span><span class="o">:</span><span class="s2">&quot;%{account:address:user1}&quot;</span><span class="o">,</span> <span class="s2">&quot;amount&quot;</span><span class="o">:</span><span class="s2">&quot;1000000000000&quot;</span><span class="o">}</span><span class="k">&#39;</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>::</dt>
-<dd><dl class="first last docutils">
-<dt>$ ft –switch mainnet call msig confirmUpdate</dt>
-<dd>‘{  “updateId”: “0x6092b3ee656aaa81” }’ –sign mywallet</dd>
-</dl>
-</dd>
-</dl>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="o">--</span><span class="n">switch</span> <span class="n">mainnet</span> <span class="n">call</span> <span class="n">msig</span> <span class="n">confirmUpdate</span>
+        <span class="k">&#39;</span><span class="o">{</span>  <span class="s2">&quot;updateId&quot;</span><span class="o">:</span> <span class="s2">&quot;0x6092b3ee656aaa81&quot;</span> <span class="o">}</span><span class="k">&#39;</span> <span class="o">--</span><span class="n">sign</span> <span class="n">mywallet</span>
+</pre></div>
+</div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">call</span> <span class="nc">ACCOUNT</span> <span class="nc">METH</span> <span class="o">[</span><span class="nc">JSON_PARAMS</span><span class="o">]</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">call</span> <span class="nc">ACCOUNT</span> <span class="nc">METH</span> <span class="o">[</span><span class="nc">JSON_PARAMS</span><span class="o">]</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -367,8 +358,8 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--subst</span> <span class="pre">FILE</span></code>   Read FILE and substitute results in the content</li>
 </ul>
 </div>
-<div class="section" id="drom-client">
-<h2>drom client<a class="headerlink" href="#drom-client" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-client">
+<h2>ft client<a class="headerlink" href="#ft-client" title="Permalink to this headline">¶</a></h2>
 <p>Call tonos-cli, use – to separate arguments. Use ‘ft exec – CMD ARGS’ for other commands.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command calls the tonos-cli executable while performing substitutions on arguments, and using the node of the current network switch. It is useful for commands that ‘ft’ cannot perform directly (calling debots for example).</p>
@@ -390,7 +381,7 @@ Delete existing accounts</li>
 </div>
 <p>Note that it is also possible to ask ‘ft’ to call ‘tonos-cli’ instead of performing calls through TON-SDK Rust binding for other commands, using the FT_USE_TONOS=1 env. variable.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">client</span> <span class="o">--</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">client</span> <span class="o">--</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -400,13 +391,13 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--stdout</span> <span class="pre">FILE</span></code>   Save command stdout to file</li>
 </ul>
 </div>
-<div class="section" id="drom-config">
-<h2>drom config<a class="headerlink" href="#drom-config" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-config">
+<h2>ft config<a class="headerlink" href="#ft-config" title="Permalink to this headline">¶</a></h2>
 <p>Modify configuration</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Change the global configuration or the network configuration.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">config</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">config</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -414,8 +405,8 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--deployer</span> <span class="pre">ACCOUNT</span></code>   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.</li>
 </ul>
 </div>
-<div class="section" id="drom-contract">
-<h2>drom contract<a class="headerlink" href="#drom-contract" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-contract">
+<h2>ft contract<a class="headerlink" href="#ft-contract" title="Permalink to this headline">¶</a></h2>
 <p>Manage contracts</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command can perform the following actions:</p>
@@ -471,7 +462,7 @@ Deploy a known contract to the blockchain</li>
 <p>Deploy a contract ‘Foobar’ an existing account ‘foo’ using its keypair.</p>
 <p>With –create and –replace, 1 TON is transferred to the initial account using a ‘deployer’ multisig account. The deployer account can either be set switch wide (ft config –deployer ‘account’) or in the deploy command (using the –deployer ‘account’ argument)</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">contract</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">contract</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -493,17 +484,38 @@ Deploy a known contract to the blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--sol-abi</span> <span class="pre">CONTRACT</span></code>   Output ABI of contract CONTRACT as Solidity</li>
 </ul>
 </div>
-<div class="section" id="drom-crawler">
-<h2>drom crawler<a class="headerlink" href="#drom-crawler" title="Permalink to this headline">¶</a></h2>
-<p>Unavailable. You must install ‘freeton_crawler’ with opam.</p>
+<div class="section" id="ft-crawler">
+<h2>ft crawler<a class="headerlink" href="#ft-crawler" title="Permalink to this headline">¶</a></h2>
+<p>Crawl all transactions to an address and fill a psql database</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command will crawl the blockchain and fill a PostgresQL database with all events related to the contract given in argument. The created database has the same name as the account.</p>
+<p>This command can run as a service, using the –start command to launch a manager program (that will not detach itself, however), –status to check the current status (running or not) and –stop to stop the process and its manager.</p>
+<p>A simple session looks like:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">start</span> <span class="o">&amp;&gt;</span> <span class="n">daemon</span><span class="o">.</span><span class="n">log</span> <span class="o">&amp;</span>
+<span class="o">$</span> <span class="n">psql</span> <span class="n">myapp</span>
+<span class="nc">SELECT</span> <span class="o">*</span> <span class="nc">FROM</span> <span class="n">freeton_events</span><span class="o">;</span>
+<span class="n">serial</span><span class="o">|</span>                              <span class="n">msg_id</span>                              <span class="o">|</span>      <span class="n">event_name</span>       <span class="o">|</span>           <span class="n">event_args</span>                            <span class="o">|</span>    <span class="n">time</span>    <span class="o">|</span> <span class="n">tr_lt</span>
+    <span class="mi">1</span> <span class="o">|</span> <span class="n">ec026489c0eb2071b606db0c7e05e5a76c91f4b02c2b66af851d56d5051be8bd</span> <span class="o">|</span> <span class="nc">OrderStateChanged</span>     <span class="o">|</span> <span class="o">{</span><span class="s2">&quot;order_id&quot;</span><span class="o">:</span><span class="s2">&quot;31&quot;</span><span class="o">,</span><span class="s2">&quot;state_count&quot;</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="o">,</span><span class="s2">&quot;state&quot;</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="o">}</span> <span class="o">|</span> <span class="mi">1620744626</span> <span class="o">|</span> <span class="mi">96</span>
+<span class="nc">SELECT</span> <span class="o">*</span> <span class="nc">FROM</span> <span class="n">freeton_transactions</span><span class="o">;</span>
+<span class="o">^</span><span class="nc">D</span>
+<span class="o">$</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">stop</span>
+</pre></div>
+</div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">crawler</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">crawler</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   Account to crawl</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--dropdb</span></code>   Drop the previous database</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--start</span></code>   Start with a manager process to restart automatically</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--status</span></code>   Check if a manager process and crawler are running</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--stop</span></code>   Stop the manager process and the crawler</li>
+</ul>
 </div>
-<div class="section" id="drom-exec">
-<h2>drom exec<a class="headerlink" href="#drom-exec" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-exec">
+<h2>ft exec<a class="headerlink" href="#ft-exec" title="Permalink to this headline">¶</a></h2>
 <p>Call command with substitution on arguments, use – before the command.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command can be used to call external commands while performing substitutions on arguments.</p>
@@ -514,7 +526,7 @@ Deploy a known contract to the blockchain</li>
 <p>For example:</p>
 <p>$ ft exec – echo %{account:address:giver}</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">exec</span> <span class="o">--</span> <span class="nc">COMMAND</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">exec</span> <span class="o">--</span> <span class="nc">COMMAND</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -523,14 +535,14 @@ Deploy a known contract to the blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--stdout</span> <span class="pre">FILENAME</span></code>   Save command stdout to file FILENAME</li>
 </ul>
 </div>
-<div class="section" id="drom-genaddr">
-<h2>drom genaddr<a class="headerlink" href="#drom-genaddr" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-genaddr">
+<h2>ft genaddr<a class="headerlink" href="#ft-genaddr" title="Permalink to this headline">¶</a></h2>
 <p>Generate new addr (default is for a SafeMultisigWallet, use ‘ft contract –list’ for more)</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>DEPRECATED</p>
 <p>This command is deprecated and will distributed soon. Use ‘ft account’ instead.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">genaddr</span> <span class="nc">ARGUMENT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">genaddr</span> <span class="nc">ARGUMENT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -542,8 +554,8 @@ Deploy a known contract to the blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wc</span> <span class="pre">INT</span></code>   WORKCHAIN The workchain (default is 0)</li>
 </ul>
 </div>
-<div class="section" id="drom-init">
-<h2>drom init<a class="headerlink" href="#drom-init" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-init">
+<h2>ft init<a class="headerlink" href="#ft-init" title="Permalink to this headline">¶</a></h2>
 <p>Initialize with TON Labs binary tools, compiled from sources.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Initialize with TON Labs binary tools, downloading them from their GIT repositories and compiling them (a recent Rust compiler must be installed).</p>
@@ -559,7 +571,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </ul>
 <p>If no specific option is specified, all tools are generated. If a tool has already been generated, calling it again will try to upgrade to a more recent version.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">init</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">init</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -570,8 +582,8 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--solc</span></code>   Build and install ‘solc’ from sources</li>
 </ul>
 </div>
-<div class="section" id="drom-inspect">
-<h2>drom inspect<a class="headerlink" href="#drom-inspect" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-inspect">
+<h2>ft inspect<a class="headerlink" href="#ft-inspect" title="Permalink to this headline">¶</a></h2>
 <p>Inspect information stored on the blockchain: display information on accounts, blocks, messages and transactions.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Inspect information stored on the blockchain: display information on accounts, blocks, messages and transactions.</p>
@@ -584,7 +596,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <p>Some operations (–block-num and –head) require to know the shard on which they apply. Arguments –shard SHARD, –shard-block BLOCK_ID and –shard-account ACCOUNT can be used to specify the shard.</p>
 <p>Use the FT_DEBUG_GRAPHQL=1 variable to show Graphql queries</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">inspect</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">inspect</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -608,20 +620,20 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--with</span> <span class="pre">ACCOUNT:CONTRACT</span></code>   Define partner account automatically defined</li>
 </ul>
 </div>
-<div class="section" id="drom-list">
-<h2>drom list<a class="headerlink" href="#drom-list" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-list">
+<h2>ft list<a class="headerlink" href="#ft-list" title="Permalink to this headline">¶</a></h2>
 <p>List known contracts (DEPRECATED). Use ‘ft contract –list’</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>DEPRECATED</p>
 <p>This command is deprecated and will disappear soon. Use ‘ft contract –list’ instead.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="kt">list</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="kt">list</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
 </div>
-<div class="section" id="drom-multisig">
-<h2>drom multisig<a class="headerlink" href="#drom-multisig" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-multisig">
+<h2>ft multisig<a class="headerlink" href="#ft-multisig" title="Permalink to this headline">¶</a></h2>
 <p>Manage a multisig-wallet (create, confirm, send)</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.</p>
@@ -691,7 +703,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">multisig</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">multisig</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -715,13 +727,13 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wc</span> <span class="pre">WORKCHAIN</span></code>   The workchain (default is 0)</li>
 </ul>
 </div>
-<div class="section" id="drom-node">
-<h2>drom node<a class="headerlink" href="#drom-node" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-node">
+<h2>ft node<a class="headerlink" href="#ft-node" title="Permalink to this headline">¶</a></h2>
 <p>Manage local nodes</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">node</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -732,8 +744,8 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--web</span></code>   Open Node GraphQL webpage</li>
 </ul>
 </div>
-<div class="section" id="drom-output">
-<h2>drom output<a class="headerlink" href="#drom-output" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-output">
+<h2>ft output<a class="headerlink" href="#ft-output" title="Permalink to this headline">¶</a></h2>
 <p>Perform substitutions on the output</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command performs substitutions on its input. By default, the output goes to stdout, unless the ‘-o’ option is used.</p>
@@ -759,7 +771,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">output</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">output</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -772,8 +784,8 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--string</span> <span class="pre">STRING</span></code>   FILE Output string after substitution</li>
 </ul>
 </div>
-<div class="section" id="drom-switch">
-<h2>drom switch<a class="headerlink" href="#drom-switch" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-switch">
+<h2>ft switch<a class="headerlink" href="#ft-switch" title="Permalink to this headline">¶</a></h2>
 <p>Display or change current network</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).</p>
@@ -800,14 +812,12 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="n">sandbox1</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>::</dt>
-<dd>$ ft node –start</dd>
-</dl>
-<dl class="docutils">
-<dt>::</dt>
-<dd>$ ft node –give user1:1000</dd>
-</dl>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">start</span>
+</pre></div>
+</div>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">give</span> <span class="n">user1</span><span class="o">:</span><span class="mi">1000</span>
+</pre></div>
+</div>
 <p>When a local network is created, it is initialized with:</p>
 <ul class="simple">
 <li>1.
@@ -817,7 +827,7 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 </ul>
 <p>The 10 accounts are not deployed, but it is possible to use ‘ft node –give ACCOUNT’ to automatically deploy the account.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">switch</span> <span class="nc">NETWORK</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="nc">NETWORK</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -829,11 +839,11 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
 </ul>
 </div>
-<div class="section" id="drom-test">
-<h2>drom test<a class="headerlink" href="#drom-test" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-test">
+<h2>ft test<a class="headerlink" href="#ft-test" title="Permalink to this headline">¶</a></h2>
 <p>For testing only</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">test</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">test</span> <span class="nc">ARGUMENTS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -842,13 +852,13 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <li><code class="code docutils literal notranslate"><span class="pre">--test</span> <span class="pre">INT</span></code>   NUM Run test NUM</li>
 </ul>
 </div>
-<div class="section" id="drom-utils">
-<h2>drom utils<a class="headerlink" href="#drom-utils" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-utils">
+<h2>ft utils<a class="headerlink" href="#ft-utils" title="Permalink to this headline">¶</a></h2>
 <p>Some useful tools</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Misc commands. For example, to translate bytes from base64 or message boc.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">utils</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">utils</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
@@ -857,13 +867,13 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <li><code class="code docutils literal notranslate"><span class="pre">--of-boc</span> <span class="pre">STRING</span></code>   Parse message boc in base64 format</li>
 </ul>
 </div>
-<div class="section" id="drom-watch">
-<h2>drom watch<a class="headerlink" href="#drom-watch" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ft-watch">
+<h2>ft watch<a class="headerlink" href="#ft-watch" title="Permalink to this headline">¶</a></h2>
 <p>Monitor a given account for new transactions.</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>Wait for transactions happening on the given ACCOUNT. Transactions are immediately displayed on stdout. If the argument –on-event CMD is provided, a command is called for every event emitted by the contract.</p>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">drom</span> <span class="n">watch</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">watch</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>

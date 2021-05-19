@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Calling Commands with Substitutions &mdash; freeton_wallet master
- (5e687e4
-) (2021/05/17 09:34) documentation</title>
+ (f30d91e
+) (2021/05/19 16:26) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (5e687e4
+ (f30d91e
 )
               </div>
             
@@ -324,9 +324,13 @@ Take remaining SUBST without substituting, just as a string</li>
 <li><code class="code docutils literal notranslate"><span class="pre">read:SUBST</span></code> :
 Do SUBST, then read it as a filename</li>
 <li><code class="code docutils literal notranslate"><span class="pre">hex:SUBST</span></code> :
-Do SUBST, then convert to hex</li>
+Do SUBST, then convert to hexa</li>
+<li><code class="code docutils literal notranslate"><span class="pre">of-hex:SUBST</span></code> :
+Do SUBST, then convert from hexa</li>
 <li><code class="code docutils literal notranslate"><span class="pre">base64:SUBST</span></code> :
 Do SUBST, then convert to base64</li>
+<li><code class="code docutils literal notranslate"><span class="pre">of-base64:SUBST</span></code> :
+Do SUBST, then convert from base64</li>
 <li><code class="code docutils literal notranslate"><span class="pre">get-code:SUBST</span></code> :
 Do SUBST, interprete it as a TVC filename, whose code should be extracted
 using <code class="code docutils literal notranslate"><span class="pre">tvm_linker</span> <span class="pre">decode</span></code> and passed in base64</li>
