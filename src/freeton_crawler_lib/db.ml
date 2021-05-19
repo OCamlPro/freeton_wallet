@@ -28,6 +28,7 @@ module EVENTS : sig
     name : string ;
     args : string ;
     time : int64 ;
+    tr_lt : int64 ;
   }
 
   val list :
@@ -42,6 +43,7 @@ end = struct
     name : string ;
     args : string ;
     time : int64 ;
+    tr_lt : int64 ;
   }
 
   let list ?serial () =
@@ -58,16 +60,18 @@ end = struct
     in
     let list = List.rev list in
     let list =
-      List.rev_map (fun ( serial, msg_id, name, args, time ) ->
-          serial, msg_id, { name ; args ; time } ) list
+      List.rev_map (fun ( serial, msg_id, name, args, time, tr_lt ) ->
+          serial, msg_id, { name ; args ; time ; tr_lt } ) list
     in
     Lwt.return list
 
   let add ~msg_id event =
     let>>> dbh = () in
     [%pgsql dbh
-        "insert into freeton_events (msg_id, event_name, event_args, time) \
-         values (${msg_id}, ${event.name}, ${event.args}, ${event.time})"]
+        "insert into freeton_events \
+         (msg_id, event_name, event_args, time, tr_lt ) \
+         values (${msg_id}, ${event.name}, ${event.args}, \
+         ${event.time}, ${event.tr_lt} )"]
 
   let mem ~msg_id =
     let>>> dbh = () in
@@ -83,13 +87,13 @@ end
 module TRANSACTIONS : sig
 
   type t = {
-    lt : int64 ;
-    id : string ;
+    tr_lt : int64 ;
+    tr_id : string ;
     block_id : string ;
     json : string option ;
   }
 
-  val add : lt:int64 -> id:string ->
+  val add : tr_lt:int64 -> tr_id:string ->
     block_id:string -> json:string -> unit Lwt.t
 
   val list : ?before_lt:int64 -> ?json:bool -> unit -> t list Lwt.t
@@ -97,17 +101,17 @@ module TRANSACTIONS : sig
   end = struct
 
   type t = {
-    lt : int64 ;
-    id : string ;
+    tr_lt : int64 ;
+    tr_id : string ;
     block_id : string ;
     json : string option ;
   }
 
-  let add ~lt ~id ~block_id ~json =
+  let add ~tr_lt ~tr_id ~block_id ~json =
     let>>> dbh = () in
     [%pgsql dbh
-        "insert into freeton_transactions (lt, id, block_id, json) \
-         values ($lt, $id, $block_id, $json)"]
+        "insert into freeton_transactions (tr_lt, tr_id, block_id, json) \
+         values ($tr_lt, $tr_id, $block_id, $json)"]
 
   let list ?before_lt ?(json=false) () =
     let>>> dbh = () in
@@ -115,38 +119,38 @@ module TRANSACTIONS : sig
     | true ->
         let> list =
           match before_lt with
-          | Some lt ->
+          | Some tr_lt ->
               [%pgsql dbh
-                  "SELECT * FROM freeton_transactions WHERE lt < $lt \
-                   ORDER BY lt DESC LIMIT 100" ]
+                  "SELECT * FROM freeton_transactions WHERE tr_lt < $tr_lt \
+                   ORDER BY tr_lt DESC LIMIT 100" ]
           | None ->
               [%pgsql dbh
                   "SELECT * FROM freeton_transactions \
-                   ORDER BY lt DESC LIMIT 100" ]
+                   ORDER BY tr_lt DESC LIMIT 100" ]
         in
         let list =
-          List.rev_map (fun ( lt, id, block_id, json ) ->
-              { lt ; id ; block_id ; json = Some json }
+          List.rev_map (fun ( tr_lt, tr_id, block_id, json ) ->
+              { tr_lt ; tr_id ; block_id ; json = Some json }
             ) ( List.rev list)
         in
         Lwt.return list
     | false ->
         let> list =
           match before_lt with
-          | Some lt ->
+          | Some tr_lt ->
               [%pgsql dbh
-                  "SELECT lt, id, block_id \
-                   FROM freeton_transactions WHERE lt < $lt \
-                   ORDER BY lt DESC LIMIT 100" ]
+                  "SELECT tr_lt, tr_id, block_id \
+                   FROM freeton_transactions WHERE tr_lt < $tr_lt \
+                   ORDER BY tr_lt DESC LIMIT 100" ]
           | None ->
               [%pgsql dbh
-                  "SELECT lt, id, block_id \
+                  "SELECT tr_lt, tr_id, block_id \
                    FROM freeton_transactions \
-                   ORDER BY lt DESC LIMIT 100" ]
+                   ORDER BY tr_lt DESC LIMIT 100" ]
         in
         let list =
-          List.rev_map (fun ( lt, id, block_id ) ->
-              { lt ; id ; block_id ; json = None }
+          List.rev_map (fun ( tr_lt, tr_id, block_id ) ->
+              { tr_lt ; tr_id ; block_id ; json = None }
             ) ( List.rev list)
         in
         Lwt.return list

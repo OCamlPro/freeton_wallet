@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.4.0)
+(version 0.4.1)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -72,6 +72,7 @@
    (freeton_crawler_db_versions (= version))
    ez_pgocaml
    (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))
+   pgocaml_ppx
    (freeton_crawler_db_updater (= version))
    ppx_inline_test
    ppx_expect
@@ -115,7 +116,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (ft (= version))
-   ez_pgocaml
+   (freeton_crawler_lib (= version))
    ppx_inline_test
    ppx_expect
    odoc

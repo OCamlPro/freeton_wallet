@@ -18,7 +18,7 @@ let (let>) = Lwt.bind
 let wait_before_retry delay =
   Lwt_unix.sleep (float_of_int delay)
 
-let iter_event ~lt ~time ~network_url ~abi ~client ~msg_id f =
+let iter_event ~tr_lt ~time ~network_url ~abi ~client ~msg_id f =
   Printf.eprintf "iter_event\n%!";
   let rec iter () =
     Printf.eprintf "iter()\n%!";
@@ -43,7 +43,7 @@ let iter_event ~lt ~time ~network_url ~abi ~client ~msg_id f =
             match BLOCK.decode_message_boc ~client ~boc ~abi with
             | decoded ->
               if decoded.body_type = 3 (* Event *) then
-                f ~lt ~time ~msg_id decoded.body_name decoded.body_args
+                f ~tr_lt ~time ~msg_id decoded.body_name decoded.body_args
               else
                 Lwt.return_unit
             | exception exn ->
@@ -196,9 +196,9 @@ let main ~url ~address ~abi =
     let> transactions = Db.TRANSACTIONS.list ?before_lt () in
     let before_lt = ref Int64.max_int in
     List.iter (fun tr ->
-        Hashtbl.add known_transactions tr.Db.TRANSACTIONS.id false;
-        if !before_lt > tr.Db.TRANSACTIONS.lt then
-          before_lt := tr.Db.TRANSACTIONS.lt
+        Hashtbl.add known_transactions tr.Db.TRANSACTIONS.tr_id false;
+        if !before_lt > tr.Db.TRANSACTIONS.tr_lt then
+          before_lt := tr.Db.TRANSACTIONS.tr_lt
       ) transactions;
     match transactions with
     | [] -> Lwt.return_unit
@@ -206,13 +206,13 @@ let main ~url ~address ~abi =
   in
   let> () = iter None in
 
-  let handle_event ~lt ~time ~msg_id event_name event_args =
+  let handle_event ~tr_lt ~time ~msg_id event_name event_args =
     update_curtime ();
     let event_args = match event_args with
       | None -> "{}"
       | Some args -> args in
     Printf.eprintf "*\n**\n***\n\n%Ld\n" time;
-    Printf.eprintf "%Ld EVENT: %s %s\n\n\n\n%!" lt event_name event_args;
+    Printf.eprintf "%Ld EVENT: %s %s\n\n\n\n%!" tr_lt event_name event_args;
 
     let> already_in = Db.EVENTS.mem ~msg_id in
     if not already_in then
@@ -221,6 +221,7 @@ let main ~url ~address ~abi =
         Db.EVENTS.name = event_name ;
         args = event_args ;
         time ;
+        tr_lt ;
       }
 
     else
@@ -230,7 +231,7 @@ let main ~url ~address ~abi =
 
   let add_transaction tr =
     Hashtbl.add known_transactions tr.ENCODING.tr_id true;
-    let lt, now = match tr.tr_lt, tr.tr_now with (* need level>=1 *)
+    let tr_lt, now = match tr.tr_lt, tr.tr_now with (* need level>=1 *)
       | Some lt, Some now ->
           Int64.of_string lt, Int64.of_float now
       | _ -> assert false
@@ -242,7 +243,7 @@ let main ~url ~address ~abi =
       end else
         Lwt_list.iter_s (fun msg_id ->
             iter_event
-              ~lt
+              ~tr_lt
               ~time:now
               ~abi ~network_url ~client ~msg_id handle_event
           )
@@ -251,7 +252,7 @@ let main ~url ~address ~abi =
     let json = EzEncoding.construct ~compact:true
         Ton_sdk.ENCODING.transaction_enc
         tr in
-    Db.TRANSACTIONS.add ~lt ~block_id: tr.tr_block_id ~id:tr.tr_id ~json
+    Db.TRANSACTIONS.add ~tr_lt ~block_id: tr.tr_block_id ~tr_id:tr.tr_id ~json
   in
 
   let block_id = Ton_sdk.BLOCK.find_last_shard_block ~client ~address in

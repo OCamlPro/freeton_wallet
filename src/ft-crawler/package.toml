@@ -46,8 +46,8 @@ kind = "virtual"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ez_pgocaml = ""
 ft = "version"
+freeton_crawler_lib = "version"
 
 # package tools dependencies
 [tools]

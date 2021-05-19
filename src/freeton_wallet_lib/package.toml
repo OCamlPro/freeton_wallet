@@ -81,9 +81,9 @@ ppx_deriving_encoding = ""
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
 [fields]
-dune-libraries = """  (select commandCrawler.ml from
-  (freeton_crawler_lib -> commandCrawler.present.ml)
-  (-> commandCrawler.absent.ml)
+dune-libraries = """  (select crawler.ml from
+  (freeton_crawler_lib -> crawler.present.ml)
+  (-> crawler.absent.ml)
   )
 """
 dune-trailer = """(rule

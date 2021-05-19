@@ -152,9 +152,13 @@ Encoders, working on the rest of the substitution:
 * :code:`read:SUBST` :
   Do SUBST, then read it as a filename
 * :code:`hex:SUBST` :
-  Do SUBST, then convert to hex
+  Do SUBST, then convert to hexa
+* :code:`of-hex:SUBST` :
+  Do SUBST, then convert from hexa
 * :code:`base64:SUBST` :
   Do SUBST, then convert to base64
+* :code:`of-base64:SUBST` :
+  Do SUBST, then convert from base64
 * :code:`get-code:SUBST` :
   Do SUBST, interprete it as a TVC filename, whose code should be extracted
   using :code:`tvm_linker decode` and passed in base64
