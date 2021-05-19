@@ -94,7 +94,7 @@ short tutorial on how to install this command.
 To build support for :code:`ft crawler`, it is required that packages
 :code:`ez_pgocaml` and :code:`pgocaml` be installed.
 
-First, you will need to disable sandboxing in opam::
+First, you will need to disable sandboxing in opam:
 
 1. Configure Postgresql to allow your user to interact with it::
 

@@ -6,10 +6,10 @@ Switching between Networks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All accounts managed by :code:`ft` are associated with a given
-network, also called switches::
+network, also called switches.
 
 The sub-command to switch between networks is :code:`ft switch`::
-
+  
   $ ft switch
   Loading wallet file /home/lefessan/.ft/mainnet/wallet.json
   * testnet

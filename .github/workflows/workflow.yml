@@ -31,6 +31,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Retrieve opam cache
         uses: actions/cache@v2
         id: cache-opam
@@ -39,11 +40,6 @@ jobs:
           key: v1-${{ runner.os }}-freeton_wallet-${{ matrix.ocaml-version }}-${{ hashFiles('*.opam') }}
 #          restore-keys: |
 #            v1-${{ runner.os }}-opam-${{ matrix.ocaml-version }}-
-
-#      - name: Set up PostgreSQL
-#        uses: Harmon758/postgresql-action@v1.0.0
-#        with:
-#            postgresql version: '9.6'
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
@@ -73,7 +69,7 @@ jobs:
 
       - name: Remove pgocaml_ppx
         run: opam remove pgocaml_ppx
-
+        
       - run: make build
 
       - name: run test suite
