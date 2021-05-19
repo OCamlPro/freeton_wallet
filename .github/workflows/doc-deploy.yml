@@ -37,6 +37,10 @@ jobs:
         if: steps.cache-opam.outputs.cache-hit != 'true'
       - run: opam upgrade --fixup
         if: steps.cache-opam.outputs.cache-hit == 'true'
+
+      - name: Remove pgocaml_ppx
+        run: opam remove pgocaml_ppx
+
       - name: build-doc
         run: |
           make doc
