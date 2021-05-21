@@ -48,3 +48,7 @@ type config = {
   mutable current_network : string ;  [@key "network"]
   mutable networks : network list ;
 } [@@deriving json_encoding]
+
+type address =
+  | RawAddress of string
+  | Account of account

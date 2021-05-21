@@ -27,3 +27,4 @@ let ft_dir = homedir // ".ft"
 let config_file = ft_dir // "config.json"
 
 let contracts_dir = ft_dir // "contracts"
+let code_hash_dir hash = ft_dir // "code_hash" // hash

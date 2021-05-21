@@ -252,6 +252,22 @@ let sol_abi contract =
   close_out oc;
   ()
 
+let create_new_version contract =
+  let contract_dir = Globals.contracts_dir // contract in
+  let version_file = contract_dir // "CURRENT" in
+  let num =
+    if Sys.file_exists contract_dir then
+      let num = EzFile.read_file version_file in
+      let num = int_of_string ( String.trim num ) in
+      let num = num + 1 in
+      string_of_int num
+    else
+      let () = EzFile.make_dir ~p:true contract_dir in
+      "1"
+  in
+  EzFile.write_file version_file num;
+  contract_dir // num
+
 let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   match todo with
   | ListContracts -> CommandList.list_contracts ()
@@ -263,20 +279,21 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
          lose the tvc file and so how to regen their address. *)
       let dirname = Filename.dirname filename in
       let basename = Filename.basename filename in
-      let name, ext = EzString.cut_at basename '.' in
+      let contract, ext = EzString.cut_at basename '.' in
       if ext <> "sol" then
         Error.raise "File %s must end with .sol extension" basename;
       let known = CommandList.known_contracts () in
-      if not force && StringMap.mem name known then
-        Error.raise "Contract %s already exists (use -f to override)" name;
+      if not force && StringMap.mem contract known then
+        Error.raise "Contract %s already exists (use -f to override)"
+          contract;
       let solc = Misc.binary_file "solc" in
       (* maybe use argument --tvm-optimize *)
       let tvm_linker = Misc.binary_file "tvm_linker" in
       let stdlib = Misc.binary_file "stdlib_sol.tvm" in
 
-      let abi_file = name ^ ".abi.json" in
-      let code_file = name ^ ".code" in
-      let tvm_file = name ^ ".tvm" in
+      let abi_file = contract ^ ".abi.json" in
+      let code_file = contract ^ ".code" in
+      let tvm_file = contract ^ ".tvm" in
       remove_files dirname [ abi_file ; code_file ; tvm_file ];
       Misc.call [ solc ; filename ];
       let abi_file = check_exists dirname abi_file in
@@ -288,9 +305,14 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
                 ];
       let tvm_file = check_exists dirname tvm_file in
 
-      Misc.call [ "cp" ; "-f" ; filename ; abi_file ; Globals.contracts_dir ];
-      let tvc_file = Globals.contracts_dir // name ^ ".tvc" in
+      let contract_prefix = create_new_version contract in
+
+      Misc.call [ "cp" ; "-f" ; abi_file ;
+                  contract_prefix ^ ".abi.json" ];
+      let tvc_file = contract_prefix ^ ".tvc" in
       Misc.call [ "cp" ; "-f" ; tvm_file ; tvc_file ];
+      Misc.call [ "cp" ; "-f" ; filename ;
+                  contract_prefix ^ ".sol" ];
       ()
 
   | ImportContract filename ->
@@ -317,14 +339,18 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
       begin
         match !abi, !tvc with
         | [ abi ], [ tvc ] ->
-            Misc.call [ "cp"; "-f"; abi ;
-                        Globals.contracts_dir // name ^ ".abi.json" ];
-            Misc.call [ "cp"; "-f"; tvc ;
-                        Globals.contracts_dir // name ^ ".tvc" ];
-            List.iter (fun src ->
-                Misc.call [ "cp"; "-f"; src ;
-                            Globals.contracts_dir // Filename.basename src ];
-              ) !src
+            let contract_prefix = create_new_version name in
+            Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
+            Misc.call [ "cp"; "-f"; tvc ; contract_prefix ^ ".tvc" ];
+            begin match !src with
+              | [] -> ()
+              | list ->
+                  EzFile.make_dir ~p:true contract_prefix;
+                  List.iter (fun src ->
+                      Misc.call [ "cp"; "-f"; src ;
+                                  contract_prefix // Filename.basename src ];
+                    ) list
+            end
         | [], _ -> Error.raise "Missing abi file"
         | _, [] -> Error.raise "Missing tvc file"
         | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
@@ -344,6 +370,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
         | Some ( UseAccount dst ), None -> UseAccount dst
         | Some ( CreateAccount dst ), _ -> CreateAccount dst
       in
+      let contract = Misc.fully_qualified_contract contract in
       let dst, sign =
         match create with
         | CreateAccount dst ->
@@ -375,7 +402,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
                       acc_address ;
                       acc_contract = Some contract ;
                       acc_workchain = None;
-                  } in
+                    } in
                   let key = { key_name = dst ;
                               key_account = key_account ;
                               key_passphrase = None ;

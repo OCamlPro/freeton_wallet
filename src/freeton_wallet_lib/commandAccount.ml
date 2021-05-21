@@ -77,19 +77,27 @@ let get_account_info config address =
 *)
 
 let get_account_info config address =
+  let addr = Misc.raw_address address in
   let open Ton_sdk in
   let level = if !Globals.verbosity > 1 then 3 else 1 in
   match
     Utils.post config
-      ( REQUEST.account ~level address )
+      ( REQUEST.account ~level addr )
   with
   | [] -> None
   |  [ account ] ->
       if !Globals.verbosity > 1 then
         Format.printf "%s@."
           (EzEncoding.construct ~compact:false ENCODING.accounts_enc [account]
-
           );
+      begin
+        match account.acc_code_hash with
+        | None -> ()
+        | Some _code_hash ->
+            match address with
+            | RawAddress _ -> ()
+            | Account _acc -> ()
+      end;
       Some account
   | _ -> assert false
 
@@ -126,19 +134,19 @@ let string_of_nanoton v =
   s
 
 let get_account_info config ~name ~address =
-    match get_account_info config address with
-    | None ->
-        Printf.printf "Account %S: not yet created\n%!" name
-    | Some account ->
-        Printf.printf "Account %S: %s\n%!" name
-          (match account.acc_balance with
-           | None -> "no balance"
-           | Some n ->
-               Printf.sprintf "%s TONs (%s)"
-                 (string_of_nanoton (Z.to_int64 n))
-                 (match account.acc_type_name with
-                  | None -> "Non Exists"
-                  | Some s -> s))
+  match get_account_info config address with
+  | None ->
+      Printf.printf "Account %S: not yet created\n%!" name
+  | Some account ->
+      Printf.printf "Account %S: %s\n%!" name
+        (match account.acc_balance with
+         | None -> "no balance"
+         | Some n ->
+             Printf.sprintf "%s TONs (%s)"
+               (string_of_nanoton (Z.to_int64 n))
+               (match account.acc_type_name with
+                | None -> "Non Exists"
+                | Some s -> s))
 
 let get_key_info config key ~info =
   if info then
@@ -149,7 +157,7 @@ let get_key_info config key ~info =
       | None ->
           Error.raise "Address %s has no address (use genaddr before)"
             key.key_name
-      | Some account -> account.acc_address
+      | Some account -> Account account
     in
     get_account_info config ~address ~name:key.key_name
 
@@ -212,8 +220,9 @@ let get_account_info accounts ~list ~info =
         List.iter (fun key ->
             match key.key_account with
             | None -> ()
-            | Some acc ->
-                get_account_info config ~address:acc.acc_address ~name:key.key_name
+            | Some account ->
+                get_account_info config
+                  ~address:( Account account ) ~name:key.key_name
           ) net.net_keys
     | _ ->
         List.iter (fun account ->
@@ -314,6 +323,8 @@ let add_account config
   let key_name = name in
   Misc.check_new_key_exn net name;
 
+  let contract = Option.map Misc.fully_qualified_contract contract in
+
   let subst, _ = Subst.subst_string config in
   let key_passphrase = Option.map subst passphrase in
 
@@ -395,7 +406,8 @@ let change_account config
                 config.modified <- true
           end;
           None
-      | _ -> contract
+      | _ ->
+          Option.map Misc.fully_qualified_contract contract
     in
 
     let address, contract = match address with
@@ -605,8 +617,9 @@ let get_live accounts =
   in
   List.iter (fun account ->
       let address = Utils.address_of_account config account in
+      let addr = Misc.raw_address address in
       let url = Printf.sprintf
-          "https://%s/accounts/accountDetails?id=%s" host address in
+          "https://%s/accounts/accountDetails?id=%s" host addr in
       Misc.call [ "xdg-open" ; url ]
     ) accounts
 
@@ -670,6 +683,7 @@ let action accounts ~list ~info
         match accounts with
           [] -> genkey config
         | _ ->
+            let contract = Option.map Misc.fully_qualified_contract contract in
             List.iter (fun name ->
                 genkey ~name config ?contract
               ) accounts;

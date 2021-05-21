@@ -184,7 +184,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
   let src_key = Misc.find_key_exn net src in
 
   let account_addr, account_contract =
-    match Utils.is_address account with
+    match Misc.is_address account with
     | Some address -> address, "SafeMultisigWallet"
     | None ->
         let account_key = Misc.find_key_exn net account in
@@ -193,6 +193,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
         ( account_addr, account_contract )
   in
   let dst_addr = Utils.address_of_account config dst in
+  let dst_addr = Misc.raw_address dst_addr in
 
   let nanotokens, allBalance =
     if amount = "all" then
@@ -272,6 +273,7 @@ let send_confirm ~account ?src ~tx_id () =
   let config = Config.config () in
   let net = Config.current_network config in
   let address = Utils.address_of_account config account in
+  let address = Misc.raw_address address in
   let src = match src with
       None -> account
     | Some src -> src
@@ -301,6 +303,7 @@ let action account args ~create ~req ~not_owner ~custodians ~waiting
       | None -> "debot-multisig"
       | Some account -> account in
     let address = Utils.address_of_account config account in
+    let address = Misc.raw_address address in
     CommandClient.action ~exec:false [ "debot" ; "fetch" ; address ] ;
   end ;
 

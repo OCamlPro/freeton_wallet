@@ -181,20 +181,13 @@ let post_lwt config req =
   | Ok r -> Lwt.return r
   | Error exn -> raise exn
 
-let is_address account =
-  let _wc, addr = EzString.cut_at account ':' in
-  let len = String.length addr in
-  if len <> 0 then
-    Some ( account ^ String.make (64 - len) '0' )
-  else None
-
 let address_of_account config account =
-  match is_address account with
-  | Some address -> address
+  match Misc.is_address account with
+  | Some address -> RawAddress address
   | None ->
       let net = Config.current_network config in
       let key = Misc.find_key_exn net account in
-      Misc.get_key_address_exn key
+      Account ( Misc.get_key_account_exn key )
 
 
 let abi_of_account config account =

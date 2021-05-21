@@ -29,6 +29,18 @@ let known_contracts () =
       | [ name ; "tvc" ] ->
           contracts := StringMap.add name
               ( Globals.contracts_dir // file ) !contracts
+      | [ name ] ->
+          let dir = Globals.contracts_dir // name in
+          if Sys.is_directory dir then
+            let current = EzFile.read_file ( dir // "CURRENT" )
+                          |> String.trim in
+            let filename = dir // current ^ ".tvc" in
+            if not ( Sys.file_exists filename ) then
+              Printf.eprintf "Warning: %s does not exist\n%!" filename
+            else
+              contracts := StringMap.add name
+                  ( Printf.sprintf "%s (version %s)" dir current )
+                  !contracts
       | _ -> ()
     ) (try Sys.readdir Globals.contracts_dir with _ -> [||]);
   !contracts

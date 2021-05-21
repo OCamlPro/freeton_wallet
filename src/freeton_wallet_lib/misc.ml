@@ -214,17 +214,27 @@ let string_of_workchain wc =
   | None -> "0"
   | Some n -> string_of_int n
 
-
 let gen_keyfile key_pair =
   let keypair_file = tmpfile () in
   write_json_file Encoding.keypair keypair_file key_pair;
   keypair_file
 
 let get_contract_file ext contract =
-  let file_name = Printf.sprintf "contracts/%s%s" contract ext in
-  let contract_file = Globals.ft_dir // file_name in
-  if not ( Sys.file_exists contract_file ) then begin
+  let contract_prefix = Globals.contracts_dir // contract in
+  let contract_file = contract_prefix ^ ext in
+  if Sys.file_exists contract_file then
+    contract_file
+  else
+  if Sys.file_exists contract_prefix then (* a directory *)
+    let num =
+      EzFile.read_file ( contract_prefix // "CURRENT" ) |> String.trim in
+    let contract_file = contract_prefix // ( num ^ ext ) in
+    if not ( Sys.file_exists contract_file ) then
+      Error.raise "File %s does not exist" contract_file;
+    contract_file
+  else
     let file_content =
+      let file_name = Printf.sprintf "contracts/%s%s" contract ext in
       match Files.read file_name with
       | None ->
           Printf.eprintf "File %s does not exist\n%!" contract_file;
@@ -232,8 +242,7 @@ let get_contract_file ext contract =
       | Some file_content -> file_content
     in
     write_file contract_file file_content;
-  end;
-  contract_file
+    contract_file
 
 let get_contract_tvcfile = get_contract_file ".tvc"
 let get_contract_abifile = get_contract_file ".abi.json"
@@ -320,3 +329,24 @@ let current_network_node net =
       Error.raise "Unknown node %S in network %S"
         net.current_node net.net_name
   | Some node -> node
+
+let is_address account =
+  let _wc, addr = EzString.cut_at account ':' in
+  let len = String.length addr in
+  if len <> 0 then
+    Some ( account ^ String.make (64 - len) '0' )
+  else None
+
+let raw_address = function
+  | RawAddress addr -> addr
+  | Account acc -> acc.acc_address
+
+let fully_qualified_contract contract : string =
+
+  let contract_dir = Globals.contracts_dir // contract in
+  let contract_version = contract_dir // "CURRENT" in
+  if Sys.file_exists contract_version then
+    let version = String.trim ( EzFile.read_file contract_version ) in
+    contract // version
+  else
+    contract
