@@ -13,68 +13,20 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 open Types
+open EzFile.OP
 
 (*
-Input arguments:
- address: 0:2e87845a4b04137d59931198006e3dd4ef49a63b62299aea5425dcf222afa02c
-Connecting to https://net.ton.dev
-Processing...
-Succeeded.
-acc_type:      Uninit
-balance:       100000000000000
-last_paid:     1613037693
-last_trans_lt: 0x1232be65b04
-data(boc): null
+Known code hashes:
+* DePool:
+14e20e304f53e6da152eb95fffc993dbd28245a775d847eed043f7c78a503885
+* SetcodeMultisigWallet2:
+207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82
+* Giver:
+fdfab26e1359ddd0c247b0fb334c2cc3943256a263e75d33e5473567cbe2c124
 
 *)
 
 type account_type = Uninit
-
-(*
-type account_info = {
-  mutable acc_type : account_type option ;
-  mutable acc_balance : int64 option ;
-  mutable acc_last_paid : int64 option ;
-  mutable acc_trans_lt : string option ;
-  mutable acc_data : string option ;
-}
-
-(*
-content-type: application/json
-accept: */*
-host: net.ton.dev
-content-length: 396
-
-{ "query": "query accounts ($filter: AccountFilter, $orderBy: [QueryOrderBy], $limit: Int, $timeout: Float) { accounts(filter: $filter, orderBy: $orderBy, limit: $limit, timeout: $timeout) { acc_type_name balance last_paid last_trans_lt data } }", "variables": {"filter":{"id":{"eq":"0:29cf011c21af372d8da18ac696c7a8787979c9b2acc65461fa8c8a374d24c8d4"}},"limit":null,"orderBy":null,"timeout":0} }
-                *)
-
-let get_account_info config address =
-
-  let stdout = Misc.call_stdout_lines @@
-    Misc.tonoscli config ["account" ; address ] in
-  let account = {
-    acc_type = None ;
-    acc_balance = None ;
-    acc_last_paid = None ;
-    acc_trans_lt = None ;
-    acc_data = None ;
-  } in
-  let success = ref false in
-  let not_found = ref false in
-  List.iter (fun s ->
-      match EzString.cut_at s ':' with
-      | "Succeeded.", "" -> success := true
-      | "Account not found.", "" -> not_found := true
-      | "balance", balance ->
-          account.acc_balance <-
-            Some ( Int64.of_string (String.trim balance ))
-      | _ -> ()
-    ) stdout;
-  if not !success then
-    Error.raise "Could not parse output of tonos-cli: %s"
-      (String.concat "\n" stdout );
-  if !not_found then None else Some account
-*)
 
 let get_account_info config address =
   let addr = Misc.raw_address address in
@@ -93,10 +45,34 @@ let get_account_info config address =
       begin
         match account.acc_code_hash with
         | None -> ()
-        | Some _code_hash ->
+        | Some code_hash ->
             match address with
             | RawAddress _ -> ()
-            | Account _acc -> ()
+            | Account acc ->
+                let code_hash_file = Globals.code_hash_dir // code_hash in
+                let is_known_code_hash =
+                  Sys.file_exists code_hash_file
+                in
+                match acc.acc_contract with
+                | None ->
+                    if is_known_code_hash then
+                      let contract = String.trim
+                          ( EzFile.read_file code_hash_file ) in
+                      acc.acc_contract <- Some contract;
+                      config.modified <- true
+                | Some contract ->
+                    if is_known_code_hash then begin
+                      let contract2 = String.trim
+                          ( EzFile.read_file code_hash_file ) in
+                      if contract2 <> contract then
+                        Printf.eprintf "Warning: address %s has code hash %s for contract %s, but that code_hash was memorized for contract %s\n%!"
+                          addr code_hash contract contract2
+                    end else begin
+                      Printf.eprintf "Remember %s has code hash %s\n%!"
+                        contract code_hash;
+                      EzFile.make_dir ~p:true Globals.code_hash_dir;
+                      EzFile.write_file code_hash_file contract
+                    end
       end;
       Some account
   | _ -> assert false
