@@ -14,7 +14,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build @install
+	opam exec -- dune build @install $(ADD_DUNE_FLAGS)
 	./scripts/copy-bin.sh freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_db_updater freeton_crawler_db_versions
 	./scripts/after.sh build
 

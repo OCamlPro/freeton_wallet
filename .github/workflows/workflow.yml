@@ -70,7 +70,7 @@ jobs:
       - name: Remove pgocaml_ppx
         run: opam remove pgocaml_ppx
         
-      - run: DUNE_DISABLE_PROMOTION=y make build
+      - run: ADD_DUNE_FLAGS=--ignore-promoted make build
 
       - name: run test suite
         run: |
