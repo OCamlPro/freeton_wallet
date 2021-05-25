@@ -101,6 +101,9 @@ jobs:
 
       - run: make build
 
+      - name: check consistency of committed pre-processed files
+        run: git diff --quiet src/freeton_crawler_lib
+
       - name: run test suite
         run: |
           ./scripts/before.sh test
