@@ -485,20 +485,17 @@ import "./I%s.sol";
 
 contract %s is I%s {
 
-/*
-  Exception codes:
-  100 - message sender is not a custodian;
-*/
+  // 100 - message sender is not a custodian;
   uint64 constant EXN_AUTH_FAILED = 100 ;
 
   uint8 g_nvals ;                      // required number of ...
   mapping(uint256 => uint8) g_vals ;   // pubkey -> value_index
 
-  constructor( uint256[] values ) public {
+  constructor( ) public {
     require( msg.pubkey() == tvm.pubkey(), EXN_AUTH_FAILED );
     tvm.accept();
     // TODO
-    g_vals[ values[0] ] = 1;
+    g_vals[ 0 ] = 1;
   }
 
 }
@@ -528,7 +525,7 @@ clean:
 contracts::%s.code
 
 %s.code: %s.sol $(INTERFACES)
-%cft contract --build %s.sol
+%cft contract --build %s.sol -f
 |} content
         name name name tab name
     in

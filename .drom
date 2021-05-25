@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-8f9768e1752baf592f4e85d095038098:.
+f6fdd7acf16a2b308e1834a7b2d9d9ef:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -97,7 +97,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-92c090dbc67f79324a0f768977a6d68d:dune-project
+bcca21a1d92a74a4bca76a654c7248c4:dune-project
 # end context for dune-project
 
 # begin context for freeton_crawler_db_updater.opam
@@ -117,7 +117,7 @@ e35a981839513bc58600bfdceb9eec20:freeton_crawler_db_versions.opam
 
 # begin context for freeton_wallet_lib.opam
 # file freeton_wallet_lib.opam
-fd16f322eb24c8b7aec5b237b7ee2a7b:freeton_wallet_lib.opam
+456932665c966225fe35ca0095d7ed36:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
 
 # begin context for ft-crawler.opam
