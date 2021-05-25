@@ -28,6 +28,38 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      PGHOST: localhost
+      PGDATABASE: postgres_db
+      PGPASSWORD: postgres_password
+      PGPORT: 5432
+      PGUSER: postgres_user
+
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgres:latest
+        # service environment variables
+        # `POSTGRES_HOST` is `postgres`
+        env:
+          # optional (defaults to `postgres`)
+          POSTGRES_DB: postgres_db
+          # required
+          POSTGRES_PASSWORD: postgres_password
+          # optional (defaults to `5432`)
+          POSTGRES_PORT: 5432
+          # optional (defaults to `postgres`)
+          POSTGRES_USER: postgres_user
+        ports:
+          # maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -59,17 +91,14 @@ jobs:
         if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y ./*.opam --deps-only --with-test
-        if: steps.cache-opam.outputs.cache-hit != 'true'
+#        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam upgrade --fixup
-        if: steps.cache-opam.outputs.cache-hit == 'true'
+#        if: steps.cache-opam.outputs.cache-hit == 'true'
 
       - run: dos2unix scripts/*.sh
         if: matrix.os == 'windows-latest'
 
-      - name: Remove pgocaml_ppx
-        run: opam remove pgocaml_ppx
-        
       - run: make build
 
       - name: run test suite
