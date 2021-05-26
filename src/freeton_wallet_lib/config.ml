@@ -25,10 +25,10 @@ let set_config = ref
 
 let set_temporary_switch net = set_config := Some net
 
-let remote_account key_name ?contract:acc_contract acc_address =
+let remote_account ?key_pair ?key_passphrase key_name ?contract:acc_contract acc_address =
   { key_name ;
-    key_passphrase = None ;
-    key_pair = None ;
+    key_passphrase ;
+    key_pair ;
     key_account = Some
         { acc_address ;
           acc_contract ;
@@ -44,6 +44,20 @@ let sandbox_keys = [
   remote_account "giver"
     "0:841288ed3b55d9cdafa806807f02a0ae0c169aa5edfe88a789a6482429756a94"
     ~contract:"Giver" ;
+  remote_account "giver2"
+    "0:b5e9240fc2d2f1ff8cbb1d1dee7fb7cae155e5f6320e585fcc685698994a19a5"
+    ~contract:"GiverV2" ;
+  remote_account "msig"
+    ~key_pair: {
+      public =
+        "99c84f920c299b5d80e4fcce2d2054b05466ec9df19532a688c10eb6dd8d6b33";
+      secret =
+        Some "73b60dc6a5b1d30a56a81ea85e0e453f6957dbfbeefb57325ca9f7be96d3fe1a";
+    }
+    ~key_passphrase:
+      "fan harsh baby section father problem person void depth already powder chicken"
+    "0:d5f5cfc4b52d2eb1bd9d3a8e51707872c7ce0c174facddd0e06ae5ffd17d2fcd"
+    ~contract:"SafeMultisigWallet";
 
   { key_name = "user9" ;
     key_passphrase = Some

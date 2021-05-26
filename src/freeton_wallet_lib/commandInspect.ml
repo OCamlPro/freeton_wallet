@@ -41,31 +41,61 @@ let query_message config ~level ?limit msg_id =
               "dst", msg_id
           in
           let address = Utils.address_of_account config address in
+          let addr = Misc.raw_address address in
           let filter =
-            REQUEST.(aeq field (astring address))
+            REQUEST.(aeq field (astring addr))
           in
           let order =
             ( "created_at" , None )
           in
           REQUEST.messages ~level ?limit ~order ~filter [])
 
+(* A cache of ABIs *)
+type abis = {
+  abis_address2abi : ( string , (* address *)
+                       string * (* account name *)
+                       ( string * (* contract *)
+                         string Lazy.t (* abi content *)
+                       ) option
+                     ) Hashtbl.t ;
+  abis_contract2abi : ( string, string ) Hashtbl.t ;
+
+  (* These functions are added to all contracts ABIs *)
+  abis_funs : Ton_types.ABI.fonction list ;
+}
+
+let json_of_abi abi =
+  EzEncoding.construct
+    ~compact:false Ton_sdk.TYPES.ABI.contract_enc abi
+
+let get_contract_abi ~abis contract =
+  match Hashtbl.find abis.abis_contract2abi contract with
+  | v -> v
+  | exception Not_found ->
+      let abifile = Misc.get_contract_abifile contract in
+      let abi = Ton_sdk.ABI.read abifile in
+      let abi = { abi with
+                  Ton_sdk.TYPES.ABI.functions =
+                    abi.Ton_sdk.TYPES.ABI.functions @ abis.abis_funs } in
+      let json = json_of_abi abi in
+      Hashtbl.add abis.abis_contract2abi contract json ;
+      json
+
 let check_account queue config ~abis addr =
   if addr <> "" then
     match !queue with
     | [] -> ()
     | s :: tail ->
-        match Hashtbl.find abis addr with
+        match Hashtbl.find abis.abis_address2abi addr with
         | exception Not_found ->
             let key_name, contract = EzString.cut_at s ':' in
             let acc_contract, contract =
               if contract = "" then None, None else
                 Some contract,
                 Some (contract,
-                      lazy (
-                        EzFile.read_file
-                          ( Misc.get_contract_abifile contract ) ) )
+                      lazy ( get_contract_abi ~abis contract ))
             in
-            Hashtbl.add abis addr (key_name, contract);
+            Hashtbl.add abis.abis_address2abi addr (key_name, contract);
             let net = Config.current_network config in
             queue := tail ;
             net.net_keys <-
@@ -91,35 +121,35 @@ let query_messages ~client ~abis queue config ~level ids =
           match m.ENCODING.msg_boc with
           | Some boc ->
               begin
-                try
+                match
                   let (_ , contract ) =
-                    Hashtbl.find abis m.msg_dst in
-                  match contract with
-                  | None -> Lwt.return ( m, None )
-                  | Some ( _ , abi ) ->
-                      let abi = Lazy.force abi in
-                      let decoded =
-                        BLOCK.decode_message_boc ~client ~boc ~abi in
-                      let body =
-                        Printf.sprintf "CALL: %s %s %s"
-                          (match decoded.body_type with
-                           | 0 -> "Input"
-                           | 1 -> "Output"
-                           | 2 -> "InternalOutput"
-                           | 3 -> "Event"
-                           | _ -> assert false)
-                          decoded.body_name
-                          (match decoded.body_args with
-                           | None -> ""
-                           | Some args -> args)
-                      in
-                      Lwt.return (
-                        { m with msg_body = None ;
-                                 msg_boc = None ;
-                        },
-                        Some body )
-                with _ ->
-                  Lwt.return ( m, None )
+                    Hashtbl.find abis.abis_address2abi m.msg_dst in
+                  contract
+                with
+                | exception Not_found -> Lwt.return ( m, None )
+                | None -> Lwt.return ( m, None )
+                | Some ( _ , abi ) ->
+                    let abi = Lazy.force abi in
+                    let decoded =
+                      BLOCK.decode_message_boc ~client ~boc ~abi in
+                    let body =
+                      Printf.sprintf "CALL: %s %s %s"
+                        (match decoded.body_type with
+                         | 0 -> "Input"
+                         | 1 -> "Output"
+                         | 2 -> "InternalOutput"
+                         | 3 -> "Event"
+                         | _ -> assert false)
+                        decoded.body_name
+                        (match decoded.body_args with
+                         | None -> ""
+                         | Some args -> args)
+                    in
+                    Lwt.return (
+                      { m with msg_body = None ;
+                               msg_boc = None ;
+                      },
+                      Some body )
               end
           | _ -> Lwt.return ( m, None )
         ) ms
@@ -127,7 +157,7 @@ let query_messages ~client ~abis queue config ~level ids =
   Lwt.return (List.flatten res)
 
 let replace_addr ~abis addr =
-    match Hashtbl.find abis addr with
+    match Hashtbl.find abis.abis_address2abi addr with
     | ( name, contract ) ->
         Printf.sprintf "%s (%s%s)" addr name
           ( match contract with
@@ -218,26 +248,42 @@ let string_of_transactions_with_messages ~abis ~level trs =
                           ) out_messages ))
        ) trs)
 
-
-let abis_of_config config =
+let abis_of_config config ~abis =
   let net = Config.current_network config in
-  let t = Hashtbl.create 113 in
-    List.iter (fun key ->
+  let abis_address2abi = Hashtbl.create 113 in
+  let abis_contract2abi = Hashtbl.create 113 in
+  let abis_list = ref [] in
+  let abis_funs = List.flatten (List.map (fun contract ->
+      let abifile = Misc.get_contract_abifile contract in
+      let abi = Ton_sdk.ABI.read abifile in
+      abis_list := ( contract, abi ) :: !abis_list ;
+      abi.Ton_sdk.TYPES.ABI.functions
+    ) abis) in
+  let abis = {
+    abis_address2abi ;
+    abis_contract2abi ;
+    abis_funs
+  } in
+  List.iter (fun ( contract, abi ) ->
+      let abi = { abi with
+                  Ton_sdk.TYPES.ABI.functions =
+                    abi.Ton_sdk.TYPES.ABI.functions @ abis_funs } in
+      Hashtbl.add abis_contract2abi contract ( json_of_abi abi )
+    ) !abis_list ;
+
+  List.iter (fun key ->
       match key.key_account with
       | Some { acc_address ; acc_contract ; _ } ->
-          Hashtbl.add t acc_address
+          Hashtbl.add abis_address2abi acc_address
             ( key.key_name ,
               match acc_contract with
               | None -> None
               | Some contract ->
                   Some (
-                    contract ,
-                    lazy (
-                      EzFile.read_file
-                        ( Misc.get_contract_abifile contract ) ) ) )
+                    contract , lazy ( get_contract_abi ~abis contract ) ))
       | _ -> ()
-      ) net.net_keys;
-    t
+    ) net.net_keys;
+  abis
 
 let transaction_with_message ~client ~abis queue config tr =
   let> tr =
@@ -266,10 +312,10 @@ let transaction_with_message ~client ~abis queue config tr =
     out_messages
   )
 
-let inspect_transaction queue ~level ?limit ~subst tr_id =
+let inspect_transaction queue ~level ?limit ~abis ~subst tr_id =
   Lwt_main.run (
     let config = Config.config () in
-    let abis = abis_of_config config in
+    let abis = abis_of_config config ~abis in
 
     let> trs =
       Utils.post_lwt config
@@ -295,7 +341,8 @@ let inspect_account ~level ?limit ~subst account =
         REQUEST.accounts ~level ?limit []
     | _ ->
         let address = Utils.address_of_account config account in
-        REQUEST.account ~level address
+        let addr = Misc.raw_address address in
+        REQUEST.account ~level addr
   in
   let accounts =
     Utils.post config request
@@ -303,10 +350,11 @@ let inspect_account ~level ?limit ~subst account =
   subst ~msg:"ACCOUNT" config
     (ENCODING.string_of_accounts accounts)
 
-let inspect_account_past ~level ?limit queue account =
+let inspect_account_past ~level ?limit ~abis queue account =
   let config = Config.config () in
-  let abis = abis_of_config config in
+  let abis = abis_of_config config ~abis in
   let address = Utils.address_of_account config account in
+  let address = Misc.raw_address address in
   let node = Config.current_node config in
   let client = CLIENT.create node.node_url in
   let url = node.node_url in
@@ -361,6 +409,7 @@ let filter_of_shard config shard =
               | Blockid blockid -> blockid
               | Account account ->
                   let address = Utils.address_of_account config account in
+                  let address = Misc.raw_address address in
                   let node = Config.current_node config in
                   let client = CLIENT.create node.node_url in
                   Printf.eprintf "Querying last shard blockid for address\n%!";
@@ -411,6 +460,7 @@ type inspect =
   | AccountPast
 
 let cmd =
+  let abis = ref [] in
   let shard = ref None in
   let inspect = ref [] in
   let level = ref 1 in
@@ -427,7 +477,8 @@ let cmd =
            queue := List.rev !queue ;
            match kind with
            | Transaction ->
-               inspect_transaction queue ~level:!level ?limit:!limit ~subst s
+               inspect_transaction queue ~level:!level ?limit:!limit
+                 ~abis:!abis ~subst s
            | Account ->
                inspect_account ~level:!level ?limit:!limit ~subst s
            | Message ->
@@ -441,6 +492,7 @@ let cmd =
                inspect_head ~level:!level ?limit:!limit ~shard:!shard ~subst ()
            | AccountPast ->
                inspect_account_past queue ~level:!level ?limit:!limit s
+                 ~abis:!abis
          ) (List.rev !inspect)
     )
     ~args:
@@ -506,6 +558,14 @@ let cmd =
             ["with"], Arg.String (fun s -> queue := s :: !queue),
             EZCMD.info ~docv:"ACCOUNT:CONTRACT"
               "Define partner account automatically defined";
+
+            [ "abis" ], Arg.String (fun s ->
+                abis := ( EzString.split s ':' ) @ !abis ),
+            EZCMD.info ~docv:"ABI"
+              "Shared ABIs. Useful for example if you expect to \
+               receive messages that your contract does not implement \
+               (IParticipant for SafeMultisigWallet, for example)";
+
           ]
       )
     ~doc: "Inspect information stored on the blockchain: display \

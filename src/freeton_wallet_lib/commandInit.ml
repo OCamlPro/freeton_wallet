@@ -74,7 +74,17 @@ let install_tvm_linker () =
   bin_install "target/debug/tvm_linker" ;
   ()
 
-let action ~clean ~client ~solc ~linker =
+let install_code_hashes () =
+  List.iter (fun file ->
+      if Filename.dirname file = "contracts" then
+        match EzString.split (Filename.basename file) '.' with
+        | [ name ; "tvc" ] ->
+            ignore ( Misc.get_contract_file ".tvc" name )
+        | _ -> ()
+    ) Files.file_list;
+  ()
+
+let action ~clean ~client ~solc ~linker ~code_hashes =
   if clean then
     Misc.call [ "rm"; "-rf"; git_dir ];
   EzFile.make_dir ~p:true git_dir ;
@@ -83,6 +93,7 @@ let action ~clean ~client ~solc ~linker =
   if client then install_tonos_cli ();
   if solc then install_solc ();
   if linker then install_tvm_linker ();
+  if code_hashes then install_code_hashes ();
 
  ()
 
@@ -91,15 +102,18 @@ let cmd =
   let client = ref false in
   let solc = ref false in
   let linker = ref false in
+  let code_hashes = ref false in
 
   EZCMD.sub
     "init"
     (fun () ->
-       let client, solc, linker = match !client, !solc, !linker with
-         | false, false, false -> true, true, true
-         | client, solc, linker -> client, solc, linker
+       let client, solc, linker, code_hashes =
+         match !client, !solc, !linker, !code_hashes with
+         | false, false, false, false -> true, true, true, true
+         | client, solc, linker, code_hashes ->
+             client, solc, linker, code_hashes
        in
-       action ~clean:!clean ~client ~solc ~linker
+       action ~clean:!clean ~client ~solc ~linker ~code_hashes
     )
     ~args: [
       [ "clean" ], Arg.Set clean,
@@ -111,6 +125,8 @@ let cmd =
       EZCMD.info "Build and install 'solc' from sources";
       [ "linker" ], Arg.Set linker,
       EZCMD.info "Build and install 'tvm_linker' from sources";
+      [ "code-hashes" ], Arg.Set code_hashes,
+      EZCMD.info "Create a database of code hashes from predefined contracts";
 
     ]
     ~doc: "Initialize with TON Labs binary tools, compiled from sources."

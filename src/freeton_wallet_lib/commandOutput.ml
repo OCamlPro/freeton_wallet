@@ -68,13 +68,16 @@ let cmd =
     ~args:
       [
         [ "o" ], Arg.String (fun s -> stdout := Some s),
-        EZCMD.info "FILE Save command stdout to file";
+        EZCMD.info ~docv:"FILE" "Save command stdout to file";
 
         [ "file" ], Arg.String (fun s -> file := Some s),
-        EZCMD.info "FILE Output content of file after substitution";
+        EZCMD.info ~docv:"FILE" "Output content of file after substitution";
 
         [ "string" ], Arg.String (fun s -> string := Some s),
-        EZCMD.info "FILE Output string after substitution";
+        EZCMD.info ~docv:"STRING" "Output string after substitution";
+
+        [ ], Arg.Anon (0, fun s -> string := Some s),
+        EZCMD.info ~docv:"STRING" "Output string after substitution";
 
         [ "keyfile" ], Arg.String (fun s -> keyfile := Some s ),
         EZCMD.info ~docv:"ACCOUNT" "Output key file of account";

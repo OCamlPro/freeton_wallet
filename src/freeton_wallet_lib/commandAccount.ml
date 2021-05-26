@@ -15,81 +15,50 @@ open EZCMD.TYPES
 open Types
 
 (*
-Input arguments:
- address: 0:2e87845a4b04137d59931198006e3dd4ef49a63b62299aea5425dcf222afa02c
-Connecting to https://net.ton.dev
-Processing...
-Succeeded.
-acc_type:      Uninit
-balance:       100000000000000
-last_paid:     1613037693
-last_trans_lt: 0x1232be65b04
-data(boc): null
+Known code hashes:
+* DePool:
+14e20e304f53e6da152eb95fffc993dbd28245a775d847eed043f7c78a503885
+* SetcodeMultisigWallet2:
+207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82
+* Giver:
+fdfab26e1359ddd0c247b0fb334c2cc3943256a263e75d33e5473567cbe2c124
 
 *)
 
 type account_type = Uninit
 
-(*
-type account_info = {
-  mutable acc_type : account_type option ;
-  mutable acc_balance : int64 option ;
-  mutable acc_last_paid : int64 option ;
-  mutable acc_trans_lt : string option ;
-  mutable acc_data : string option ;
-}
-
-(*
-content-type: application/json
-accept: */*
-host: net.ton.dev
-content-length: 396
-
-{ "query": "query accounts ($filter: AccountFilter, $orderBy: [QueryOrderBy], $limit: Int, $timeout: Float) { accounts(filter: $filter, orderBy: $orderBy, limit: $limit, timeout: $timeout) { acc_type_name balance last_paid last_trans_lt data } }", "variables": {"filter":{"id":{"eq":"0:29cf011c21af372d8da18ac696c7a8787979c9b2acc65461fa8c8a374d24c8d4"}},"limit":null,"orderBy":null,"timeout":0} }
-                *)
-
 let get_account_info config address =
-
-  let stdout = Misc.call_stdout_lines @@
-    Misc.tonoscli config ["account" ; address ] in
-  let account = {
-    acc_type = None ;
-    acc_balance = None ;
-    acc_last_paid = None ;
-    acc_trans_lt = None ;
-    acc_data = None ;
-  } in
-  let success = ref false in
-  let not_found = ref false in
-  List.iter (fun s ->
-      match EzString.cut_at s ':' with
-      | "Succeeded.", "" -> success := true
-      | "Account not found.", "" -> not_found := true
-      | "balance", balance ->
-          account.acc_balance <-
-            Some ( Int64.of_string (String.trim balance ))
-      | _ -> ()
-    ) stdout;
-  if not !success then
-    Error.raise "Could not parse output of tonos-cli: %s"
-      (String.concat "\n" stdout );
-  if !not_found then None else Some account
-*)
-
-let get_account_info config address =
+  let addr = Misc.raw_address address in
   let open Ton_sdk in
   let level = if !Globals.verbosity > 1 then 3 else 1 in
   match
     Utils.post config
-      ( REQUEST.account ~level address )
+      ( REQUEST.account ~level addr )
   with
   | [] -> None
   |  [ account ] ->
       if !Globals.verbosity > 1 then
         Format.printf "%s@."
           (EzEncoding.construct ~compact:false ENCODING.accounts_enc [account]
-
           );
+      begin
+        match account.acc_code_hash with
+        | None -> ()
+        | Some code_hash ->
+            match address with
+            | RawAddress _ -> ()
+            | Account acc ->
+                match acc.acc_contract with
+                | Some _ -> ()
+                | None ->
+                    match Misc.contract_of_code_hash ~code_hash with
+                    | None -> ()
+                    | Some contract ->
+                        Printf.eprintf "Setting contract %S for %s\n%!"
+                          contract acc.acc_address;
+                        acc.acc_contract <- Some contract;
+                        config.modified <- true
+      end;
       Some account
   | _ -> assert false
 
@@ -126,19 +95,24 @@ let string_of_nanoton v =
   s
 
 let get_account_info config ~name ~address =
-    match get_account_info config address with
-    | None ->
-        Printf.printf "Account %S: not yet created\n%!" name
-    | Some account ->
-        Printf.printf "Account %S: %s\n%!" name
-          (match account.acc_balance with
-           | None -> "no balance"
-           | Some n ->
-               Printf.sprintf "%s TONs (%s)"
-                 (string_of_nanoton (Z.to_int64 n))
-                 (match account.acc_type_name with
-                  | None -> "Non Exists"
-                  | Some s -> s))
+  match get_account_info config address with
+  | None ->
+      Printf.printf "Account %S: not yet created\n%!" name
+  | Some account ->
+      Printf.printf "Account %S: %s\n%!" name
+        (match account.acc_balance with
+         | None -> "no balance"
+         | Some n ->
+             Printf.sprintf "%s TONs (%s)"
+               (string_of_nanoton (Z.to_int64 n))
+               (match account.acc_type_name with
+                | None -> "Non Exists"
+                | Some s ->
+                    match address with
+                    | Account { acc_contract = Some contract; _ } ->
+                        Printf.sprintf "%s: %s" contract s
+                    | _ -> s
+               ))
 
 let get_key_info config key ~info =
   if info then
@@ -149,7 +123,7 @@ let get_key_info config key ~info =
       | None ->
           Error.raise "Address %s has no address (use genaddr before)"
             key.key_name
-      | Some account -> account.acc_address
+      | Some account -> Account account
     in
     get_account_info config ~address ~name:key.key_name
 
@@ -212,8 +186,9 @@ let get_account_info accounts ~list ~info =
         List.iter (fun key ->
             match key.key_account with
             | None -> ()
-            | Some acc ->
-                get_account_info config ~address:acc.acc_address ~name:key.key_name
+            | Some account ->
+                get_account_info config
+                  ~address:( Account account ) ~name:key.key_name
           ) net.net_keys
     | _ ->
         List.iter (fun account ->
@@ -314,6 +289,8 @@ let add_account config
   let key_name = name in
   Misc.check_new_key_exn net name;
 
+  let contract = Option.map Misc.fully_qualified_contract contract in
+
   let subst, _ = Subst.subst_string config in
   let key_passphrase = Option.map subst passphrase in
 
@@ -395,7 +372,8 @@ let change_account config
                 config.modified <- true
           end;
           None
-      | _ -> contract
+      | _ ->
+          Option.map Misc.fully_qualified_contract contract
     in
 
     let address, contract = match address with
@@ -605,8 +583,9 @@ let get_live accounts =
   in
   List.iter (fun account ->
       let address = Utils.address_of_account config account in
+      let addr = Misc.raw_address address in
       let url = Printf.sprintf
-          "https://%s/accounts/accountDetails?id=%s" host address in
+          "https://%s/accounts/accountDetails?id=%s" host addr in
       Misc.call [ "xdg-open" ; url ]
     ) accounts
 
@@ -670,6 +649,7 @@ let action accounts ~list ~info
         match accounts with
           [] -> genkey config
         | _ ->
+            let contract = Option.map Misc.fully_qualified_contract contract in
             List.iter (fun name ->
                 genkey ~name config ?contract
               ) accounts;

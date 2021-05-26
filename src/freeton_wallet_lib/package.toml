@@ -60,7 +60,7 @@ ez_config = "0.1.0"
 ez_file = "0.2.0"
 ez_subst = ">=0.1"
 ezjsonm = ""
-freeton_ocaml_sdk = "0.3.0"
+freeton_ocaml_sdk = "0.3.1"
 lwt_ssl = ">=1.1"
 [dependencies.freeton_crawler_lib]
 opt = true

@@ -50,19 +50,26 @@ and date_now_delay now f rem =
   date_now (f now delay) rem
 
 let get_code filename =
-  let tvm_linker = Misc.binary_file "tvm_linker" in
-  let lines =
-    Misc.call_stdout_lines [ tvm_linker ; "decode" ; "--tvc" ; filename ] in
-  let code = ref None in
-  List.iter (fun line ->
-      match EzString.split line ' ' with
-      | [ "" ; "code:" ; base64 ] -> code := Some base64
-      | _ -> ()
-    ) lines;
-  match !code with
-  | None -> Error.raise "Code not found in file %S" filename
-  | Some code -> code
+  if Globals.use_ton_sdk then
+    let tvm_linker = Misc.binary_file "tvm_linker" in
+    let lines =
+      Misc.call_stdout_lines [ tvm_linker ; "decode" ; "--tvc" ; filename ] in
+    let code = ref None in
+    List.iter (fun line ->
+        match EzString.split line ' ' with
+        | [ "" ; "code:" ; base64 ] -> code := Some base64
+        | _ -> ()
+      ) lines;
+    match !code with
+    | None -> Error.raise "Code not found in file %S" filename
+    | Some code -> code
+  else
+    let state = Ton_sdk.TVC.read filename in
+    Ton_sdk.TVC.code state
 
+let get_code_hash filename =
+  let state = Ton_sdk.TVC.read filename in
+  Ton_sdk.TVC.code_hash state
 
 let subst_string ?brace config =
   let net = Config.current_network config in
@@ -182,8 +189,8 @@ let subst_string ?brace config =
           | Ok s -> s
           | Error _ -> Error.raise "of-base64: %s" s
         end
-    | "get-code" :: rem ->
-        get_code ( iter rem )
+    | "get-code" :: rem -> get_code ( iter rem )
+    | "get-code-hash" :: rem -> get_code_hash ( iter rem )
 
 
     (* deprecated *)
@@ -293,7 +300,7 @@ Encoders, working on the rest of the substitution:
 * of-hex:SUBST        Do SUBST, then convert from hex
 * of-base64:SUBST     Do SUBST, then convert from base64
 * get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
-
+* get-code-hash:SUBST   Do SUBST to generate a TVC filename, compute code hash
 |}
 
 

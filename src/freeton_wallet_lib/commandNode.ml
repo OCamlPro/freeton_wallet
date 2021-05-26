@@ -19,6 +19,8 @@ type todo =
     NodeStart
   | NodeStop
   | NodeWeb
+  | NodeLive
+  | NodeUpdate
   | NodeGive of string
 
 let container_of_node local_node =
@@ -57,9 +59,15 @@ let action ~todo =
           Misc.call [ "docker"; "start" ; container_of_node local_node ]
       | NodeStop ->
           Misc.call [ "docker"; "stop" ; container_of_node local_node ]
+      | NodeUpdate ->
+          Misc.call [ "docker"; "pull" ; "tonlabs/local-node" ]
       | NodeWeb ->
           Misc.call [ "xdg-open";
                       Printf.sprintf "http://0.0.0.0:%d/graphql"
+                        local_node.local_port ]
+      | NodeLive ->
+          Misc.call [ "xdg-open";
+                      Printf.sprintf "http://0.0.0.0:%d/"
                         local_node.local_port ]
 
       | NodeGive account ->
@@ -160,6 +168,14 @@ let cmd =
 
       [ "web" ], Arg.Unit (fun () -> set_todo "--web" NodeWeb ),
       EZCMD.info "Open Node GraphQL webpage";
+
+      [ "live" ], Arg.Unit (fun () -> set_todo "--live" NodeLive ),
+      EZCMD.info "Open Node Live block explorer webpage";
+
+      [ "update" ], Arg.Unit (fun () -> set_todo "--update" NodeUpdate ),
+      EZCMD.info "Update Docker image of TONOS SE for new \
+                  features. You must recreate sandbox switches to \
+                  benefit from the new image.";
 
       [ "give" ], Arg.String (fun s -> set_todo "--give" (NodeGive s) ),
       EZCMD.info
