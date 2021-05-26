@@ -13,7 +13,6 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 open Types
-open EzFile.OP
 
 (*
 Known code hashes:
@@ -49,30 +48,16 @@ let get_account_info config address =
             match address with
             | RawAddress _ -> ()
             | Account acc ->
-                let code_hash_file = Globals.code_hash_dir // code_hash in
-                let is_known_code_hash =
-                  Sys.file_exists code_hash_file
-                in
                 match acc.acc_contract with
+                | Some _ -> ()
                 | None ->
-                    if is_known_code_hash then
-                      let contract = String.trim
-                          ( EzFile.read_file code_hash_file ) in
-                      acc.acc_contract <- Some contract;
-                      config.modified <- true
-                | Some contract ->
-                    if is_known_code_hash then begin
-                      let contract2 = String.trim
-                          ( EzFile.read_file code_hash_file ) in
-                      if contract2 <> contract then
-                        Printf.eprintf "Warning: address %s has code hash %s for contract %s, but that code_hash was memorized for contract %s\n%!"
-                          addr code_hash contract contract2
-                    end else begin
-                      Printf.eprintf "Remember %s has code hash %s\n%!"
-                        contract code_hash;
-                      EzFile.make_dir ~p:true Globals.code_hash_dir;
-                      EzFile.write_file code_hash_file contract
-                    end
+                    match Misc.contract_of_code_hash ~code_hash with
+                    | None -> ()
+                    | Some contract ->
+                        Printf.eprintf "Setting contract %S for %s\n%!"
+                          contract acc.acc_address;
+                        acc.acc_contract <- Some contract;
+                        config.modified <- true
       end;
       Some account
   | _ -> assert false
@@ -122,7 +107,12 @@ let get_account_info config ~name ~address =
                (string_of_nanoton (Z.to_int64 n))
                (match account.acc_type_name with
                 | None -> "Non Exists"
-                | Some s -> s))
+                | Some s ->
+                    match address with
+                    | Account { acc_contract = Some contract; _ } ->
+                        Printf.sprintf "%s: %s" contract s
+                    | _ -> s
+               ))
 
 let get_key_info config key ~info =
   if info then

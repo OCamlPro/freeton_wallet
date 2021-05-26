@@ -311,6 +311,8 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
                   contract_prefix ^ ".abi.json" ];
       let tvc_file = contract_prefix ^ ".tvc" in
       Misc.call [ "cp" ; "-f" ; tvm_file ; tvc_file ];
+      Misc.register_tvc_file ~tvc_file
+        ~contract: ( Misc.fully_qualified_contract contract ) ;
       Misc.call [ "cp" ; "-f" ; filename ;
                   contract_prefix ^ ".sol" ];
       ()
@@ -318,7 +320,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   | ImportContract filename ->
       let dirname = Filename.dirname filename in
       let basename = Filename.basename filename in
-      let name, _ext = EzString.cut_at basename '.' in
+      let contract, _ext = EzString.cut_at basename '.' in
       let abi = ref [] in
       let tvc = ref [] in
       let src = ref [] in
@@ -332,16 +334,19 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
         src, "hpp";
       ] in
       List.iter (fun (kind, ext) ->
-          let filename = Filename.concat dirname (name ^ "." ^ ext) in
+          let filename = Filename.concat dirname ( contract ^ "." ^ ext) in
           if Sys.file_exists filename then
             kind := filename :: !kind
         ) files;
       begin
         match !abi, !tvc with
         | [ abi ], [ tvc ] ->
-            let contract_prefix = create_new_version name in
+            let contract_prefix = create_new_version contract in
             Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
-            Misc.call [ "cp"; "-f"; tvc ; contract_prefix ^ ".tvc" ];
+            let tvc_file = contract_prefix ^ ".tvc" in
+            Misc.call [ "cp"; "-f"; tvc ; tvc_file ];
+            Misc.register_tvc_file ~tvc_file
+              ~contract: ( Misc.fully_qualified_contract contract ) ;
             begin match !src with
               | [] -> ()
               | list ->

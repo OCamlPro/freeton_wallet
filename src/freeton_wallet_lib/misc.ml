@@ -219,6 +219,31 @@ let gen_keyfile key_pair =
   write_json_file Encoding.keypair keypair_file key_pair;
   keypair_file
 
+
+let contract_of_code_hash ~code_hash =
+  let dirname = Globals.code_hash_dir //
+                ( Printf.sprintf "%c%c" code_hash.[0] code_hash.[1] ) in
+  let filename = dirname // code_hash in
+  if Sys.file_exists filename then
+    Some ( String.trim ( EzFile.read_file filename ))
+  else
+    None
+
+let register_code_hash ~code_hash ~contract =
+  let dirname = Globals.code_hash_dir //
+                ( Printf.sprintf "%c%c" code_hash.[0] code_hash.[1] ) in
+  let filename = dirname // code_hash in
+  if not ( Sys.file_exists filename ) then begin
+    EzFile.make_dir ~p:true dirname ;
+    EzFile.write_file filename contract
+  end
+
+let register_tvc_file ~tvc_file ~contract =
+  let state = Ton_sdk.TVC.read tvc_file in
+  let code_hash = Ton_sdk.TVC.code_hash state in
+  Printf.eprintf "Contract %s has code hash %s\n%!" contract code_hash ;
+  register_code_hash ~code_hash ~contract
+
 let get_contract_file ext contract =
   let contract_prefix = Globals.contracts_dir // contract in
   let contract_file = contract_prefix ^ ext in
@@ -242,6 +267,8 @@ let get_contract_file ext contract =
       | Some file_content -> file_content
     in
     write_file contract_file file_content;
+    if ext = ".tvc" then
+      register_tvc_file ~tvc_file:contract_file ~contract ;
     contract_file
 
 let get_contract_tvcfile = get_contract_file ".tvc"

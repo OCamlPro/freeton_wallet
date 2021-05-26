@@ -1,5 +1,5 @@
 
-[![Actions Status](https://github.com/ocamlpro/freeton_wallet/workflows/Main%20Workflow/badge.svg)](https://github.com/ocamlpro/freeton_wallet/actions)
+[![Actions Status](https://github.com/ocamlpro/freeton_wallet/workflows/Main%20Workflow/badge.svg)](https://github.com/ocamlpro/freeton_wallet/actions)[![Actions Status](https://github.com/ocamlpro/freeton_wallet/workflows/doc-deploy/badge.svg)](https://github.com/ocamlpro/freeton_wallet/actions)
 [![Release](https://img.shields.io/github/release/ocamlpro/freeton_wallet.svg)](https://github.com/ocamlpro/freeton_wallet/releases)
 
 # freeton_wallet

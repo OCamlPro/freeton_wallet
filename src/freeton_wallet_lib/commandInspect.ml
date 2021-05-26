@@ -121,35 +121,35 @@ let query_messages ~client ~abis queue config ~level ids =
           match m.ENCODING.msg_boc with
           | Some boc ->
               begin
-                try
+                match
                   let (_ , contract ) =
                     Hashtbl.find abis.abis_address2abi m.msg_dst in
-                  match contract with
-                  | None -> Lwt.return ( m, None )
-                  | Some ( _ , abi ) ->
-                      let abi = Lazy.force abi in
-                      let decoded =
-                        BLOCK.decode_message_boc ~client ~boc ~abi in
-                      let body =
-                        Printf.sprintf "CALL: %s %s %s"
-                          (match decoded.body_type with
-                           | 0 -> "Input"
-                           | 1 -> "Output"
-                           | 2 -> "InternalOutput"
-                           | 3 -> "Event"
-                           | _ -> assert false)
-                          decoded.body_name
-                          (match decoded.body_args with
-                           | None -> ""
-                           | Some args -> args)
-                      in
-                      Lwt.return (
-                        { m with msg_body = None ;
-                                 msg_boc = None ;
-                        },
-                        Some body )
-                with _ ->
-                  Lwt.return ( m, None )
+                  contract
+                with
+                | exception Not_found -> Lwt.return ( m, None )
+                | None -> Lwt.return ( m, None )
+                | Some ( _ , abi ) ->
+                    let abi = Lazy.force abi in
+                    let decoded =
+                      BLOCK.decode_message_boc ~client ~boc ~abi in
+                    let body =
+                      Printf.sprintf "CALL: %s %s %s"
+                        (match decoded.body_type with
+                         | 0 -> "Input"
+                         | 1 -> "Output"
+                         | 2 -> "InternalOutput"
+                         | 3 -> "Event"
+                         | _ -> assert false)
+                        decoded.body_name
+                        (match decoded.body_args with
+                         | None -> ""
+                         | Some args -> args)
+                    in
+                    Lwt.return (
+                      { m with msg_body = None ;
+                               msg_boc = None ;
+                      },
+                      Some body )
               end
           | _ -> Lwt.return ( m, None )
         ) ms
