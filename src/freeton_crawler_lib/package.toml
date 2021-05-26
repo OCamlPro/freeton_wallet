@@ -36,7 +36,7 @@ optional = true
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps pgocaml_ppx"
+# preprocess = "pps pgocaml_ppx"
 
 # files to skip while updating at package level
 # skip = []
@@ -68,18 +68,37 @@ pgocaml_ppx = ""
 #  gen-opam = "some" | "all" 
 [fields]
 dune-libraries = "lwt.unix"
-dune-stanzas = """ 
- (preprocessor_deps
-   (env_var PGDATABASE)
-   (env_var PGCUSTOM_CONVERTERS_CONFIG)
-   (file updated.ml)
- )
-"""
-dune-trailer = """(rule
+dune-trailer = """
+(rule
+ (targets db.ml)
+ (deps
+  (:src db.pp.ml)
+  updated.ml
+  (env_var PGDATABASE)
+  (env_var PGCUSTOM_CONVERTERS_CONFIG))
+ (mode promote)
+ (action
+  (with-stdout-to %{targets}
+    (run %{lib:pgocaml_ppx:ppx.exe} %{src}))))
+
+(rule
+ (targets db_utils.ml)
+ (deps
+  (:src db_utils.pp.ml)
+  updated.ml
+  (env_var PGDATABASE)
+  (env_var PGCUSTOM_CONVERTERS_CONFIG))
+ (mode promote)
+ (action
+  (with-stdout-to %{targets}
+    (run %{lib:pgocaml_ppx:ppx.exe} %{src}))))
+
+(rule
   (targets updated.ml)
   (deps
     ../freeton_crawler_db_versions/main.ml
     %{bin:freeton_crawler_db_updater})
+  (mode promote)
   (action
       (run %{bin:freeton_crawler_db_updater} updated.ml))
 )
