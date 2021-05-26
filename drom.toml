@@ -71,6 +71,51 @@ share-dirs = ["share"]
 # project-wide fields (depends on project skeleton)
 [fields]
 opam-repo = "git+https://github.com/OCamlPro/ocp-opam-repository"
+github-worlflow-env = """
+
+    env:
+      PGHOST: localhost
+      PGDATABASE: postgres_db
+      PGPASSWORD: postgres_password
+      PGPORT: 5432
+      PGUSER: postgres_user
+
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgres:latest
+        # service environment variables
+        # `POSTGRES_HOST` is `postgres`
+        env:
+          # optional (defaults to `postgres`)
+          POSTGRES_DB: postgres_db
+          # required
+          POSTGRES_PASSWORD: postgres_password
+          # optional (defaults to `5432`)
+          POSTGRES_PORT: 5432
+          # optional (defaults to `postgres`)
+          POSTGRES_USER: postgres_user
+        ports:
+          # maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+"""
+
+github-workflow-after-build = """
+
+      - name: check consistency of committed pre-processed files
+        run: git diff --exit-code src/freeton_crawler_lib
+"""
+github-workflow-before-doc = """
+
+      - name: Remove pgocaml_ppx
+        run: opam remove pgocaml_ppx
+"""
 
 [[package]]
 dir = "src/freeton_wallet"

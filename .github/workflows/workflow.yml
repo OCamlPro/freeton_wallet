@@ -88,12 +88,12 @@ jobs:
       - run: opam pin add . -y --no-action
 
       - run: opam depext -y freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_db_updater freeton_crawler_db_versions
-        if: steps.cache-opam.outputs.cache-hit != 'true'
+#        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y ./*.opam --deps-only --with-test
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
-      - run: opam upgrade --fixup
+#      - run: opam upgrade --fixup
 #        if: steps.cache-opam.outputs.cache-hit == 'true'
 
       - run: dos2unix scripts/*.sh
@@ -102,7 +102,7 @@ jobs:
       - run: make build
 
       - name: check consistency of committed pre-processed files
-        run: git diff --quiet src/freeton_crawler_lib
+        run: git diff --exit-code src/freeton_crawler_lib
 
       - name: run test suite
         run: |
