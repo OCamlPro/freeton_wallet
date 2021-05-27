@@ -2,8 +2,17 @@ let database = ref (Freeton_crawler_db_versions.Main.database ())
 module PGOCaml = PGOCaml_lwt
 module M = PGOCaml_lwt.M
 type database_handle = (string, bool) Hashtbl.t PGOCaml.t
-let connect () = PGOCaml.connect ~database:(!database) ()
-let create () = EzPG.createdb (!database)
+let host = match Sys.getenv "PGHOST" with | exception _ -> None | s -> Some s
+let (host, unix_domain_socket_dir) =
+  match host with
+  | None -> (None, None)
+  | Some s ->
+      if ((String.length s) > 0) && ((s.[0]) = '/')
+      then (None, (Some s))
+      else ((Some s), None)
+let connect () =
+  PGOCaml.connect ?host ?unix_domain_socket_dir ~database:(!database) ()
+let create () = EzPG.createdb ?host ?unix_domain_socket_dir (!database)
 let (>>=) = M.(>>=)
 let connected = ref false
 let dbh_pool : database_handle Lwt_pool.t Lazy.t =

@@ -11,7 +11,7 @@ license = "LGPL2"
 min-edition = "4.08.0"
 name = "freeton_wallet"
 synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)"
-version = "0.4.2"
+version = "0.4.3"
 
 # keys that you could also define:
 # odoc-target = "...odoc-target..."
@@ -110,11 +110,6 @@ github-workflow-after-build = """
 
       - name: check consistency of committed pre-processed files
         run: git diff --exit-code src/freeton_crawler_lib
-"""
-github-workflow-before-doc = """
-
-      - name: Remove pgocaml_ppx
-        run: opam remove pgocaml_ppx
 """
 
 [[package]]

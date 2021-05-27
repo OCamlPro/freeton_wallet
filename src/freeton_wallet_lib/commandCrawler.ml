@@ -54,14 +54,31 @@ let cmd =
             (running or not) and --stop to stop the process and its \
             manager.";
         `P "A simple session looks like:";
-        `Pre {|$ ft crawler myapp --start &> daemon.log &
-$ psql myapp
+        `Pre {|sh> ft crawler myapp --start &> daemon.log &
+sh> psql myapp
 SELECT * FROM freeton_events;
 serial|                              msg_id                              |      event_name       |           event_args                            |    time    | tr_lt
     1 | ec026489c0eb2071b606db0c7e05e5a76c91f4b02c2b66af851d56d5051be8bd | OrderStateChanged     | {"order_id":"31","state_count":"1","state":"1"} | 1620744626 | 96
 SELECT * FROM freeton_transactions;
 ^D
-$ ft crawler myapp --stop
+sh> ft crawler myapp --stop
 |};
-      ]
+      ];
+      `S "ERRORS";
+      `Blocks [
+        `P "The crawler may fail connecting to the database. You can \
+            use PGHOST to set the hostname of the database, or the \
+            directory of unix sockets (default is \
+            /var/run/postgresql). You can use PGPORT for the port \
+            (default is 5432).";
+        `P {|The crawler may also fail for authorizations (something like FATAL: 28000: role USER does not exist ). In such a case, you need to configure postgresql to allow your role (<user> is your username):|};
+        `Pre {|
+     sh> sudo -i -u postgres
+     root> psql
+     CREATE USER <user>;
+     ALTER ROLE <user> CREATEDB;
+|}
+
+
+      ];
     ]
