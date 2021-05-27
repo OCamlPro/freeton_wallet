@@ -135,6 +135,7 @@ let show_abi ~contract =
       end)
 
 type param_kind =
+  | Address
   | Numerical
   | String
   | Cell
@@ -176,7 +177,7 @@ let check_abi ~contract ~abifile ~meth ~params =
             )
         | `String s ->
             let param_kind = match p.param_type with
-              | "address"
+              | "address" -> Address
               | "uint"
               | "uint8"
               | "uint16"
@@ -198,6 +199,19 @@ let check_abi ~contract ~abifile ~meth ~params =
             let len = String.length s in
             begin
               match param_kind with
+              | Address ->
+                  begin match
+                      let before, after = EzString.cut_at s ':' in
+                      ignore ( int_of_string before ) ;
+                      if String.length after <> 64 then
+                        failwith "not an address"
+                    with _exn ->
+                      error f
+                        (Printf.sprintf
+                           "Param %S of type %S should be an address instead of %s"
+                           p.param_name p.param_type s)
+
+                  end
               | Numerical ->
                   begin
                     let is_hexa = ref false in
@@ -224,16 +238,16 @@ let check_abi ~contract ~abifile ~meth ~params =
                              p.param_name p.param_type s)
                   end
               | String ->
-                  let is_hexa = ref false in
+                  let is_hexa = ref true in
                   for i = 0 to len -1 do
                     match s.[i] with
-                    '0'..'9'
-                    | 'a'..'f' | 'A'..'F' -> ()
-                    | _ -> is_hexa := false
+                    '0'..'9' | 'a'..'f' | 'A'..'F' -> ()
+                             | _ -> is_hexa := false
                   done;
-                  error f
-                    (Printf.sprintf "Param %S of type %S should be in hexadecimal instead of %s\nHINT: you can use %%{hex:string:%s} instead."
-                       p.param_name p.param_type s s)
+                  if not !is_hexa then
+                    error f
+                      (Printf.sprintf "Param %S of type %S should be in hexadecimal instead of %s\nHINT: you can use %%{hex:string:%s} instead."
+                         p.param_name p.param_type s s)
               | Cell -> ()
               | Unknown -> ()
             end
