@@ -4,7 +4,7 @@
   (public_name freeton_crawler_db_updater)
   (package freeton_crawler_db_updater)
   (libraries freeton_crawler_db_versions )
-  (optional)
+  
   
   )
 

@@ -62,9 +62,7 @@ ez_subst = ">=0.1"
 ezjsonm = ""
 freeton_ocaml_sdk = "0.3.1"
 lwt_ssl = ">=1.1"
-[dependencies.freeton_crawler_lib]
-opt = true
-version = "version"
+freeton_crawler_lib = "version"
 
 # package tools dependencies
 [tools]
@@ -81,11 +79,6 @@ ppx_deriving_encoding = ""
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
 [fields]
-dune-libraries = """  (select crawler.ml from
-  (freeton_crawler_lib -> crawler.present.ml)
-  (-> crawler.absent.ml)
-  )
-"""
 dune-trailer = """(rule
   (targets files.ml)
   (deps

@@ -17,11 +17,23 @@ module M = PGOCaml_lwt.M
 
 type database_handle = (string, bool) Hashtbl.t PGOCaml.t
 
+let host = match Sys.getenv "PGHOST" with
+  | exception _ -> None
+  | s -> Some s
+let host, unix_domain_socket_dir =
+  match host with
+  | None -> None, None
+  | Some s ->
+      if String.length s > 0 && s.[0] = '/' then
+        None, Some s
+      else
+        Some s, None
+
 let connect () =
-  PGOCaml.connect ~database:!database ()
+  PGOCaml.connect ?host ?unix_domain_socket_dir ~database:!database ()
 
 let create () =
-  EzPG.createdb !database
+   EzPG.createdb ?host ?unix_domain_socket_dir !database
 
 let (>>=) = M.(>>=)
 (* let return = M.return *)

@@ -44,87 +44,6 @@ let check_exists dirname file =
     else
       Error.raise "File %s was not generated" file
 
-let show_abi contract =
-  let _config = Config.config () in
-  let contract_abi = Misc.get_contract_abifile contract in
-  let abi = Ton_sdk.ABI.read contract_abi in
-
-  Printf.printf "ABI of contract %S\n%!" contract ;
-  Printf.printf "  File: %s\n%!" contract_abi ;
-
-  let open Ton_sdk.TYPES.ABI in
-
-  begin
-    match abi.header with
-    | [] -> () | headers ->
-        Printf.printf "Headers: %s\n%!"
-          ( String.concat " " headers );
-  end;
-  begin
-    match abi.data with
-    | [] -> ()
-    | data ->
-        Printf.printf "\nStatic variables:\n%!";
-        List.iter (fun d ->
-            Printf.printf "  %s: %s\n%!" d.data_name d.data_type
-          ) data;
-  end;
-
-  let constructors, functions = List.partition (fun f ->
-      f.fun_name = "constructor"
-    ) abi.functions
-  in
-
-  let printf_params params =
-    match params with
-    | [] -> Format.printf "{}"
-    | _ ->
-        Format.printf "'{@[<1>@ ";
-        List.iteri (fun i p ->
-            if i > 0 then Format.printf ",@ ";
-            Format.printf "%S:@ %S" p.param_name p.param_type
-          ) params ;
-        Format.printf "@ @]}'"
-  in
-
-  let print_functions msg list =
-    match list with
-    | [] -> ()
-    | _ ->
-        Printf.printf "\n%s:\n%!" msg;
-        List.iter (fun f ->
-            Format.printf "  * @[<1>%s@ "
-              f.fun_name;
-
-            printf_params f.fun_inputs ;
-            begin
-              match f.fun_outputs with
-              | [] -> ()
-              | outputs ->
-                   Format.printf "@ ->@ ";
-                   printf_params outputs;
-            end;
-            Format.printf "@]@."
-          ) list
-  in
-
-  print_functions "Constructors" constructors ;
-  print_functions "Methods" functions ;
-
-  begin
-    match abi.events with
-    | [] -> ()
-    | events ->
-        Printf.printf "\nEvents:\n%!";
-        List.iter (fun ev ->
-            Format.printf " * %s " ev.ev_name ;
-            printf_params ev.ev_inputs ;
-            Format.printf "@."
-          ) events
-  end;
-
-  ()
-
 let sol_abi contract =
   let _config = Config.config () in
   let contract_abi = Misc.get_contract_abifile contract in
@@ -271,7 +190,9 @@ let create_new_version contract =
 let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
   match todo with
   | ListContracts -> CommandList.list_contracts ()
-  | ShowABI contract -> show_abi contract
+  | ShowABI contract ->
+      let s = Utils.show_abi ~contract in
+      Printf.printf "%s\n%!" s
   | SolABI contract -> sol_abi contract
   | BuildContract filename ->
       (* TODO: check that no account is using this contract,

@@ -29,7 +29,7 @@ gen-version = "version.ml"
 pack-modules = false
 
 # whether the package can be silently skipped if missing deps (default is false)
-optional = true
+# optional = true
 
 # module name used to pack modules (if pack-modules is true)
 # pack = "Mylib"
