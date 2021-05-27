@@ -45,6 +45,234 @@ let tonoscli config args =
   end;
   tonoscli binary config args
 
+let string_of_ppf f =
+
+  let b = Buffer.create 1000 in
+  let ppf = Format.formatter_of_buffer b in
+  f ppf ;
+  Format.pp_print_flush ppf () ;
+  Buffer.contents b
+
+let printf_params ppf params =
+  let open Ton_sdk.TYPES.ABI in
+  match params with
+  | [] -> Format.fprintf ppf "{}"
+  | _ ->
+      Format.fprintf ppf "'{@[<1>@ ";
+      List.iteri (fun i p ->
+          if i > 0 then Format.fprintf ppf ",@ ";
+          Format.fprintf ppf "%S:@ %S" p.param_name p.param_type
+        ) params ;
+      Format.fprintf ppf "@ @]}'"
+
+let printf_function ppf f =
+  let open Ton_sdk.TYPES.ABI in
+  Format.fprintf ppf "  * @[<1>%s@ "
+    f.fun_name;
+  printf_params ppf f.fun_inputs ;
+  begin
+    match f.fun_outputs with
+    | [] -> ()
+    | outputs ->
+        Format.fprintf ppf "@ ->@ ";
+        printf_params ppf outputs;
+  end;
+  Format.fprintf ppf "@]@."
+
+
+let show_abi ~contract =
+  let contract_abi = Misc.get_contract_abifile contract in
+  let abi = Ton_sdk.ABI.read contract_abi in
+
+  string_of_ppf (fun ppf ->
+      Format.fprintf ppf "ABI of contract %S@." contract ;
+      Format.fprintf ppf "  File: %s@." contract_abi ;
+
+      let open Ton_sdk.TYPES.ABI in
+
+      begin
+        match abi.header with
+        | [] -> () | headers ->
+            Format.fprintf ppf "Headers: %s@."
+              ( String.concat " " headers );
+      end;
+      begin
+        match abi.data with
+        | [] -> ()
+        | data ->
+            Format.fprintf ppf "\nStatic variables:@.";
+            List.iter (fun d ->
+                Printf.printf "  %s: %s@." d.data_name d.data_type
+              ) data;
+      end;
+
+      let constructors, functions = List.partition (fun f ->
+          f.fun_name = "constructor"
+        ) abi.functions
+      in
+
+      let print_functions msg list =
+        match list with
+        | [] -> ()
+        | _ ->
+            Format.fprintf ppf "\n%s:\n" msg;
+            List.iter (printf_function ppf) list
+      in
+
+      print_functions "Constructors" constructors ;
+      print_functions "Methods" functions ;
+
+      begin
+        match abi.events with
+        | [] -> ()
+        | events ->
+            Format.fprintf ppf "\nEvents:\n";
+            List.iter (fun ev ->
+                Format.fprintf ppf " * %s " ev.ev_name ;
+                printf_params ppf ev.ev_inputs ;
+                Format.fprintf ppf "@."
+              ) events
+      end)
+
+type param_kind =
+  | Numerical
+  | String
+  | Cell
+  | Unknown
+
+let check_abi ~contract ~abifile ~meth ~params =
+  let open Ton_sdk.TYPES.ABI in
+  let abi = Ton_sdk.ABI.read abifile in
+  let found = ref None in
+  let error f s =
+    Error.raise "%s\nMethod has type: %s"
+      s (string_of_ppf (fun ppf -> printf_function ppf f))
+  in
+  let check_params f list params =
+    found := Some params ;
+
+    if List.length f.fun_inputs <> List.length list then
+      error f
+        (Printf.sprintf "Method %S has arity %d, but %d arguments provided"
+           f.fun_name
+           (List.length f.fun_inputs) (List.length list));
+
+    List.iter (fun (name, _v) ->
+        if not ( List.exists (fun p ->
+            p.param_name = name
+          ) f.fun_inputs ) then begin
+          error f (Printf.sprintf "Unknown argument %S" name)
+        end
+      ) list ;
+
+    let map = ref ( StringMap.of_list list ) in
+
+    List.iter (fun p ->
+        match StringMap.find p.param_name !map with
+        | exception Not_found ->
+            error f (
+              Printf.sprintf "Expected argument %S was not provided"
+                p.param_name
+            )
+        | `String s ->
+            let param_kind = match p.param_type with
+              | "address"
+              | "uint"
+              | "uint8"
+              | "uint16"
+              | "uint32"
+              | "uint64"
+              | "uint128"
+              | "uint256"
+              | "int"
+              | "int8"
+              | "int16"
+              | "int32"
+              | "int64"
+              | "int128"
+              | "int256" -> Numerical
+              | "string" | "bytes" -> String
+              | "cell" -> Cell
+              | _ -> Unknown
+            in
+            let len = String.length s in
+            begin
+              match param_kind with
+              | Numerical ->
+                  begin
+                    let is_hexa = ref false in
+                    let is_alpha = ref false in
+                    for i = 0 to len -1 do
+                      match s.[i] with
+                      '0'..'9' -> ()
+                      | 'a'..'f' | 'A'..'F' -> is_hexa := true
+                      | 'x' | 'X' when i = 1 -> is_hexa := true
+                      | _ -> is_alpha := true
+                    done;
+                    if !is_alpha then
+                      error f
+                        (Printf.sprintf "Param %S of type %S should be numerical instead of %s"
+                           p.param_name p.param_type s)
+                    else
+                    if !is_hexa then
+                      if len > 2 && s.[0] = '0' &&
+                         ( s.[1] = 'x' || s.[1] = 'X' ) then
+                        ()
+                      else
+                        error f
+                          (Printf.sprintf "Param %S of type %S should be numerical instead of %s\nHINT: maybe you forgot 0x in front."
+                             p.param_name p.param_type s)
+                  end
+              | String ->
+                  let is_hexa = ref false in
+                  for i = 0 to len -1 do
+                    match s.[i] with
+                    '0'..'9'
+                    | 'a'..'f' | 'A'..'F' -> ()
+                    | _ -> is_hexa := false
+                  done;
+                  error f
+                    (Printf.sprintf "Param %S of type %S should be in hexadecimal instead of %s\nHINT: you can use %%{hex:string:%s} instead."
+                       p.param_name p.param_type s s)
+              | Cell -> ()
+              | Unknown -> ()
+            end
+        | _ -> ()
+      ) f.fun_inputs
+  in
+  let maybe_single_param f arg =
+    match f.fun_inputs with
+      [ p ] ->
+        let list = [ p.param_name, arg ] in
+        check_params f list
+          ( Ezjsonm.value_to_string (`O list) )
+    | _ -> Error.raise "Invalid JSON params"
+  in
+  List.iter (fun f ->
+      if f.fun_name = meth then begin
+        match Ezjsonm.value_from_string params with
+        | exception exn ->
+            for i = 0 to String.length params - 1 do
+              match params.[i] with
+              | ' ' | ':' | '"' | '\'' | '{' | '}' -> raise exn
+              | _ -> ()
+            done;
+            maybe_single_param f (`String params)
+        | `O list -> check_params f list params
+        | `Bool _
+        | `Null
+        | `A _ ->
+            Error.raise "Invalid JSON params"
+        | ( `String _ | `Float _ ) as p ->
+            maybe_single_param f p
+      end) abi.functions;
+  match !found with
+  | Some params -> params
+  | None ->
+      Error.raise "The ABI of %S does not contain method %S.\nHINT:Use the following command to show the full ABI:\nft contract --show-abi %s\n"
+        contract meth contract
+
+
 let call_contract
     config ~address ~contract ~meth ~params
     ?client ?src ?(local=false) ?subst () =
@@ -55,6 +283,8 @@ let call_contract
          let keypair = match src with
            | None -> None
            | Some key -> Some (Misc.get_key_pair_exn key)
+         in
+         let params = check_abi ~contract ~abifile:contract_abi ~meth ~params
          in
          let abi = EzFile.read_file contract_abi in
          if Misc.verbose 1 then begin

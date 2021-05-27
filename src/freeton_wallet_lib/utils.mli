@@ -44,3 +44,5 @@ val abi_of_account : Types.config -> string -> string option (* content *)
 
 (* returns Some (exists, balance) if exists, None otherwise *)
 val get_account_info : Types.config -> string -> ( bool * Z.t ) option
+
+val show_abi : contract:string -> string
