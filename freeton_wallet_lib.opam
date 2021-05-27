@@ -47,6 +47,7 @@ depends: [
   "dune" {>= "2.6.0"}
   "lwt_ssl" {>= "1.1"}
   "freeton_ocaml_sdk" {>= "0.3.1" & < "1.0.0"}
+  "freeton_crawler_lib" {= version}
   "ezjsonm" {}
   "ez_subst" {>= "0.1"}
   "ez_file" {>= "0.2.0" & < "1.0.0"}
@@ -59,7 +60,4 @@ depends: [
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}
-]
-depopts: [
-  "freeton_crawler_lib" {= version}
 ]
