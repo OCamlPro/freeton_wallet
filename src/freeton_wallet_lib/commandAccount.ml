@@ -732,7 +732,12 @@ let cmd =
         EZCMD.info ~docv:"PASSPHRASE" "BIP39 Passphrase for account";
 
         [ "address"],
-        Arg.String (fun s -> address := Some s),
+        Arg.String (fun s ->
+            let s = match EzString.chop_prefix s ~prefix:"0-1:" with
+                None -> s
+              | Some s -> "-1:" ^ s
+            in
+            address := Some s),
         EZCMD.info ~docv:"ADDRESS" "Address for account";
 
         [ "contract"],
