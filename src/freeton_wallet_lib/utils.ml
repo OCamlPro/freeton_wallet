@@ -200,17 +200,16 @@ let check_abi ~contract ~abifile ~meth ~params =
             begin
               match param_kind with
               | Address ->
-                  begin match
+                  begin try
                       let before, after = EzString.cut_at s ':' in
                       ignore ( int_of_string before ) ;
                       if String.length after <> 64 then
                         failwith "not an address"
                     with _exn ->
-                      error f
-                        (Printf.sprintf
-                           "Param %S of type %S should be an address instead of %s"
-                           p.param_name p.param_type s)
-
+                        error f
+                          (Printf.sprintf
+                             "Param %S should be an address instead of %s"
+                             p.param_name s)
                   end
               | Numerical ->
                   begin
