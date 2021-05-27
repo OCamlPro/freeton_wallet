@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (f30d91e
-) (2021/05/19 16:26) documentation</title>
+ (5dcf765
+) (2021/05/27 18:19) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (f30d91e
+ (5dcf765
 )
               </div>
             
@@ -491,14 +491,23 @@ Deploy a known contract to the blockchain</li>
 <p>This command will crawl the blockchain and fill a PostgresQL database with all events related to the contract given in argument. The created database has the same name as the account.</p>
 <p>This command can run as a service, using the –start command to launch a manager program (that will not detach itself, however), –status to check the current status (running or not) and –stop to stop the process and its manager.</p>
 <p>A simple session looks like:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">start</span> <span class="o">&amp;&gt;</span> <span class="n">daemon</span><span class="o">.</span><span class="n">log</span> <span class="o">&amp;</span>
-<span class="o">$</span> <span class="n">psql</span> <span class="n">myapp</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">sh</span><span class="o">&gt;</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">start</span> <span class="o">&amp;&gt;</span> <span class="n">daemon</span><span class="o">.</span><span class="n">log</span> <span class="o">&amp;</span>
+<span class="n">sh</span><span class="o">&gt;</span> <span class="n">psql</span> <span class="n">myapp</span>
 <span class="nc">SELECT</span> <span class="o">*</span> <span class="nc">FROM</span> <span class="n">freeton_events</span><span class="o">;</span>
 <span class="n">serial</span><span class="o">|</span>                              <span class="n">msg_id</span>                              <span class="o">|</span>      <span class="n">event_name</span>       <span class="o">|</span>           <span class="n">event_args</span>                            <span class="o">|</span>    <span class="n">time</span>    <span class="o">|</span> <span class="n">tr_lt</span>
     <span class="mi">1</span> <span class="o">|</span> <span class="n">ec026489c0eb2071b606db0c7e05e5a76c91f4b02c2b66af851d56d5051be8bd</span> <span class="o">|</span> <span class="nc">OrderStateChanged</span>     <span class="o">|</span> <span class="o">{</span><span class="s2">&quot;order_id&quot;</span><span class="o">:</span><span class="s2">&quot;31&quot;</span><span class="o">,</span><span class="s2">&quot;state_count&quot;</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="o">,</span><span class="s2">&quot;state&quot;</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="o">}</span> <span class="o">|</span> <span class="mi">1620744626</span> <span class="o">|</span> <span class="mi">96</span>
 <span class="nc">SELECT</span> <span class="o">*</span> <span class="nc">FROM</span> <span class="n">freeton_transactions</span><span class="o">;</span>
 <span class="o">^</span><span class="nc">D</span>
-<span class="o">$</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">stop</span>
+<span class="n">sh</span><span class="o">&gt;</span> <span class="n">ft</span> <span class="n">crawler</span> <span class="n">myapp</span> <span class="o">--</span><span class="n">stop</span>
+</pre></div>
+</div>
+<p><strong>ERRORS</strong></p>
+<p>The crawler may fail connecting to the database. You can use PGHOST to set the hostname of the database, or the directory of unix sockets (default is /var/run/postgresql). You can use PGPORT for the port (default is 5432).</p>
+<p>The crawler may also fail for authorizations (something like FATAL: 28000: role USER does not exist ). In such a case, you need to configure postgresql to allow your role (&lt;user&gt; is your username):</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">sh</span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span>
+<span class="n">root</span><span class="o">&gt;</span> <span class="n">psql</span>
+<span class="nc">CREATE</span> <span class="nc">USER</span> <span class="o">&lt;</span><span class="n">user</span><span class="o">&gt;;</span>
+<span class="nc">ALTER</span> <span class="nc">ROLE</span> <span class="o">&lt;</span><span class="n">user</span><span class="o">&gt;</span> <span class="nc">CREATEDB</span><span class="o">;</span>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
@@ -578,6 +587,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">--clean</span></code>   Clean before building</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--client</span></code>   Build and install ‘tonos-cli’ from sources</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--code-hashes</span></code>   Create a database of code hashes from predefined contracts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--linker</span></code>   Build and install ‘tvm_linker’ from sources</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--solc</span></code>   Build and install ‘solc’ from sources</li>
 </ul>
@@ -605,6 +615,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-3</span></code>   Verbosity level 3</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-4</span></code>   Verbosity level 4</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-a</span> <span class="pre">ACCOUNT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--account</span> <span class="pre">ACCOUNT</span></code>   Inspect state of account ACCOUNT (or ‘all’) on blockchain</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--abis</span> <span class="pre">ABI</span></code>   Shared ABIs. Useful for example if you expect to receive messages that your contract does not implement (IParticipant for SafeMultisigWallet, for example)</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-b</span> <span class="pre">BLOCK</span></code> or <code class="code docutils literal notranslate"><span class="pre">--block</span> <span class="pre">BLOCK</span></code>   BLOCK Inspect block TR_ID on blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--bn</span> <span class="pre">BLOCK_NUM</span></code> or <code class="code docutils literal notranslate"><span class="pre">--block-num</span> <span class="pre">BLOCK_NUM</span></code>   Inspect block at level BLOCK_NUM on blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">-h</span></code> or <code class="code docutils literal notranslate"><span class="pre">--head</span></code>   Inspect head</li>
@@ -739,8 +750,10 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <p>Where options are:</p>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">--give</span> <span class="pre">ACCOUNT[:AMOUNT]</span></code>   Give TONs from giver to ACCOUNT (use ‘all’ for user*). By default, transfer 1000 TONS (or AMOUNT) to the account if its balance is smaller, and deploy a contract if it is a multisig smart contract.</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--live</span></code>   Open Node Live block explorer webpage</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--start</span></code>   Start network node</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--stop</span></code>   Stop network node</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--update</span></code>   Update Docker image of TONOS SE for new features. You must recreate sandbox switches to benefit from the new image.</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--web</span></code>   Open Node GraphQL webpage</li>
 </ul>
 </div>
@@ -771,17 +784,18 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">output</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">output</span> <span class="nc">STRING</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>Where options are:</p>
 <ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">STRING</span></code>   Output string after substitution</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--addr</span> <span class="pre">ACCOUNT</span></code>   Output address of account</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--file</span> <span class="pre">STRING</span></code>   FILE Output content of file after substitution</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--file</span> <span class="pre">FILE</span></code>   Output content of file after substitution</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--keyfile</span> <span class="pre">ACCOUNT</span></code>   Output key file of account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--list-subst</span></code>   List all substitutions</li>
-<li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">STRING</span></code>   FILE Save command stdout to file</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--string</span> <span class="pre">STRING</span></code>   FILE Output string after substitution</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code>   Save command stdout to file</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--string</span> <span class="pre">STRING</span></code>   Output string after substitution</li>
 </ul>
 </div>
 <div class="section" id="ft-switch">

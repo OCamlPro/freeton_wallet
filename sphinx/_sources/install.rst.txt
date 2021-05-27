@@ -86,37 +86,15 @@ FreeTON Crawler :code:`ft crawler`
 
 The :code:`ft crawler` command requires a specific installation.
 Indeed, this command crawls the blockchain and stores events for a
-specific contract in the local PostgresQL database. :code:`opam` and
-PostgresQL have issues interacting together, because :code:`opam`
-restricts what packages can do during their installation. So here is a
-short tutorial on how to install this command.
+specific contract in the local PostgresQL database.
 
-To build support for :code:`ft crawler`, it is required that packages
-:code:`ez_pgocaml` and :code:`pgocaml` be installed.
-
-First, you will need to disable sandboxing in opam:
-
-1. Configure Postgresql to allow your user to interact with it::
+You will need to configure PostgresQL to use it::
 
      $ sudo -i -u postgres
      $ psql
      CREATE USER <user>;
      ALTER ROLE <user> CREATEDB;
 
-2. Edit the :code:`$HOME/.opam/config` file, and comment these lines::
-
-    wrap-build-commands:
-      ["%{hooks}%/sandbox.sh" "build"] {os = "linux" | os = "macos"}
-    wrap-install-commands:
-      ["%{hooks}%/sandbox.sh" "install"] {os = "linux" | os = "macos"}
-    wrap-remove-commands:
-      ["%{hooks}%/sandbox.sh" "remove"] {os = "linux" | os = "macos"}
-
-3. Install :code:`ez_pgocaml`::
-
-   $ opam install pgocaml ez_pgocaml pgocaml_ppx
-
-4. Revert step (2) to reactivate sandboxing
-
-At this point, you can install :code:`ft` again, and the
-:code:`crawler` subcommand should be available.
+The command :code:`ft crawler account` will create a database
+:code:`account`. You can check it afterwards, for this example using
+:code:`psql account`.

@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>How to install &mdash; freeton_wallet master
- (f30d91e
-) (2021/05/19 16:26) documentation</title>
+ (5dcf765
+) (2021/05/27 18:19) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (f30d91e
+ (5dcf765
 )
               </div>
             
@@ -253,42 +253,17 @@ deploy smart contracts.</p>
 <h2>FreeTON Crawler <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">crawler</span></code><a class="headerlink" href="#freeton-crawler-ft-crawler" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">crawler</span></code> command requires a specific installation.
 Indeed, this command crawls the blockchain and stores events for a
-specific contract in the local PostgresQL database. <code class="code docutils literal notranslate"><span class="pre">opam</span></code> and
-PostgresQL have issues interacting together, because <code class="code docutils literal notranslate"><span class="pre">opam</span></code>
-restricts what packages can do during their installation. So here is a
-short tutorial on how to install this command.</p>
-<p>To build support for <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">crawler</span></code>, it is required that packages
-<code class="code docutils literal notranslate"><span class="pre">ez_pgocaml</span></code> and <code class="code docutils literal notranslate"><span class="pre">pgocaml</span></code> be installed.</p>
-<p>First, you will need to disable sandboxing in opam:</p>
-<ol class="arabic">
-<li><p class="first">Configure Postgresql to allow your user to interact with it:</p>
+specific contract in the local PostgresQL database.</p>
+<p>You will need to configure PostgresQL to use it:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">sudo</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span>
 <span class="o">$</span> <span class="n">psql</span>
 <span class="nc">CREATE</span> <span class="nc">USER</span> <span class="o">&lt;</span><span class="n">user</span><span class="o">&gt;;</span>
 <span class="nc">ALTER</span> <span class="nc">ROLE</span> <span class="o">&lt;</span><span class="n">user</span><span class="o">&gt;</span> <span class="nc">CREATEDB</span><span class="o">;</span>
 </pre></div>
 </div>
-</li>
-<li><p class="first">Edit the <code class="code docutils literal notranslate"><span class="pre">$HOME/.opam/config</span></code> file, and comment these lines:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">wrap</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">commands</span><span class="o">:</span>
-  <span class="o">[</span><span class="s2">&quot;%{hooks}%/sandbox.sh&quot;</span> <span class="s2">&quot;build&quot;</span><span class="o">]</span> <span class="o">{</span><span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">|</span> <span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;macos&quot;</span><span class="o">}</span>
-<span class="n">wrap</span><span class="o">-</span><span class="n">install</span><span class="o">-</span><span class="n">commands</span><span class="o">:</span>
-  <span class="o">[</span><span class="s2">&quot;%{hooks}%/sandbox.sh&quot;</span> <span class="s2">&quot;install&quot;</span><span class="o">]</span> <span class="o">{</span><span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">|</span> <span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;macos&quot;</span><span class="o">}</span>
-<span class="n">wrap</span><span class="o">-</span><span class="n">remove</span><span class="o">-</span><span class="n">commands</span><span class="o">:</span>
-  <span class="o">[</span><span class="s2">&quot;%{hooks}%/sandbox.sh&quot;</span> <span class="s2">&quot;remove&quot;</span><span class="o">]</span> <span class="o">{</span><span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">|</span> <span class="n">os</span> <span class="o">=</span> <span class="s2">&quot;macos&quot;</span><span class="o">}</span>
-</pre></div>
-</div>
-</li>
-<li><p class="first">Install <code class="code docutils literal notranslate"><span class="pre">ez_pgocaml</span></code>:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">opam</span> <span class="n">install</span> <span class="n">pgocaml</span> <span class="n">ez_pgocaml</span> <span class="n">pgocaml_ppx</span>
-</pre></div>
-</div>
-</li>
-<li><p class="first">Revert step (2) to reactivate sandboxing</p>
-</li>
-</ol>
-<p>At this point, you can install <code class="code docutils literal notranslate"><span class="pre">ft</span></code> again, and the
-<code class="code docutils literal notranslate"><span class="pre">crawler</span></code> subcommand should be available.</p>
+<p>The command <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">crawler</span> <span class="pre">account</span></code> will create a database
+<code class="code docutils literal notranslate"><span class="pre">account</span></code>. You can check it afterwards, for this example using
+<code class="code docutils literal notranslate"><span class="pre">psql</span> <span class="pre">account</span></code>.</p>
 </div>
 </div>
 
