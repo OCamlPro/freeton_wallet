@@ -129,27 +129,30 @@ let query_messages ~client ~abis queue config ~level ids =
                 | exception Not_found -> Lwt.return ( m, None )
                 | None -> Lwt.return ( m, None )
                 | Some ( _ , abi ) ->
-                    let abi = Lazy.force abi in
-                    let decoded =
-                      BLOCK.decode_message_boc ~client ~boc ~abi in
-                    let body =
-                      Printf.sprintf "CALL: %s %s %s"
-                        (match decoded.body_type with
-                         | 0 -> "Input"
-                         | 1 -> "Output"
-                         | 2 -> "InternalOutput"
-                         | 3 -> "Event"
-                         | _ -> assert false)
-                        decoded.body_name
-                        (match decoded.body_args with
-                         | None -> ""
-                         | Some args -> args)
-                    in
-                    Lwt.return (
-                      { m with msg_body = None ;
-                               msg_boc = None ;
-                      },
-                      Some body )
+                    try
+                      let abi = Lazy.force abi in
+                      let decoded =
+                        BLOCK.decode_message_boc ~client ~boc ~abi in
+                      let body =
+                        Printf.sprintf "CALL: %s %s %s"
+                          (match decoded.body_type with
+                           | 0 -> "Input"
+                           | 1 -> "Output"
+                           | 2 -> "InternalOutput"
+                           | 3 -> "Event"
+                           | _ -> assert false)
+                          decoded.body_name
+                          (match decoded.body_args with
+                           | None -> ""
+                           | Some args -> args)
+                      in
+                      Lwt.return (
+                        { m with msg_body = None ;
+                                 msg_boc = None ;
+                        },
+                        Some body )
+                    with
+                    | _ -> Lwt.return ( m, None )
               end
           | _ -> Lwt.return ( m, None )
         ) ms

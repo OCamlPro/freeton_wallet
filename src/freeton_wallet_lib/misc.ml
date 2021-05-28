@@ -358,10 +358,12 @@ let current_network_node net =
   | Some node -> node
 
 let is_address account =
-  let _wc, addr = EzString.cut_at account ':' in
+  let wc, addr = EzString.cut_at account ':' in
   let len = String.length addr in
   if len <> 0 then
-    Some ( account ^ String.make (64 - len) '0' )
+    let wc = if wc = "0-1" then "-1" else wc in
+    Some ( Printf.sprintf "%s:%s%s"
+             wc addr ( String.make (64 - len) '0' ) )
   else None
 
 let raw_address = function
