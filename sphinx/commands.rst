@@ -477,14 +477,31 @@ This command can run as a service, using the --start command to launch a manager
 A simple session looks like:
 ::
 
-  $ ft crawler myapp --start &> daemon.log &
-  $ psql myapp
+  sh> ft crawler myapp --start &> daemon.log &
+  sh> psql myapp
   SELECT * FROM freeton_events;
   serial|                              msg_id                              |      event_name       |           event_args                            |    time    | tr_lt
       1 | ec026489c0eb2071b606db0c7e05e5a76c91f4b02c2b66af851d56d5051be8bd | OrderStateChanged     | {"order_id":"31","state_count":"1","state":"1"} | 1620744626 | 96
   SELECT * FROM freeton_transactions;
   ^D
-  $ ft crawler myapp --stop
+  sh> ft crawler myapp --stop
+  
+
+
+
+**ERRORS**
+
+
+The crawler may fail connecting to the database. You can use PGHOST to set the hostname of the database, or the directory of unix sockets (default is /var/run/postgresql). You can use PGPORT for the port (default is 5432).
+
+The crawler may also fail for authorizations (something like FATAL: 28000: role USER does not exist ). In such a case, you need to configure postgresql to allow your role (<user> is your username):
+::
+
+  
+       sh> sudo -i -u postgres
+       root> psql
+       CREATE USER <user>;
+       ALTER ROLE <user> CREATEDB;
   
 
 
@@ -614,6 +631,8 @@ Where options are:
 
 * :code:`--client`   Build and install 'tonos-cli' from sources
 
+* :code:`--code-hashes`   Create a database of code hashes from predefined contracts
+
 * :code:`--linker`   Build and install 'tvm_linker' from sources
 
 * :code:`--solc`   Build and install 'solc' from sources
@@ -660,6 +679,8 @@ Where options are:
 * :code:`-4`   Verbosity level 4
 
 * :code:`-a ACCOUNT` or :code:`--account ACCOUNT`   Inspect state of account ACCOUNT (or 'all') on blockchain
+
+* :code:`--abis ABI`   Shared ABIs. Useful for example if you expect to receive messages that your contract does not implement (IParticipant for SafeMultisigWallet, for example)
 
 * :code:`-b BLOCK` or :code:`--block BLOCK`   BLOCK Inspect block TR_ID on blockchain
 
@@ -901,9 +922,13 @@ Where options are:
 
 * :code:`--give ACCOUNT[:AMOUNT]`   Give TONs from giver to ACCOUNT (use 'all' for user*). By default, transfer 1000 TONS (or AMOUNT) to the account if its balance is smaller, and deploy a contract if it is a multisig smart contract.
 
+* :code:`--live`   Open Node Live block explorer webpage
+
 * :code:`--start`   Start network node
 
 * :code:`--stop`   Stop network node
+
+* :code:`--update`   Update Docker image of TONOS SE for new features. You must recreate sandbox switches to benefit from the new image.
 
 * :code:`--web`   Open Node GraphQL webpage
 
@@ -955,22 +980,24 @@ Output keyfile of account ACCOUNT to file KEYFILE:
 **USAGE**
 ::
   
-  ft output [OPTIONS]
+  ft output STRING [OPTIONS]
 
 Where options are:
 
 
+* :code:`STRING`   Output string after substitution
+
 * :code:`--addr ACCOUNT`   Output address of account
 
-* :code:`--file STRING`   FILE Output content of file after substitution
+* :code:`--file FILE`   Output content of file after substitution
 
 * :code:`--keyfile ACCOUNT`   Output key file of account
 
 * :code:`--list-subst`   List all substitutions
 
-* :code:`-o STRING`   FILE Save command stdout to file
+* :code:`-o FILE`   Save command stdout to file
 
-* :code:`--string STRING`   FILE Output string after substitution
+* :code:`--string STRING`   Output string after substitution
 
 
 ft switch

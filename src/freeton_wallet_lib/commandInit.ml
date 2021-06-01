@@ -34,7 +34,7 @@ let install_tonos_cli () =
   end;
   Misc.call [ "cargo"; "build" ];
 
-  bin_install "tonos-cli" ;
+  bin_install "target/debug/tonos-cli" ;
   ()
 
 let install_solc () =
