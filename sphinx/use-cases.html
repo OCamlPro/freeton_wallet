@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Watching an Account &mdash; freeton_wallet master
+  <title>Simple Use Cases &mdash; freeton_wallet master
  (6cdaa26
 ) (2021/06/01 11:42) documentation</title>
   
@@ -39,8 +39,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Deploying a Solidity Contract" href="smart-contract.html" />
-    <link rel="prev" title="Exploring the Blockchain" href="explorer.html" /> 
+    <link rel="next" title="How to install" href="install.html" />
+    <link rel="prev" title="About" href="about.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,13 +94,19 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/freeton_wallet">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="use-cases.html">Simple Use Cases</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Simple Use Cases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#list-and-confirm-transactions-on-a-multisig">List and Confirm Transactions on a Multisig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#experiment-with-hellodebot">Experiment with HelloDebot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#watch-an-account-in-real-time">Watch an Account in real-time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inspect-the-past-of-an-account">Inspect the past of an account</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="wallet.html">Managing Multiple Accounts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
@@ -150,13 +156,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Watching an Account</li>
+      <li>Simple Use Cases</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/watch.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/use-cases.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -169,8 +175,73 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="watching-an-account">
-<h1>Watching an Account<a class="headerlink" href="#watching-an-account" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="simple-use-cases">
+<h1>Simple Use Cases<a class="headerlink" href="#simple-use-cases" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="list-and-confirm-transactions-on-a-multisig">
+<h2>List and Confirm Transactions on a Multisig<a class="headerlink" href="#list-and-confirm-transactions-on-a-multisig" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example of interactions with a Multisig contract:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span># switch to mainnet network
+ft switch mainnet
+
+# register the contract
+ft account --create formet_subgov --contract SetcodeMultisigWallet2 \
+    --address 0:1ec958fd022ab1d479dd722283fe5fd1d9de7196ee7f09f96b68e435776548c1
+
+# show available methods for this ABI
+ft contract --show-abi SetcodeMultisigWallet2
+
+# start a transaction with payload
+ft multisig -a formet_subgov --transfer 10 --to other-account \
+    this-method &#39;{ &quot;src&quot;: &quot;%{account:address:formet_subgov}&quot; }&#39;
+
+# list awaiting transactions
+ft call formet_subgov getTransactions --local
+
+# confirm, signing with a specific account
+ft call formet_subgov  --sign me-as-custodian \
+    confirmTransaction &#39;{  &quot;updateId&quot;: &quot;0x6086aedc2b637541&quot; }&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="experiment-with-hellodebot">
+<h2>Experiment with HelloDebot<a class="headerlink" href="#experiment-with-hellodebot" title="Permalink to this headline">¶</a></h2>
+<p>If you want to experiment with the Helloworld DeBot from
+<a class="reference external" href="https://github.com/tonlabs/debots/tree/main/helloworld">https://github.com/tonlabs/debots/tree/main/helloworld</a> , the following
+list of commands will deploy and start the debot.</p>
+<p>First, let’s start by preparing a local network with TONOS SE:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="nc">Create</span> <span class="n">a</span> <span class="n">sandbox</span> <span class="n">network</span><span class="o">,</span> <span class="n">called</span> <span class="n">sandbox1</span>
+<span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="n">sandbox1</span>
+
+<span class="o">#</span> <span class="nc">Start</span> <span class="n">the</span> <span class="n">corresponding</span> <span class="n">node</span>
+<span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">start</span>
+<span class="o">#</span> <span class="n">wait</span> <span class="mi">5</span> <span class="n">seconds</span> <span class="k">for</span> <span class="n">the</span> <span class="n">node</span> <span class="k">to</span> <span class="n">start</span>
+<span class="n">sleep</span> <span class="mi">5</span>
+
+<span class="o">#</span> <span class="n">user1</span> <span class="n">is</span> <span class="n">the</span> <span class="s2">&quot;deployer&quot;</span> <span class="k">for</span> <span class="n">contracts</span><span class="o">,</span> <span class="n">give</span> <span class="n">it</span> <span class="n">some</span> <span class="n">tokens</span>
+<span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">give</span> <span class="n">user1</span>
+</pre></div>
+</div>
+<p>Now, we can build and deploy the debot:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span># build the contract
+ft contract --build helloDebot.sol -f
+
+#deploy the contract
+ft contract --deploy helloDebot --create my-first-debot -f
+
+# set the ABI of the debot
+ft call my-first-debot setABI &#39;{ &quot;dabi&quot;: &quot;%{hex:read:contract:abi:helloDebot}&quot; }&#39;
+
+# set the ICON of the debot (from local file hellodebot.png)
+ft call my-first-debot setIcon \
+   &#39;{ &quot;icon&quot;: &quot;%{hex:string:data:image/png;base64,%{base64:file:hellodebot.png}}&quot; }&#39;
+
+# execute the debot
+ft client -- debot fetch %{account:address:my-first-debot}
+</pre></div>
+</div>
+</div>
+<div class="section" id="watch-an-account-in-real-time">
+<h2>Watch an Account in real-time<a class="headerlink" href="#watch-an-account-in-real-time" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">watch</span></code> sub-command can be used to watch messages
 received by an account. It can be very useful when debugging smart
 contracts:</p>
@@ -185,12 +256,16 @@ shard).</p>
 <p>By default, the command will exit if nothing happens during 15
 minutes. The argument <code class="code docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">SECONDS</span></code> can be used to
 increase or decrease this delay.</p>
+</div>
+<div class="section" id="inspect-the-past-of-an-account">
+<h2>Inspect the past of an account<a class="headerlink" href="#inspect-the-past-of-an-account" title="Permalink to this headline">¶</a></h2>
 <p>It is also possible to do it at the end of execution:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">--</span><span class="n">past</span> <span class="n">my</span><span class="o">-</span><span class="n">contract</span>
 </pre></div>
 </div>
 <p>This command will print all the transactions, you may limit the number using
 :code:` –limit NUM`.</p>
+</div>
 </div>
 
 
@@ -201,10 +276,10 @@ increase or decrease this delay.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="smart-contract.html" class="btn btn-neutral float-right" title="Deploying a Solidity Contract" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="install.html" class="btn btn-neutral float-right" title="How to install" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="explorer.html" class="btn btn-neutral float-left" title="Exploring the Blockchain" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="about.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
