@@ -12,6 +12,7 @@ Welcome to Freeton OCaml Wallet
 
    Home <https://ocamlpro.github.io/freeton_wallet>
    about
+   use-cases
    install
    wallet
    switches

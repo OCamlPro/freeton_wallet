@@ -1,4 +1,25 @@
 
+## v0.4.3
+
+* Fix build without PostgresQL server, `ft crawler` always included now,
+  package ft-crawler is deprecated
+* Fix bug in `ft inspect --past`
+* New substitution %{account:in-message:ACCOUNT:NANOTONS:METH:PARAMS}
+  to create an in-message for 'tonos-cli debot invoke'
+* Better Checking of call parameters in `ft call` against ABI
+
+## v0.4.2
+
+* Remove build dependency to a running PostgresQL server
+* Fix documentation of subcommands
+* Set contract (if known) from code_hash at `ft account`
+* `ft contract --build/--import` create new versions of the contract XXX/NUM
+* `ft init --code-hashes` to initialize a local database of code_hashes
+    for embedded contracts
+* `ft node --update`: docker pull a new version of TONOS SE
+* `ft node --live`: open browser on the new block explorer included in TONOS SE
+* New embedded contract GiverV2 for TONOS SE
+
 ## v0.4.1
 
 * Add `--abis CONTRACT` to `ft inspect --past ACCOUNT` to be able to parse

@@ -27,7 +27,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt_ssl ( >= 1.1 ))
-   (freeton_ocaml_sdk (and (>= 0.3.1) (< 1.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.3.2) (< 1.0.0)))
    (freeton_crawler_lib (= version))
    ezjsonm
    (ez_subst ( >= 0.1 ))

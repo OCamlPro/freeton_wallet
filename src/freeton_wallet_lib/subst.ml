@@ -153,6 +153,34 @@ let subst_string ?brace config =
         Base64.encode_string (
           Ton_sdk.ABI.encode_body ~abi ~meth ~params
         )
+    | "account" :: "in-message" :: account :: value :: meth :: rem ->
+        let key = Misc.find_key_exn net account in
+        let address = Misc.get_key_address_exn key in
+        let contract = Misc.get_key_contract_exn key in
+        let parameters = match rem with
+          | [] -> "{}"
+          | _ -> String.concat ":" rem in
+        let abi_file = Misc.get_contract_abifile contract in
+        let abi = EzFile.read_file abi_file in
+
+        let call = Ton_sdk.SDK.EncodeFunctionCall.{
+            abi ;
+            meth ;
+            header = None ;
+            parameters ;
+            internal = true ;
+            key_pair = None ;
+          } in
+
+        let msg = Ton_sdk.SDK.encode_internal_message
+            ~address
+            ~value: (Misc.nanotokens_of_string value )
+            ~call
+            ()
+        in
+        Printf.eprintf "message:\n  id: %s\n  msg: %s\n  address: %s\n%!"
+          msg.id msg.serialized_message msg.address;
+        msg.serialized_message
 
     (* Node substitutions *)
     | [ "node" ; "url" ] ->
@@ -279,6 +307,8 @@ On wallet accounts:
 * account:contract:tvc:ACCOUNT    Contract tvc file for account
 * account:contract:abi:ACCOUNT    Contract abi file for account
 * account:payload:ACCOUNT:METH:PARAMS Output payload base64
+* account:in-message:ACCOUNT:NANOTONS:METH:PARAMS
+    Output an in-message to ACCOUNT with the given arguments
 
 On contracts:
 * contract:tvc:CONTRACT
@@ -301,6 +331,9 @@ Encoders, working on the rest of the substitution:
 * of-base64:SUBST     Do SUBST, then convert from base64
 * get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
 * get-code-hash:SUBST   Do SUBST to generate a TVC filename, compute code hash
+
+Escaping of '}' is done using '\}'.
+
 |}
 
 
