@@ -181,7 +181,7 @@ Where options are:
 
 * :code:`--create`   Create new account
 
-* :code:`--delete`   Delete old accounts
+* :code:`--delete` or :code:`--remove`   Delete old accounts
 
 * :code:`--info`   Display account parameters
 
@@ -243,6 +243,8 @@ Where options are:
 * :code:`--sign ACCOUNT`   Sign message with account
 
 * :code:`--subst FILE`   Read FILE and substitute results in the content
+
+* :code:`--wait`   Wait for all transactions to finish
 
 
 ft client
@@ -895,6 +897,8 @@ Where options are:
 
 * :code:`--transfer AMOUNT`   Transfer this amount
 
+* :code:`--wait`   Wait for all transactions to finish
+
 * :code:`--waiting`    List waiting transactions
 
 * :code:`--wc WORKCHAIN`   The workchain (default is 0)
@@ -1084,7 +1088,7 @@ Where options are:
 
 * :code:`--delete`   Remove switch of a network
 
-* :code:`--remove`   Remove switch of a network
+* :code:`--delete` or :code:`--remove`   Remove switch of a network
 
 * :code:`--url URL`   URL of the default node in this network
 

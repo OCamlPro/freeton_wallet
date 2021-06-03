@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (6cdaa26
-) (2021/06/01 11:42) documentation</title>
+ (1e6e950
+) (2021/06/03 19:54) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (6cdaa26
+ (1e6e950
 )
               </div>
             
@@ -320,7 +320,7 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--address</span> <span class="pre">ADDRESS</span></code>   Address for account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--contract</span> <span class="pre">CONTRACT</span></code>   Contract for account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--create</span></code>   Create new account</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code>   Delete old accounts</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code> or <code class="code docutils literal notranslate"><span class="pre">--remove</span></code>   Delete old accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--info</span></code>   Display account parameters</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--keyfile</span> <span class="pre">KEYFILE</span></code>   Key file for account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--list</span></code>   List all accounts</li>
@@ -357,6 +357,7 @@ Delete existing accounts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--run</span></code> or <code class="code docutils literal notranslate"><span class="pre">--local</span></code>   Run locally</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--sign</span> <span class="pre">ACCOUNT</span></code>   Sign message with account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--subst</span> <span class="pre">FILE</span></code>   Read FILE and substitute results in the content</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--wait</span></code>   Wait for all transactions to finish</li>
 </ul>
 </div>
 <div class="section" id="ft-client">
@@ -735,6 +736,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--surf</span></code>   Use Surf contract</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--to</span> <span class="pre">ACCOUNT</span></code>   Target of a transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--transfer</span> <span class="pre">AMOUNT</span></code>   Transfer this amount</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--wait</span></code>   Wait for all transactions to finish</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--waiting</span></code>    List waiting transactions</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wc</span> <span class="pre">WORKCHAIN</span></code>   The workchain (default is 0)</li>
 </ul>
@@ -850,7 +852,7 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <li><code class="code docutils literal notranslate"><span class="pre">NETWORK</span></code>   Name of network switch</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--create</span></code>   Create switch for a new network</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code>   Remove switch of a network</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--remove</span></code>   Remove switch of a network</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code> or <code class="code docutils literal notranslate"><span class="pre">--remove</span></code>   Remove switch of a network</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
 </ul>
 </div>
