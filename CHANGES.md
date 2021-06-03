@@ -1,4 +1,9 @@
 
+## v0.4.4
+
+* Add option --wait to ft call and ft multisig --transfer to wait for the
+  thread of message to end
+
 ## v0.4.3
 
 * Fix build without PostgresQL server, `ft crawler` always included now,
