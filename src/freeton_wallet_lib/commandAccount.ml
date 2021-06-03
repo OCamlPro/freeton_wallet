@@ -723,7 +723,7 @@ let cmd =
         Arg.Set create,
         EZCMD.info "Create new account" ;
 
-        [ "delete" ] ,
+        [ "delete" ; "remove" ] ,
         Arg.Set delete,
         EZCMD.info "Delete old accounts" ;
 

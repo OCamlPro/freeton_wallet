@@ -15,7 +15,7 @@ open EZCMD.TYPES
 open Types
 
 
-let action ~account ~meth ~params ~local ~sign ~subst =
+let action ~account ~meth ~params ~local ~sign ~subst ~wait =
 
   let config = Config.config () in
   let net = Config.current_network config in
@@ -34,13 +34,14 @@ let action ~account ~meth ~params ~local ~sign ~subst =
             | Some _ -> Some key
       in
       Subst.with_substituted config params (fun params ->
-          Utils.call_contract config
+          Utils.call_contract config ~wait
             ~address ~contract ~meth ~params ~local ?src ~subst () )
 
 let cmd =
   let args = ref [] in
   let local = ref false in
   let sign = ref None in
+  let wait = ref false in
   let subst_args, subst = Subst.make_args () in
   EZCMD.sub
     "call"
@@ -55,6 +56,7 @@ let cmd =
              Error.raise "Requires at least ACCOUNT METHOD [PARAMS]"
        in
        action ~account ~meth ~params
+         ~wait:!wait
          ~local:!local
          ~sign:!sign
          ~subst
@@ -69,6 +71,10 @@ let cmd =
 
           [ "sign"], Arg.String (fun s -> sign := Some s),
           EZCMD.info ~docv:"ACCOUNT" "Sign message with account";
+
+          [ "wait" ], Arg.Set wait,
+          EZCMD.info "Wait for all transactions to finish";
+
         ] )
     ~doc: "Call contracts"
     ~man:[
