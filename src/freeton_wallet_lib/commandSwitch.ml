@@ -135,7 +135,7 @@ let cmd =
         ( [ "create" ], Arg.Set create,
           EZCMD.info "Create switch for a new network" );
 
-        ( [ "remove" ], Arg.Set remove,
+        ( [ "delete" ; "remove" ], Arg.Set remove,
           EZCMD.info "Remove switch of a network" );
 
         ( [ "delete" ], Arg.Set remove,

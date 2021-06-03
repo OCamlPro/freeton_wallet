@@ -173,7 +173,8 @@ let create_multisig
 
   Utils.deploy_contract config ~key ~contract ~params ~wc ?client ()
 
-let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
+let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
+    ?(wait=false) () =
   let config = Config.config () in
   let net = Config.current_network config in
 
@@ -267,6 +268,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[]) () =
     ~meth ~params
     ~local:false
     ~src:src_key
+    ~wait
     ()
 
 let send_confirm ~account ?src ~tx_id () =
@@ -295,7 +297,8 @@ let send_confirm ~account ?src ~tx_id () =
     ()
 
 let action account args ~create ~req ~not_owner ~custodians ~waiting
-    ~transfer ~dst ~bounce ~confirm ?wc ~debot ~contract ~src =
+    ~transfer ~dst ~bounce ~confirm ?wc ~debot ~contract ~src
+    ~wait =
 
   let config = Config.config () in
   if debot then begin
@@ -323,7 +326,7 @@ let action account args ~create ~req ~not_owner ~custodians ~waiting
       begin
         match transfer, dst with
         | Some amount, Some dst ->
-            send_transfer ~account ?src ~dst ~bounce ~amount ~args ()
+            send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ()
         | None, None ->
             ()
         | _ ->
@@ -352,6 +355,7 @@ let cmd =
   let waiting = ref false in
 
   let wc = ref None in
+  let wait = ref false in
 
   let src = ref None in
   let transfer = ref None in
@@ -376,6 +380,7 @@ let cmd =
          ?wc:!wc
          ~debot:!debot
          ~contract:!contract
+         ~wait:!wait
     )
     ~args:
       [
@@ -390,6 +395,9 @@ let cmd =
 
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
         EZCMD.info ~docv:"WORKCHAIN" "The workchain (default is 0)";
+
+          [ "wait" ], Arg.Set wait,
+          EZCMD.info "Wait for all transactions to finish";
 
         [ "create" ], Arg.Set create,
         EZCMD.info "Deploy multisig wallet on account (use generic \

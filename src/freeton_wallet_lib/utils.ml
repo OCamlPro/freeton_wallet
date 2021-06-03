@@ -286,9 +286,107 @@ let check_abi ~contract ~abifile ~meth ~params =
         contract meth contract
 
 
+let post config req =
+  let node = Config.current_node config in
+  let url = node.node_url in
+  let open Ton_sdk in
+  match REQUEST.post_run url req with
+  | Ok r -> r
+  | Error exn -> raise exn
+
+let track_messages config queue =
+  let last_time = ref ( Unix.gettimeofday () ) in
+  let node = Config.current_node config in
+  let client = Ton_sdk.CLIENT.create node.node_url in
+  let abis = AbiCache.create config ~abis:[] in
+
+  while not ( Queue.is_empty queue ) do
+    let msg_id = Queue.peek queue in
+    begin
+      match post config
+              Ton_sdk.REQUEST.( transactions
+                                  ~filter:
+                                    (aeq "in_msg" (astring msg_id))
+                                  [] ) with
+      | exception _ ->
+          Unix.sleep 3;
+      | [ tr ] ->
+          ignore ( Queue.take queue );
+          last_time := Unix.gettimeofday ();
+          Printf.printf "Msg %s:\nIn trans. %s\n%!" msg_id
+            tr.tr_id;
+          List.iter (fun msg_id ->
+              match post config
+                      Ton_sdk.REQUEST.( messages ~level:3 ~id: msg_id [] ) with
+              | exception exn ->
+                  Printf.eprintf "Warning: lookup on msg_id %s failed (%s)\n%!" msg_id ( Printexc.to_string exn )
+              | [ msg ] ->
+                  begin
+                    match msg.msg_msg_type_name with
+                    | None -> assert false
+                    | Some s ->
+                        match s with
+                        | "Internal" ->
+                            Printf.printf "  * sent msg %s\n" msg_id ;
+                            Printf.printf "    to %s\n%!"
+                              (AbiCache.replace_addr
+                                 ~abis ~address:msg.msg_dst);
+                            begin
+                              match AbiCache.parse_message_body ~client ~abis msg with
+                              | None -> ()
+                              | Some body ->
+                                  Printf.printf "    %s\n%!" body
+                            end;
+                            Queue.add msg_id queue
+                        | "ExtOut" -> ()
+                        | _ ->
+                            Printf.eprintf "msg_msg_type_name: %s\n%!" s;
+                  end
+              | _ -> assert false
+
+            ) tr.tr_out_msgs
+      | _ -> assert false
+    end;
+    let time = Unix.gettimeofday () in
+    if time -. !last_time > 40. then
+      failwith "Timeout (40s without message)"
+  done
+
+let call_run config ?client ~wait
+    ~server_url ~address ~abi ~meth ~params ~local ?keypair () =
+  if wait then
+    let client =
+      match client with
+      | Some client -> client
+      | None -> Ton_client.create server_url
+    in
+    let msg = Ton_sdk.ACTION.prepare_message
+        ~client ~address ~abi ~meth ~params ?keypair () in
+    let res = Ton_sdk.ACTION.send_message ~client
+        ~abi ~msg:msg.message
+    in
+    let result = Ton_sdk.ACTION.wait_for_transaction
+        ~client ~abi ~msg:msg.message res in
+    let queue = Queue.create () in
+    Queue.add msg.message_id queue;
+(*    let shards = Hashtbl.create 100 in
+      Hashtbl.add shards address res.shard_block_id ; *)
+    track_messages config queue ;
+    result
+  else
+    Ton_sdk.ACTION.call_run ?client ~server_url
+      ~address
+      ~abi
+      ~meth ~params
+      ~local
+      ?keypair
+      ()
+
+
+
 let call_contract
     config ~address ~contract ~meth ~params
-    ?client ?src ?(local=false) ?subst () =
+    ?client ?src ?(local=false) ?subst ?(wait=false)  () =
   Misc.with_contract contract
     (fun ~contract_tvc:_ ~contract_abi ->
        if Globals.use_ton_sdk then
@@ -312,12 +410,13 @@ let call_contract
            end;
          end;
          let res =
-           Ton_sdk.ACTION.call_run ?client ~server_url:node.node_url
+           call_run config ?client ~server_url:node.node_url
              ~address
              ~abi
              ~meth ~params
              ~local
              ?keypair
+             ~wait
              ()
          in
          match subst with
@@ -403,14 +502,6 @@ let deploy_contract config ~key ?sign ~contract ~params ~wc ?client () =
            config.modified <- true
         )
 
-
-let post config req =
-  let node = Config.current_node config in
-  let url = node.node_url in
-  let open Ton_sdk in
-  match REQUEST.post_run url req with
-  | Ok r -> r
-  | Error exn -> raise exn
 
 
 let (let>) p f = Lwt.bind p f

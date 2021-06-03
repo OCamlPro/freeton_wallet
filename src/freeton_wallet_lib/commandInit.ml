@@ -79,6 +79,7 @@ let install_code_hashes () =
       if Filename.dirname file = "contracts" then
         match EzString.split (Filename.basename file) '.' with
         | [ name ; "tvc" ] ->
+            Printf.eprintf "Getting TVC code Hash of %s\n%!" name;
             ignore ( Misc.get_contract_file ".tvc" name )
         | _ -> ()
     ) Files.file_list;

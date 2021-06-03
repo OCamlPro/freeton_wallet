@@ -20,6 +20,7 @@ val call_contract :
   ?src:Types.key ->
   ?local:bool ->
   ?subst:(msg:string -> Types.config -> string -> unit) ->
+  ?wait:bool -> (* false by default *)
   unit -> unit
 
 val post :
