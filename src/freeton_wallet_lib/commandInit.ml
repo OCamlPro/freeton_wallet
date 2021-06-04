@@ -14,16 +14,13 @@ open Ezcmd.V2
 open EzFile.OP
 open EZCMD.TYPES
 
-let git_dir = Globals.ft_dir // "GIT"
-let bin_dir = Globals.ft_dir // "bin"
-
 let bin_install file =
   let basename = Filename.basename file in
-  Misc.call [ "cp" ; "-f" ; file ; bin_dir // basename ]
+  Misc.call [ "cp" ; "-f" ; file ; Globals.bin_dir // basename ]
 
 let install_tonos_cli () =
-  Unix.chdir git_dir ;
-  let dir = git_dir // "tonos-cli" in
+  Unix.chdir Globals.git_dir ;
+  let dir = Globals.git_dir // "tonos-cli" in
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/tonos-cli.git" ];
@@ -38,8 +35,8 @@ let install_tonos_cli () =
   ()
 
 let install_solc () =
-  Unix.chdir git_dir ;
-  let dir = git_dir // "TON-Solidity-Compiler" in
+  Unix.chdir Globals.git_dir ;
+  let dir = Globals.git_dir // "TON-Solidity-Compiler" in
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/TON-Solidity-Compiler.git" ];
@@ -58,8 +55,8 @@ let install_solc () =
   ()
 
 let install_tvm_linker () =
-  Unix.chdir git_dir ;
-  let dir = git_dir // "TVM-linker" in
+  Unix.chdir Globals.git_dir ;
+  let dir = Globals.git_dir // "TVM-linker" in
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/TVM-linker.git" ];
@@ -87,9 +84,9 @@ let install_code_hashes () =
 
 let action ~clean ~client ~solc ~linker ~code_hashes =
   if clean then
-    Misc.call [ "rm"; "-rf"; git_dir ];
-  EzFile.make_dir ~p:true git_dir ;
-  EzFile.make_dir ~p:true bin_dir ;
+    Misc.call [ "rm"; "-rf"; Globals.git_dir ];
+  EzFile.make_dir ~p:true Globals.git_dir ;
+  EzFile.make_dir ~p:true Globals.bin_dir ;
 
   if client then install_tonos_cli ();
   if solc then install_solc ();
