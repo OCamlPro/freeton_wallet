@@ -138,9 +138,6 @@ let cmd =
         ( [ "delete" ; "remove" ], Arg.Set remove,
           EZCMD.info "Remove switch of a network" );
 
-        ( [ "delete" ], Arg.Set remove,
-          EZCMD.info "Remove switch of a network" );
-
         ( [ "url" ], Arg.String ( fun s -> url := Some s ),
           EZCMD.info ~docv:"URL" "URL of the default node in this network" );
       ] )

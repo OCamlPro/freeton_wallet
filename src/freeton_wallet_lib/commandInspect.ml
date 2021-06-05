@@ -10,6 +10,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(*
+
+    // safe msig
+    0x80d6c47c4a25543c9b397b71716f3fae1e2c5d247174c52e2c19bd896442b105
+        // surf msig
+       0x207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82
+        // 24 msig
+        0x7d0996943406f7d62a4ff291b1228bf06ebd3e048b58436c5b70fb77ff8b4bf2 &&
+        // 24 setcode msig
+            code_hash != 0xa491804ca55dd5b28cffdff48cb34142930999621a54acee6be83c342051d884 &&
+        // setcode msig
+            code_hash != 0xe2b60b6b602c10ced7ea8ede4bdf96342c97570a3798066f3fb50a4b2b27a208) {
+            _start();
+            return;
+        }
+        preMain();
+    }
+
+*)
+
 open Ezcmd.V2
 open EZCMD.TYPES
 (* open Ez_subst.V1 *)

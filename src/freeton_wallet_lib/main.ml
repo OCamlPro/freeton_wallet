@@ -46,6 +46,7 @@ let main () =
       CommandWatch.cmd;
       CommandInspect.cmd;
       CommandCrawler.cmd;
+      CommandDebot.cmd;
     ]
   in
   let common_args =
