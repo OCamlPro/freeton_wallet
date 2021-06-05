@@ -30,6 +30,9 @@ Overview of sub-commands::
   crawler
     Crawl all transactions to an address and fill a psql database
   
+  debot
+    Manage debots
+  
   exec
     Call command with substitution on arguments, use -- before the command.
   
@@ -524,6 +527,27 @@ Where options are:
 * :code:`--status`   Check if a manager process and crawler are running
 
 * :code:`--stop`   Stop the manager process and the crawler
+
+
+ft debot
+~~~~~~~~~~
+
+Manage debots
+
+
+
+**DESCRIPTION**
+
+
+**USAGE**
+::
+  
+  ft debot [OPTIONS]
+
+Where options are:
+
+
+* :code:`--new NAME`   Create template files for debot NAME
 
 
 ft exec
@@ -1085,8 +1109,6 @@ Where options are:
 * :code:`NETWORK`   Name of network switch
 
 * :code:`--create`   Create switch for a new network
-
-* :code:`--delete`   Remove switch of a network
 
 * :code:`--delete` or :code:`--remove`   Remove switch of a network
 

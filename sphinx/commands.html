@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (494a973
-) (2021/06/03 19:57) documentation</title>
+ (448f977
+) (2021/06/05 07:53) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (494a973
+ (448f977
 )
               </div>
             
@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#ft-config">ft config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-contract">ft contract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-crawler">ft crawler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-debot">ft debot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-exec">ft exec</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-genaddr">ft genaddr</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-init">ft init</a></li>
@@ -215,6 +216,9 @@
 
 <span class="n">crawler</span>
   <span class="nc">Crawl</span> <span class="n">all</span> <span class="n">transactions</span> <span class="k">to</span> <span class="n">an</span> <span class="n">address</span> <span class="ow">and</span> <span class="n">fill</span> <span class="n">a</span> <span class="n">psql</span> <span class="n">database</span>
+
+<span class="n">debot</span>
+  <span class="nc">Manage</span> <span class="n">debots</span>
 
 <span class="n">exec</span>
   <span class="nc">Call</span> <span class="n">command</span> <span class="k">with</span> <span class="n">substitution</span> <span class="n">on</span> <span class="n">arguments</span><span class="o">,</span> <span class="n">use</span> <span class="o">--</span> <span class="n">before</span> <span class="n">the</span> <span class="n">command</span><span class="o">.</span>
@@ -523,6 +527,19 @@ Deploy a known contract to the blockchain</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--start</span></code>   Start with a manager process to restart automatically</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--status</span></code>   Check if a manager process and crawler are running</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--stop</span></code>   Stop the manager process and the crawler</li>
+</ul>
+</div>
+<div class="section" id="ft-debot">
+<h2>ft debot<a class="headerlink" href="#ft-debot" title="Permalink to this headline">¶</a></h2>
+<p>Manage debots</p>
+<p><strong>DESCRIPTION</strong></p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">debot</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">--new</span> <span class="pre">NAME</span></code>   Create template files for debot NAME</li>
 </ul>
 </div>
 <div class="section" id="ft-exec">
@@ -851,7 +868,6 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">NETWORK</span></code>   Name of network switch</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--create</span></code>   Create switch for a new network</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code>   Remove switch of a network</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--delete</span></code> or <code class="code docutils literal notranslate"><span class="pre">--remove</span></code>   Remove switch of a network</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
 </ul>
