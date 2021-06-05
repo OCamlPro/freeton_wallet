@@ -299,6 +299,22 @@ let () =
 
   ()
 
+let tons_of_int64 n =
+  if n > 1_000_000L then
+    let i = Int64.div n 1_000_000_000L in
+    let r = Int64.rem n 1_000_000_000L in
+    Printf.sprintf "%Ld.%09Ld" i r
+  else
+    Printf.sprintf "%Ld nanotons" n
+
+let tons_of_int64 n =
+  if n < 0L then
+    "-" ^ tons_of_int64 ( Int64.neg n )
+  else
+    tons_of_int64 n
+
+let tons_of_z n = tons_of_int64 ( Z.to_int64 n )
+
 let todo_arg () =
   let todo = ref None in
   let set_todo arg2 action =

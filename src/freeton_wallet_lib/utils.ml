@@ -313,8 +313,12 @@ let track_messages config queue =
       | [ tr ] ->
           ignore ( Queue.take queue );
           last_time := Unix.gettimeofday ();
-          Printf.printf "Msg %s:\nIn trans. %s\n%!" msg_id
-            tr.tr_id;
+          Printf.printf "Msg %s:\nIn trans. %s\n%!" msg_id tr.tr_id;
+          Printf.printf "  %s %s, delta: %s\n%!"
+            (match tr.tr_aborted with
+             | false -> ""
+             | true -> "aborted,") tr.tr_status_name
+            (Misc.tons_of_z tr.tr_balance_delta );
           List.iter (fun msg_id ->
               match post config
                       Ton_sdk.REQUEST.( messages ~level:3 ~id: msg_id [] ) with
@@ -324,23 +328,33 @@ let track_messages config queue =
                   begin
                     match msg.msg_msg_type_name with
                     | None -> assert false
-                    | Some s ->
-                        match s with
-                        | "Internal" ->
-                            Printf.printf "  * sent msg %s\n" msg_id ;
-                            Printf.printf "    to %s\n%!"
-                              (AbiCache.replace_addr
-                                 ~abis ~address:msg.msg_dst);
-                            begin
-                              match AbiCache.parse_message_body ~client ~abis msg with
-                              | None -> ()
-                              | Some body ->
-                                  Printf.printf "    %s\n%!" body
-                            end;
-                            Queue.add msg_id queue
-                        | "ExtOut" -> ()
-                        | _ ->
-                            Printf.eprintf "msg_msg_type_name: %s\n%!" s;
+                    | Some "Internal" ->
+                        Printf.printf "   * sent msg %s\n" msg_id ;
+                        Printf.printf "       to %s\n%!"
+                          (AbiCache.replace_addr
+                             ~abis ~address:msg.msg_dst);
+                        let body =
+                          match AbiCache.parse_message_body ~client ~abis msg with
+                          | None -> ""
+                          | Some body -> body
+                        in
+                        Printf.printf "       value: %s %s\n%!"
+                          ( match msg.msg_value with
+                            | None -> "--"
+                            | Some v ->
+                                Misc.tons_of_z v )
+                          body;
+                        Queue.add msg_id queue;
+                    | Some "ExtOut" ->
+                        Printf.printf "   * event %s\n" msg_id ;
+                        begin
+                          match AbiCache.parse_message_body
+                                  ~client ~abis msg with
+                          | None -> ()
+                          | Some body ->
+                              Printf.printf "       %s\n%!" body
+                        end
+                    | Some _kind -> ()
                   end
               | _ -> assert false
 
