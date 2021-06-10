@@ -14,6 +14,17 @@ open Ezcmd.V2
 open EzFile.OP
 open EZCMD.TYPES
 
+let hardcoded_code_hashes = [
+  "a491804ca55dd5b28cffdff48cb34142930999621a54acee6be83c342051d884",
+  "SetcodeMultisigWallet24" ;
+  "7d0996943406f7d62a4ff291b1228bf06ebd3e048b58436c5b70fb77ff8b4bf2",
+  "SafeMultisigWallet24" ;
+  "5daea8b855140d110ab07d430883bfecdd4cba9bcded8968fae7fa6cdb5adfbd",
+  "FreeTonContest" ;
+
+
+]
+
 let bin_install file =
   let basename = Filename.basename file in
   Misc.call [ "cp" ; "-f" ; file ; Globals.bin_dir // basename ]
@@ -80,6 +91,10 @@ let install_code_hashes () =
             ignore ( Misc.get_contract_file ".tvc" name )
         | _ -> ()
     ) Files.file_list;
+  List.iter (fun ( code_hash, contract ) ->
+      Misc.register_code_hash ~code_hash ~contract
+    ) hardcoded_code_hashes;
+
   ()
 
 let action ~clean ~client ~solc ~linker ~code_hashes =
