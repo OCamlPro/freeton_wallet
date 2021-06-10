@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action name contract create wc =
+let action name contract create wc ~force =
   let config = Config.config () in
   let net = Config.current_network config in
   match name with
@@ -24,7 +24,7 @@ let action name contract create wc =
         match Misc.find_key net name with
         | None ->
             if create then begin
-              CommandAccount.genkey ~name config;
+              CommandAccount.genkey ~name config ~force;
               iter false
             end
             else
@@ -42,9 +42,10 @@ let cmd =
   let contract = ref "SafeMultisigWallet" in
   let create = ref false in
   let wc = ref None in
+  let force = ref false in
   EZCMD.sub
     "genaddr"
-    (fun () -> action !name !contract !create !wc)
+    (fun () -> action !name !contract !create !wc ~force:!force)
     ~args:
       [
         [],
@@ -65,6 +66,10 @@ let cmd =
         [ "create" ],
         Arg.Set create,
         EZCMD.info "Create new key";
+
+        [ "force" ; "f" ], Arg.Set force,
+        EZCMD.info "Override existing contracts with --create";
+
       ]
     ~doc: "Generate new addr (default is for a SafeMultisigWallet, use \
            'ft contract --list' for more)"
