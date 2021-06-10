@@ -312,7 +312,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
             let sign =
               match sign with
               | None ->
-                  CommandAccount.genkey ~name:dst ~contract config;
+                  CommandAccount.genkey ~name:dst ~contract config ~force:false;
                   None
               | Some sign ->
                   let sign = Misc.find_key_exn net sign in

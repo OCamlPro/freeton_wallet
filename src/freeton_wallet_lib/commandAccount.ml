@@ -87,7 +87,7 @@ let string_of_nanoton v =
   in
   let nanotons = match nanotons, mutons, millitons with
     | 0L, 0L, 0L -> ""
-    | 0L, 0L, _ -> Int64.to_string millitons
+    | 0L, 0L, _ -> Printf.sprintf "%03Ld" millitons
     | 0L, _, _ -> Printf.sprintf "%03Ld_%03Ld" millitons mutons
     | _, _, _ -> Printf.sprintf "%03Ld_%03Ld_%03Ld" millitons mutons nanotons
   in
@@ -284,10 +284,18 @@ let genaddr config contract key ~wc =
   config.modified <- true
 
 let add_account config
-    ~name ~passphrase ~address ~contract ~wc ~keyfile =
+    ~name ~passphrase ~address ~contract ~wc ~keyfile ~force =
   let net = Config.current_network config in
   let key_name = name in
-  Misc.check_new_key_exn net name;
+  (try
+     Misc.check_new_key_exn net name
+   with exn ->
+     if force then
+       net.net_keys <-
+         List.filter (fun k -> k.key_name <> name) net.net_keys
+     else
+       raise exn
+  );
 
   let contract = Option.map Misc.fully_qualified_contract contract in
 
@@ -590,13 +598,20 @@ let get_live accounts =
     ) accounts
 
 
-let genkey ?name ?contract config =
+let genkey ?name ?contract config ~force =
   let net = Config.current_network config in
   begin
     match name with
     | None -> ()
     | Some name ->
-        Misc.check_new_key_exn net name
+        try
+          Misc.check_new_key_exn net name
+        with exn ->
+          if force then
+            net.net_keys <-
+              List.filter (fun k -> k.key_name <> name) net.net_keys
+          else
+            raise exn
   end;
   let seed_phrase = gen_passphrase config in
 
@@ -640,18 +655,19 @@ let genkey ?name ?contract config =
           change_account config ~name ~contract ()
 
 let action accounts ~list ~info
-    ~create ~delete ~passphrase ~address ~contract ~keyfile ~live ~wc =
+    ~create ~delete ~passphrase ~address ~contract ~keyfile ~live ~wc
+    ~force =
   let config = Config.config () in
   match passphrase, address, contract, keyfile, wc with
   | None, None, _, None, None when
     ( contract = None || create ) ->
       if create then
         match accounts with
-          [] -> genkey config
+          [] -> genkey config ~force
         | _ ->
             let contract = Option.map Misc.fully_qualified_contract contract in
             List.iter (fun name ->
-                genkey ~name config ?contract
+                genkey ~name config ?contract ~force
               ) accounts;
       else
       if delete then
@@ -674,7 +690,7 @@ let action accounts ~list ~info
       | [ name ] ->
           if create then
             add_account config
-              ~name ~passphrase ~address ~contract ~keyfile ~wc
+              ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
           else
             change_account config
               ~name ?passphrase ?address ?contract ?keyfile ?wc ()
@@ -691,6 +707,7 @@ let cmd =
   let delete = ref false in
   let live = ref false in
   let wc = ref None in
+  let force = ref false in
   EZCMD.sub
     "account"
     (fun () -> action
@@ -705,6 +722,7 @@ let cmd =
         ~keyfile:!keyfile
         ~live:!live
         ~wc:!wc
+        ~force:!force
     )
     ~args:
       [ [],
@@ -765,6 +783,9 @@ let cmd =
 
         [ "whois" ], Arg.String whois,
         EZCMD.info ~docv:"ADDRESS" "Returns corresponding key name";
+
+        [ "force" ; "f" ], Arg.Set force,
+        EZCMD.info "Override existing contracts with --create";
 
       ]
     ~man:[
