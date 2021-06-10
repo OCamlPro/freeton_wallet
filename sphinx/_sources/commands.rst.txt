@@ -186,6 +186,8 @@ Where options are:
 
 * :code:`--delete` or :code:`--remove`   Delete old accounts
 
+* :code:`--force` or :code:`-f`   Override existing contracts with --create
+
 * :code:`--info`   Display account parameters
 
 * :code:`--keyfile KEYFILE`   Key file for account
@@ -612,6 +614,8 @@ Where options are:
 * :code:`--contract STRING`   Name of contract
 
 * :code:`--create`   Create new key
+
+* :code:`--force` or :code:`-f`   Override existing contracts with --create
 
 * :code:`--surf`   Use TON Surf contract
 
