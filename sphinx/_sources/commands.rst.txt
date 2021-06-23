@@ -657,11 +657,11 @@ If no specific option is specified, all tools are generated. If a tool has alrea
 Where options are:
 
 
-* :code:`--clean`   Clean before building
-
 * :code:`--client`   Build and install 'tonos-cli' from sources
 
 * :code:`--code-hashes`   Create a database of code hashes from predefined contracts
+
+* :code:`--distclean`   Clean completely before building
 
 * :code:`--linker`   Build and install 'tvm_linker' from sources
 

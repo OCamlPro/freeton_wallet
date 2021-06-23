@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Watching an Account &mdash; freeton_wallet master
+  <title>FreeTON Error codes &mdash; freeton_wallet master
  (97ab29e
 ) (2021/06/23 14:30) documentation</title>
   
@@ -39,8 +39,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Deploying a Solidity Contract" href="smart-contract.html" />
-    <link rel="prev" title="Exploring the Blockchain" href="explorer.html" /> 
+    <link rel="next" title="Sub-commands and Arguments" href="commands.html" />
+    <link rel="prev" title="Deploying a Solidity Contract" href="smart-contract.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -100,9 +100,9 @@
 <li class="toctree-l1"><a class="reference internal" href="switches.html">Managing Multiple Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="substitutions.html">Calling Commands with Substitutions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Watching an Account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smart-contract.html">Deploying a Solidity Contract</a></li>
-<li class="toctree-l1"><a class="reference internal" href="error-codes.html">FreeTON Error codes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FreeTON Error codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
@@ -151,13 +151,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Watching an Account</li>
+      <li>FreeTON Error codes</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/watch.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/error-codes.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -170,28 +170,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="watching-an-account">
-<h1>Watching an Account<a class="headerlink" href="#watching-an-account" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">watch</span></code> sub-command can be used to watch messages
-received by an account. It can be very useful when debugging smart
-contracts:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">watch</span> <span class="o">--</span><span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">contract</span> <span class="o">[--</span><span class="n">from</span> <span class="nc">BLOCKID</span><span class="o">]</span> <span class="o">[--</span><span class="n">timeout</span> <span class="nc">DELAY</span><span class="o">]</span>
-</pre></div>
-</div>
-<p>The account is either an account managed by the wallet, or an address.</p>
-<p>If <code class="code docutils literal notranslate"><span class="pre">--from</span> <span class="pre">BLOCKID</span></code> is specified, the command will display
-everything that happened since the given <code class="code docutils literal notranslate"><span class="pre">BLOCKID</span></code> (it might
-take some time as the command crawls every block of the account’s
-shard).</p>
-<p>By default, the command will exit if nothing happens during 15
-minutes. The argument <code class="code docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">SECONDS</span></code> can be used to
-increase or decrease this delay.</p>
-<p>It is also possible to do it at the end of execution:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">inspect</span> <span class="o">--</span><span class="n">past</span> <span class="n">my</span><span class="o">-</span><span class="n">contract</span>
-</pre></div>
-</div>
-<p>This command will print all the transactions, you may limit the number using
-:code:` –limit NUM`.</p>
+  <div class="section" id="freeton-error-codes">
+<h1>FreeTON Error codes<a class="headerlink" href="#freeton-error-codes" title="Permalink to this headline">¶</a></h1>
+<p>It is often useful to have the mapping between error codes and the
+corresponding errors. Here are a few useful links:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.ton.dev/86757ecb2/p/3874d1-error-codes/b/82f8c1">https://docs.ton.dev/86757ecb2/p/3874d1-error-codes/b/82f8c1</a></li>
+<li><a class="reference external" href="https://github.com/tonlabs/TON-SDK/blob/master/docs/mod_client.md#clienterrorcode">https://github.com/tonlabs/TON-SDK/blob/master/docs/mod_client.md#clienterrorcode</a></li>
+<li><a class="reference external" href="https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#solidity-runtime-errors">https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#solidity-runtime-errors</a></li>
+</ul>
+<p>Additionnally, other non documented codes are:</p>
+<ul class="simple">
+<li><cite>result_code = 37</cite>: not enough value to transfer with the message</li>
+</ul>
 </div>
 
 
@@ -202,10 +193,10 @@ increase or decrease this delay.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="smart-contract.html" class="btn btn-neutral float-right" title="Deploying a Solidity Contract" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="commands.html" class="btn btn-neutral float-right" title="Sub-commands and Arguments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="explorer.html" class="btn btn-neutral float-left" title="Exploring the Blockchain" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="smart-contract.html" class="btn btn-neutral float-left" title="Deploying a Solidity Contract" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

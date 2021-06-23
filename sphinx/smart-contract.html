@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Deploying a Solidity Contract &mdash; freeton_wallet master
- (b6d3ca3
-) (2021/06/10 14:11) documentation</title>
+ (97ab29e
+) (2021/06/23 14:30) documentation</title>
   
 
   
@@ -39,7 +39,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Sub-commands and Arguments" href="commands.html" />
+    <link rel="next" title="FreeTON Error codes" href="error-codes.html" />
     <link rel="prev" title="Watching an Account" href="watch.html" /> 
 </head>
 
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (b6d3ca3
+ (97ab29e
 )
               </div>
             
@@ -102,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="explorer.html">Exploring the Blockchain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="watch.html">Watching an Account</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Deploying a Solidity Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-codes.html">FreeTON Error codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/freeton_wallet">Devel and Issues on Github</a></li>
@@ -172,7 +173,7 @@
   <div class="section" id="deploying-a-solidity-contract">
 <h1>Deploying a Solidity Contract<a class="headerlink" href="#deploying-a-solidity-contract" title="Permalink to this headline">¶</a></h1>
 <p>Let’s suppose that we have a simple Free TON Solidity smart contract:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">pragma</span> <span class="n">ton</span><span class="o">-</span><span class="n">solidity</span> <span class="o">^</span><span class="mi">0</span><span class="o">.</span><span class="mi">37</span><span class="o">.</span><span class="mi">0</span><span class="o">;</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">pragma</span> <span class="n">ton</span><span class="o">-</span><span class="n">solidity</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">37</span><span class="o">.</span><span class="mi">0</span><span class="o">;</span>
 <span class="n">pragma</span> <span class="nc">AbiHeader</span> <span class="n">expire</span><span class="o">;</span>
 
 <span class="n">contract</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
@@ -390,7 +391,7 @@ call returned {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="commands.html" class="btn btn-neutral float-right" title="Sub-commands and Arguments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="error-codes.html" class="btn btn-neutral float-right" title="FreeTON Error codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="watch.html" class="btn btn-neutral float-left" title="Watching an Account" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -3,7 +3,7 @@ Deploying a Solidity Contract
 
 Let's suppose that we have a simple Free TON Solidity smart contract::
 
-  pragma ton-solidity ^0.37.0;
+  pragma ton-solidity >= 0.37.0;
   pragma AbiHeader expire;
   
   contract HelloWorld {
