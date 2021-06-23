@@ -1,6 +1,26 @@
 How to install
 ==============
 
+Using Docker
+~~~~~~~~~~~~
+
+Using :code:`ft: with Docker will work on Linux, Mac OS and Windows.
+
+The latest image of :code:`ft` is available on:
+
+https://hub.docker.com/r/ocamlpro/ft
+
+You just need to copy the script (either for Linux/MacOS or Windows)
+on your computer and run it!
+
+There are a few known limitations:
+
+* All files to which you refer should be in the current directory (or
+  its subdirectories)
+
+* You cannot update the utility tools (solc, tvm_linker, etc.) using
+  :code:`ft init`
+
 Build and install
 ~~~~~~~~~~~~~~~~~
 

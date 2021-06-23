@@ -1,0 +1,9 @@
+#!/bin/sh
+
+USER=$(id -u)
+GROUP=$(getent group docker | cut -d: -f3)
+CURDIR=$(pwd)
+
+MOUNT_FLAGS=" -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.ft:/user/.ft -v $CURDIR:/local  --user $USER:$GROUP"
+
+docker run --network host $MOUNT_FLAGS ocamlpro/ft /bin/ft $*
