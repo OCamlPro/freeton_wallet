@@ -202,7 +202,7 @@ let get_key_contract_exn key =
   | Some contract -> contract
 
 let binary_file exe =
-  let binary = Globals.ft_dir // "bin" // exe in
+  let binary = Globals.bin_dir // exe in
   if not ( Sys.file_exists binary ) then begin
     EzFile.make_dir ~p:true ( Filename.dirname binary );
     Error.raise "You must put a copy of %s binary in %s\n%!" exe binary

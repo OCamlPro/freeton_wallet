@@ -14,6 +14,17 @@ open Ezcmd.V2
 open EzFile.OP
 open EZCMD.TYPES
 
+let hardcoded_code_hashes = [
+  "a491804ca55dd5b28cffdff48cb34142930999621a54acee6be83c342051d884",
+  "SetcodeMultisigWallet24" ;
+  "7d0996943406f7d62a4ff291b1228bf06ebd3e048b58436c5b70fb77ff8b4bf2",
+  "SafeMultisigWallet24" ;
+  "5daea8b855140d110ab07d430883bfecdd4cba9bcded8968fae7fa6cdb5adfbd",
+  "FreeTonContest" ;
+
+
+]
+
 let bin_install file =
   let basename = Filename.basename file in
   Misc.call [ "cp" ; "-f" ; file ; Globals.bin_dir // basename ]
@@ -30,8 +41,8 @@ let install_tonos_cli () =
     Misc.call [ "cargo" ; "update" ];
   end;
   Misc.call [ "cargo"; "build" ];
-
   bin_install "target/debug/tonos-cli" ;
+  Misc.call [ "cargo"; "clean" ];
   ()
 
 let install_solc () =
@@ -67,8 +78,8 @@ let install_tvm_linker () =
   if exists then
     Misc.call [ "cargo" ; "update" ];
   Misc.call [ "cargo"; "build" ];
-
   bin_install "target/debug/tvm_linker" ;
+  Misc.call [ "Cargo"; "clean" ];
   ()
 
 let install_code_hashes () =
@@ -80,23 +91,32 @@ let install_code_hashes () =
             ignore ( Misc.get_contract_file ".tvc" name )
         | _ -> ()
     ) Files.file_list;
+  List.iter (fun ( code_hash, contract ) ->
+      Misc.register_code_hash ~code_hash ~contract
+    ) hardcoded_code_hashes;
+
   ()
 
-let action ~clean ~client ~solc ~linker ~code_hashes =
-  if clean then
-    Misc.call [ "rm"; "-rf"; Globals.git_dir ];
-  EzFile.make_dir ~p:true Globals.git_dir ;
-  EzFile.make_dir ~p:true Globals.bin_dir ;
-
-  if client then install_tonos_cli ();
-  if solc then install_solc ();
-  if linker then install_tvm_linker ();
+let action ~distclean ~client ~solc ~linker ~code_hashes =
   if code_hashes then install_code_hashes ();
 
- ()
+  if Globals.is_alpine then begin
+    Printf.eprintf
+      "Docker detected. Use 'docker pull ocamlpro/ft:latest' to upgrade\n%!";
+  end else begin
+    if distclean then
+      Misc.call [ "rm"; "-rf"; Globals.git_dir ];
+    EzFile.make_dir ~p:true Globals.git_dir ;
+    EzFile.make_dir ~p:true Globals.bin_dir ;
+
+    if client then install_tonos_cli ();
+    if solc then install_solc ();
+    if linker then install_tvm_linker ();
+  end;
+  ()
 
 let cmd =
-  let clean = ref false in
+  let distclean = ref false in
   let client = ref false in
   let solc = ref false in
   let linker = ref false in
@@ -111,11 +131,11 @@ let cmd =
          | client, solc, linker, code_hashes ->
              client, solc, linker, code_hashes
        in
-       action ~clean:!clean ~client ~solc ~linker ~code_hashes
+       action ~distclean:!distclean ~client ~solc ~linker ~code_hashes
     )
     ~args: [
-      [ "clean" ], Arg.Set clean,
-      EZCMD.info "Clean before building";
+      [ "distclean" ], Arg.Set distclean,
+      EZCMD.info "Clean completely before building";
 
       [ "client" ], Arg.Set client,
       EZCMD.info "Build and install 'tonos-cli' from sources";
@@ -125,7 +145,6 @@ let cmd =
       EZCMD.info "Build and install 'tvm_linker' from sources";
       [ "code-hashes" ], Arg.Set code_hashes,
       EZCMD.info "Create a database of code hashes from predefined contracts";
-
     ]
     ~doc: "Initialize with TON Labs binary tools, compiled from sources."
     ~man:[

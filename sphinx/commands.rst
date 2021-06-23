@@ -30,6 +30,9 @@ Overview of sub-commands::
   crawler
     Crawl all transactions to an address and fill a psql database
   
+  debot
+    Manage debots
+  
   exec
     Call command with substitution on arguments, use -- before the command.
   
@@ -181,7 +184,9 @@ Where options are:
 
 * :code:`--create`   Create new account
 
-* :code:`--delete`   Delete old accounts
+* :code:`--delete` or :code:`--remove`   Delete old accounts
+
+* :code:`--force` or :code:`-f`   Override existing contracts with --create
 
 * :code:`--info`   Display account parameters
 
@@ -243,6 +248,8 @@ Where options are:
 * :code:`--sign ACCOUNT`   Sign message with account
 
 * :code:`--subst FILE`   Read FILE and substitute results in the content
+
+* :code:`--wait`   Wait for all transactions to finish
 
 
 ft client
@@ -524,6 +531,27 @@ Where options are:
 * :code:`--stop`   Stop the manager process and the crawler
 
 
+ft debot
+~~~~~~~~~~
+
+Manage debots
+
+
+
+**DESCRIPTION**
+
+
+**USAGE**
+::
+  
+  ft debot [OPTIONS]
+
+Where options are:
+
+
+* :code:`--new NAME`   Create template files for debot NAME
+
+
 ft exec
 ~~~~~~~~~
 
@@ -587,6 +615,8 @@ Where options are:
 
 * :code:`--create`   Create new key
 
+* :code:`--force` or :code:`-f`   Override existing contracts with --create
+
 * :code:`--surf`   Use TON Surf contract
 
 * :code:`--wc INT`   WORKCHAIN The workchain (default is 0)
@@ -627,11 +657,11 @@ If no specific option is specified, all tools are generated. If a tool has alrea
 Where options are:
 
 
-* :code:`--clean`   Clean before building
-
 * :code:`--client`   Build and install 'tonos-cli' from sources
 
 * :code:`--code-hashes`   Create a database of code hashes from predefined contracts
+
+* :code:`--distclean`   Clean completely before building
 
 * :code:`--linker`   Build and install 'tvm_linker' from sources
 
@@ -895,6 +925,8 @@ Where options are:
 
 * :code:`--transfer AMOUNT`   Transfer this amount
 
+* :code:`--wait`   Wait for all transactions to finish
+
 * :code:`--waiting`    List waiting transactions
 
 * :code:`--wc WORKCHAIN`   The workchain (default is 0)
@@ -1082,9 +1114,7 @@ Where options are:
 
 * :code:`--create`   Create switch for a new network
 
-* :code:`--delete`   Remove switch of a network
-
-* :code:`--remove`   Remove switch of a network
+* :code:`--delete` or :code:`--remove`   Remove switch of a network
 
 * :code:`--url URL`   URL of the default node in this network
 

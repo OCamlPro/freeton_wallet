@@ -20,6 +20,7 @@ Welcome to Freeton OCaml Wallet
    explorer
    watch
    smart-contract
+   error-codes
    commands
    license
 

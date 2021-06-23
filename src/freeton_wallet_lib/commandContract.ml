@@ -171,19 +171,22 @@ let sol_abi contract =
   close_out oc;
   ()
 
-let create_new_version contract =
+let same_file f1 f2 =
+  EzFile.read_file f1 = EzFile.read_file f2
+
+let get_current_version contract =
   let contract_dir = Globals.contracts_dir // contract in
   let version_file = contract_dir // "CURRENT" in
-  let num =
-    if Sys.file_exists contract_dir then
-      let num = EzFile.read_file version_file in
-      let num = int_of_string ( String.trim num ) in
-      let num = num + 1 in
-      string_of_int num
-    else
-      let () = EzFile.make_dir ~p:true contract_dir in
-      "1"
-  in
+  if Sys.file_exists contract_dir then
+    let num = EzFile.read_file version_file in
+    Some ( int_of_string ( String.trim num ) )
+  else
+    None
+
+let create_new_version contract num =
+  let num = string_of_int num in
+  let contract_dir = Globals.contracts_dir // contract in
+  let version_file = contract_dir // "CURRENT" in
   EzFile.write_file version_file num;
   contract_dir // num
 
@@ -226,17 +229,36 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
                 ];
       let tvm_file = check_exists dirname tvm_file in
 
-      let contract_prefix = create_new_version contract in
+      let next_version =
+        match get_current_version contract with
+        | None -> Some 1
+        | Some version ->
+            let contract_dir = Globals.contracts_dir // contract in
+            let contract_prefix = contract_dir // string_of_int version in
 
-      Misc.call [ "cp" ; "-f" ; abi_file ;
-                  contract_prefix ^ ".abi.json" ];
-      let tvc_file = contract_prefix ^ ".tvc" in
-      Misc.call [ "cp" ; "-f" ; tvm_file ; tvc_file ];
-      Misc.register_tvc_file ~tvc_file
-        ~contract: ( Misc.fully_qualified_contract contract ) ;
-      Misc.call [ "cp" ; "-f" ; filename ;
-                  contract_prefix ^ ".sol" ];
-      ()
+            if
+              same_file (contract_prefix ^ ".tvc")  tvm_file &&
+              same_file (contract_prefix ^ ".abi.json") abi_file then begin
+              Printf.eprintf "Contract already known as %s/%d\n%!" contract version;
+              None
+            end else
+              Some ( version + 1 )
+      in
+      begin
+        match next_version with
+        | None -> ()
+        | Some next_version ->
+            let contract_prefix = create_new_version contract next_version in
+            Misc.call [ "cp" ; "-f" ; abi_file ;
+                        contract_prefix ^ ".abi.json" ];
+            let tvc_file = contract_prefix ^ ".tvc" in
+            Misc.call [ "cp" ; "-f" ; tvm_file ; tvc_file ];
+            Misc.register_tvc_file ~tvc_file
+              ~contract: ( Misc.fully_qualified_contract contract ) ;
+            Misc.call [ "cp" ; "-f" ; filename ;
+                        contract_prefix ^ ".sol" ];
+            ()
+      end
 
   | ImportContract filename ->
       let dirname = Filename.dirname filename in
@@ -262,20 +284,37 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
       begin
         match !abi, !tvc with
         | [ abi ], [ tvc ] ->
-            let contract_prefix = create_new_version contract in
-            Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
-            let tvc_file = contract_prefix ^ ".tvc" in
-            Misc.call [ "cp"; "-f"; tvc ; tvc_file ];
-            Misc.register_tvc_file ~tvc_file
-              ~contract: ( Misc.fully_qualified_contract contract ) ;
-            begin match !src with
-              | [] -> ()
-              | list ->
-                  EzFile.make_dir ~p:true contract_prefix;
-                  List.iter (fun src ->
-                      Misc.call [ "cp"; "-f"; src ;
-                                  contract_prefix // Filename.basename src ];
-                    ) list
+            let next_version =
+              match get_current_version contract with
+              | None -> Some 1
+              | Some version ->
+                  let contract_dir = Globals.contracts_dir // contract in
+                  let contract_prefix = contract_dir // string_of_int version in
+                  if
+                    same_file (contract_prefix ^ ".tvc")  tvc &&
+                    same_file (contract_prefix ^ ".abi.json") abi then
+                    None
+                  else
+                    Some ( version + 1 )
+            in
+            begin
+              match next_version with
+              | None -> ()
+              | Some next_version ->
+                  let contract_prefix = create_new_version contract next_version in
+                  Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
+                  let tvc_file = contract_prefix ^ ".tvc" in
+                  Misc.call [ "cp"; "-f"; tvc ; tvc_file ];
+                  Misc.register_tvc_file ~tvc_file
+                    ~contract: ( Misc.fully_qualified_contract contract ) ;
+                  match !src with
+                  | [] -> ()
+                  | list ->
+                      EzFile.make_dir ~p:true contract_prefix;
+                      List.iter (fun src ->
+                          Misc.call [ "cp"; "-f"; src ;
+                                      contract_prefix // Filename.basename src ];
+                        ) list
             end
         | [], _ -> Error.raise "Missing abi file"
         | _, [] -> Error.raise "Missing tvc file"
