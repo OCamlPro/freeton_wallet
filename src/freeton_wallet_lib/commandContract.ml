@@ -190,7 +190,8 @@ let create_new_version contract num =
   EzFile.write_file version_file num;
   contract_dir // num
 
-let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
+let action ~todo ~force ~params ~wc ?create ?sign ~deployer
+    ?contract () =
   match todo with
   | ListContracts -> CommandList.list_contracts ()
   | ShowABI contract ->
@@ -203,9 +204,13 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
          lose the tvc file and so how to regen their address. *)
       let dirname = Filename.dirname filename in
       let basename = Filename.basename filename in
-      let contract, ext = EzString.cut_at basename '.' in
+      let contract_name, ext = EzString.cut_at basename '.' in
       if ext <> "sol" then
         Error.raise "File %s must end with .sol extension" basename;
+      let contract = match contract with
+        | None -> contract_name
+        | Some contract -> contract
+      in
       let known = CommandList.known_contracts () in
       if not force && StringMap.mem contract known then
         Error.raise "Contract %s already exists (use -f to override)"
@@ -219,7 +224,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer () =
       let code_file = contract ^ ".code" in
       let tvm_file = contract ^ ".tvm" in
       remove_files dirname [ abi_file ; code_file ; tvm_file ];
-      Misc.call [ solc ; filename ];
+      Misc.call [ solc ; "--contract"; contract; filename ];
       let abi_file = check_exists dirname abi_file in
       let code_file = check_exists dirname code_file in
       Misc.call [ tvm_linker ; "compile" ; "-o" ; tvm_file ;
@@ -524,6 +529,7 @@ let cmd =
   let create = ref None in
   let deployer = ref None in
   let sign = ref None in
+  let contract = ref None in
   EZCMD.sub
     "contract"
     (fun () ->
@@ -536,6 +542,7 @@ let cmd =
                ?create:!create
                ?sign:!sign
                ~deployer:!deployer
+               ?contract:!contract
                ()
            )
     )
@@ -562,6 +569,9 @@ let cmd =
         [ "build"], Arg.String (fun filename ->
             set_todo "--build" (BuildContract filename)),
         EZCMD.info ~docv:"FILENAME" "Build a contract and remember it";
+
+        [ "contract"], Arg.String (fun s -> contract := Some s),
+        EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
 
         [ "deploy" ], Arg.String (fun contract ->
             set_todo "--deploy" (DeployContract contract)
