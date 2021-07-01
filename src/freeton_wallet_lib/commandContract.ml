@@ -202,15 +202,12 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
       (* TODO: check that no account is using this contract,
          otherwise, these accounts will become unreachable, i.e. we
          lose the tvc file and so how to regen their address. *)
+      let contract_name = contract in
       let dirname = Filename.dirname filename in
       let basename = Filename.basename filename in
-      let contract_name, ext = EzString.cut_at basename '.' in
+      let contract, ext = EzString.cut_at basename '.' in
       if ext <> "sol" then
         Error.raise "File %s must end with .sol extension" basename;
-      let contract = match contract with
-        | None -> contract_name
-        | Some contract -> contract
-      in
       let known = CommandList.known_contracts () in
       if not force && StringMap.mem contract known then
         Error.raise "Contract %s already exists (use -f to override)"
@@ -224,7 +221,9 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
       let code_file = contract ^ ".code" in
       let tvm_file = contract ^ ".tvm" in
       remove_files dirname [ abi_file ; code_file ; tvm_file ];
-      Misc.call [ solc ; "--contract"; contract; filename ];
+      Misc.call ( match contract_name with
+          | Some contract -> [ solc ; "--contract"; contract; filename ]
+          | None -> [ solc ; filename ] );
       let abi_file = check_exists dirname abi_file in
       let code_file = check_exists dirname code_file in
       Misc.call [ tvm_linker ; "compile" ; "-o" ; tvm_file ;

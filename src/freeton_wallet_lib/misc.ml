@@ -377,7 +377,11 @@ let is_address account =
   let wc, addr = EzString.cut_at account ':' in
   let len = String.length addr in
   if len <> 0 then
-    let wc = if wc = "0-1" then "-1" else wc in
+    let wc =
+      let len = String.length wc in
+      if len > 2 &&
+         wc.[0] = '0' && wc.[1] = '-' then String.sub wc 1 (len-1)
+      else wc in
     Some ( Printf.sprintf "%s:%s%s"
              wc addr ( String.make (64 - len) '0' ) )
   else None
