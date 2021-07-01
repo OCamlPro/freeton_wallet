@@ -54,7 +54,7 @@ let string_of_ppf f =
   Buffer.contents b
 
 let printf_params ppf params =
-  let open Ton_sdk.TYPES.ABI in
+  let open Ton_client.ABI.AbiContract in
   match params with
   | [] -> Format.fprintf ppf "{}"
   | _ ->
@@ -66,7 +66,7 @@ let printf_params ppf params =
       Format.fprintf ppf "@ @]}'"
 
 let printf_function ppf f =
-  let open Ton_sdk.TYPES.ABI in
+  let open Ton_client.ABI.AbiContract in
   Format.fprintf ppf "  * @[<1>%s@ "
     f.fun_name;
   printf_params ppf f.fun_inputs ;
@@ -88,7 +88,7 @@ let show_abi ~contract =
       Format.fprintf ppf "ABI of contract %S@." contract ;
       Format.fprintf ppf "  File: %s@." contract_abi ;
 
-      let open Ton_sdk.TYPES.ABI in
+      let open Ton_client.ABI.AbiContract in
 
       begin
         match abi.header with
@@ -142,7 +142,7 @@ type param_kind =
   | Unknown
 
 let check_abi ~contract ~abifile ~meth ~params =
-  let open Ton_sdk.TYPES.ABI in
+  let open Ton_client.ABI.AbiContract in
   let abi = Ton_sdk.ABI.read abifile in
   let found = ref None in
   let error f s =
@@ -372,7 +372,7 @@ let call_run config ?client ~wait
     let client =
       match client with
       | Some client -> client
-      | None -> Ton_client.create server_url
+      | None -> Ton_sdk.CLIENT.create server_url
     in
     let msg = Ton_sdk.ACTION.prepare_message
         ~client ~address ~abi ~meth ~params ?keypair () in

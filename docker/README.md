@@ -55,6 +55,8 @@ or manually:
 source $HOME/.cargo/env
 git clone https://github.com/OCamlPro/freeton_wallet
 cd freeton_wallet
+emacs src/freeton_crawler_lib/dune
+# remove promoted rules
 drom build --switch 4.10.0
 cp -f ft /bin/ft
 ```

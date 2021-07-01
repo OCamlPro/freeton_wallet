@@ -16,7 +16,7 @@ val call_contract :
   contract:string ->
   meth:string ->
   params:string ->
-  ?client:Ton_types.client ->
+  ?client:Ton_sdk.TYPES.client ->
   ?src:Types.key ->
   ?local:bool ->
   ?subst:(msg:string -> Types.config -> string -> unit) ->
@@ -34,7 +34,7 @@ val deploy_contract :
   key:Types.key ->
   ?sign:Types.key ->
   contract:string -> params:string -> wc:int option ->
-  ?client:Ton_types.client ->
+  ?client:Ton_sdk.TYPES.client ->
   unit -> unit
 
 

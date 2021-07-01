@@ -14,8 +14,8 @@ open Ezcmd.V2
 open EZCMD.TYPES
 
 let test1 file =
-  let abi = Misc.read_json_file Ton_sdk.TYPES.ABI.contract_enc file in
-  Misc.write_json_file Ton_sdk.TYPES.ABI.contract_enc (file ^ ".enc") abi
+  let abi = Misc.read_json_file Ton_client.ABI.AbiContract.enc file in
+  Misc.write_json_file Ton_client.ABI.AbiContract.enc (file ^ ".enc") abi
 
 let test2 () =
   let s = Ton_sdk.RPC.sync ~network:"net.ton.dev"

@@ -23,13 +23,13 @@ type t = {
   abis_contract2abi : ( string, string ) Hashtbl.t ;
 
   (* These functions are added to all contracts ABIs *)
-  abis_funs : Ton_types.ABI.fonction list ;
+  abis_funs : Ton_client.ABI.AbiContract.fonction list ;
 }
 
 
 let json_of_abi abi =
   EzEncoding.construct
-    ~compact:false Ton_sdk.TYPES.ABI.contract_enc abi
+    ~compact:false Ton_client.ABI.AbiContract.enc abi
 
 let get_contract_abi ~abis contract =
   match Hashtbl.find abis.abis_contract2abi contract with
@@ -38,8 +38,8 @@ let get_contract_abi ~abis contract =
       let abifile = Misc.get_contract_abifile contract in
       let abi = Ton_sdk.ABI.read abifile in
       let abi = { abi with
-                  Ton_sdk.TYPES.ABI.functions =
-                    abi.Ton_sdk.TYPES.ABI.functions @ abis.abis_funs } in
+                  Ton_client.ABI.AbiContract.functions =
+                    abi.Ton_client.ABI.AbiContract.functions @ abis.abis_funs } in
       let json = json_of_abi abi in
       Hashtbl.add abis.abis_contract2abi contract json ;
       json
@@ -94,7 +94,7 @@ let create config ~abis =
       let abifile = Misc.get_contract_abifile contract in
       let abi = Ton_sdk.ABI.read abifile in
       abis_list := ( contract, abi ) :: !abis_list ;
-      abi.Ton_sdk.TYPES.ABI.functions
+      abi.Ton_client.ABI.AbiContract.functions
     ) abis) in
   let abis = {
     abis_address2abi ;
@@ -103,8 +103,8 @@ let create config ~abis =
   } in
   List.iter (fun ( contract, abi ) ->
       let abi = { abi with
-                  Ton_sdk.TYPES.ABI.functions =
-                    abi.Ton_sdk.TYPES.ABI.functions @ abis_funs } in
+                  Ton_client.ABI.AbiContract.functions =
+                    abi.Ton_client.ABI.AbiContract.functions @ abis_funs } in
       Hashtbl.add abis_contract2abi contract ( json_of_abi abi )
     ) !abis_list ;
 

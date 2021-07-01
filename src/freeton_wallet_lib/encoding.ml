@@ -10,7 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let keypair = Ton_types.keypair_enc
+let keypair = Ton_sdk.TYPES.keypair_enc
 let config = Types.config_enc
 let key = Types.key_enc
 let wallet = Json_encoding.list key

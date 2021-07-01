@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.4.4)
+(version 0.5.0)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -27,7 +27,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt_ssl ( >= 1.1 ))
-   (freeton_ocaml_sdk (and (>= 0.3.3) (< 1.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.4.0) (< 1.0.0)))
    (freeton_crawler_lib (= version))
    ezjsonm
    (ez_subst ( >= 0.1 ))
@@ -66,7 +66,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt (and (>= 5.0.0) (< 6.0.0)))
-   (freeton_ocaml_sdk (and (>= 0.3.0) (< 1.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.4.0) (< 1.0.0)))
    (freeton_crawler_db_versions (= version))
    ez_pgocaml
    (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))

@@ -27,6 +27,7 @@ type todo =
   | ImportContract of string
   | ShowABI of string
   | SolABI of string
+  | IntfABI of string
 
 let remove_files dirname files =
   List.iter (fun file ->
@@ -44,18 +45,132 @@ let check_exists dirname file =
     else
       Error.raise "File %s was not generated" file
 
-let sol_abi contract =
+let intf_abi contract =
   let _config = Config.config () in
-  let contract_abi = Misc.get_contract_abifile contract in
+  let contract, contract_abi =
+    if Sys.file_exists contract then
+      let abifile = contract in
+      let basename = Filename.basename abifile in
+      let contract, _ = EzString.cut_at basename '.' in
+      contract, abifile
+    else
+      contract, Misc.get_contract_abifile contract
+  in
+  let filename = contract ^ "_intf.sol" in
   let abi = Ton_sdk.ABI.read contract_abi in
-  let filename = contract ^ "_impl.sol" in
   Printf.eprintf "Generating %S\n%!" filename;
   let oc = open_out filename  in
   let ppf = Format.formatter_of_out_channel oc in
 
   Format.fprintf ppf "pragma ton-solidity >= 0.32.0;@.";
 
-  let open Ton_sdk.TYPES.ABI in
+  let open Ton_client.ABI.AbiContract in
+
+  begin
+    match abi.header with
+    | [] -> () | headers ->
+        List.iter (fun header ->
+            Format.fprintf ppf "pragma AbiHeader %s;@." header
+          ) headers ;
+  end;
+  Format.fprintf ppf "@.abstract contract %s {@[<1>@.@." contract ;
+
+  begin
+    match abi.data with
+    | [] -> ()
+    | data ->
+        List.iter (fun d ->
+            Format.fprintf ppf "  %s static %s;@." d.data_type d.data_name
+          ) data;
+  end;
+
+  let constructors, functions = List.partition (fun f ->
+      f.fun_name = "constructor"
+    ) abi.functions
+  in
+  let _variables, functions = List.partition (fun f ->
+      match EzString.chop_prefix ~prefix:"g_" f.fun_name with
+      | Some _ -> true
+      | None -> false
+    ) functions
+  in
+
+  let fprintf_params params =
+    match params with
+    | [] -> Format.fprintf ppf "()"
+    | _ ->
+        Format.fprintf ppf "(@[<1>@ ";
+        List.iteri (fun i p ->
+            if i > 0 then Format.fprintf ppf ",@ ";
+            Format.fprintf ppf "%s@ %s" p.param_type p.param_name
+          ) params ;
+        Format.fprintf ppf "@ @])"
+  in
+
+  let fprintf_functions list =
+    match list with
+    | [] -> ()
+    | _ ->
+        List.iter (fun f ->
+            Format.fprintf ppf "  %s @[<1>@ "
+              ( match f.fun_name with
+               | "constructor" -> "constructor"
+               | name -> Printf.sprintf "function %s" name );
+
+            fprintf_params f.fun_inputs ;
+            Format.fprintf ppf "@ public";
+            begin
+              match f.fun_outputs with
+              | [] -> ()
+              | outputs ->
+                   Format.fprintf ppf "@ returns@ ";
+                   fprintf_params outputs;
+            end;
+            Format.fprintf ppf " {}";
+            Format.fprintf ppf "@]@."
+          ) list
+  in
+
+
+  begin
+    match abi.events with
+    | [] -> ()
+    | events ->
+        Format.fprintf ppf "@.";
+        List.iter (fun ev ->
+            Format.fprintf ppf "  event %s " ev.ev_name ;
+            fprintf_params ev.ev_inputs ;
+            Format.fprintf ppf "@."
+          ) events
+  end;
+  fprintf_functions constructors ;
+  fprintf_functions functions ;
+
+  Format.fprintf ppf "@]}@.";
+  close_out oc;
+  ()
+
+
+let sol_abi contract =
+  let _config = Config.config () in
+  let contract, contract_abi =
+    if Sys.file_exists contract then
+      let abifile = contract in
+      let basename = Filename.basename abifile in
+      let contract, _ = EzString.cut_at basename '.' in
+      contract, abifile
+    else
+      contract, Misc.get_contract_abifile contract
+  in
+  let filename = contract ^ "_impl.sol" in
+  let abi = Ton_sdk.ABI.read contract_abi in
+  Printf.eprintf "Generating %S\n%!" filename;
+  let oc = open_out filename  in
+  let ppf = Format.formatter_of_out_channel oc in
+
+  Format.fprintf ppf "pragma ton-solidity >= 0.32.0;@.";
+
+  let open Ton_client.ABI.AbiContract in
 
   begin
     match abi.header with
@@ -171,6 +286,7 @@ let sol_abi contract =
   close_out oc;
   ()
 
+
 let same_file f1 f2 =
   EzFile.read_file f1 = EzFile.read_file f2
 
@@ -198,6 +314,7 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
       let s = Utils.show_abi ~contract in
       Printf.printf "%s\n%!" s
   | SolABI contract -> sol_abi contract
+  | IntfABI contract -> intf_abi contract
   | BuildContract filename ->
       (* TODO: check that no account is using this contract,
          otherwise, these accounts will become unreachable, i.e. we
@@ -591,8 +708,15 @@ let cmd =
             Globals.verbosity := 0;
             set_todo "--sol-abi" (SolABI contract)
           ),
-        EZCMD.info ~docv:"CONTRACT"
+        EZCMD.info ~docv:"CONTRACT|FILE"
           "Output ABI of contract CONTRACT as Solidity ";
+
+        [ "intf-abi" ], Arg.String (fun contract ->
+            Globals.verbosity := 0;
+            set_todo "--intf-abi" (IntfABI contract)
+          ),
+        EZCMD.info ~docv:"CONTRACT|FILE"
+          "Output ABI of contract CONTRACT as Solidity Interface ";
 
         [ "dst" ], Arg.String (fun s -> create := Some (UseAccount s) ),
         EZCMD.info ~docv:"ACCOUNT"
