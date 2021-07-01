@@ -54,7 +54,10 @@ let install_solc () =
   Unix.chdir dir;
   if exists then
     Misc.call [ "git" ; "pull" ];
-  Misc.call [ "sh" ; "./compiler/scripts/install_deps.sh" ];
+  Printf.eprintf "If deps are missing, use:\n";
+  Printf.eprintf "  cd %s\n" dir;
+  Printf.eprintf "  sh ./compiler/scripts/install_deps.sh\n%!";
+  (* Misc.call [ "sh" ; "./compiler/scripts/install_deps.sh" ]; *)
   EzFile.make_dir ~p:true "build";
   Unix.chdir "build";
   Misc.call [ "cmake" ; "../compiler/" ; "-DCMAKE_BUILD_TYPE=Release" ];
