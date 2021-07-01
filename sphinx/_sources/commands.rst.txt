@@ -438,6 +438,8 @@ Where options are:
 
 * :code:`--build FILENAME`   Build a contract and remember it
 
+* :code:`--contract CONTRACT`   Name of contract to build
+
 * :code:`--create ACCOUNT`   Create ACCOUNT by deploying contract (with --deploy)
 
 * :code:`--deploy CONTRACT`   Deploy contract CONTRACT
