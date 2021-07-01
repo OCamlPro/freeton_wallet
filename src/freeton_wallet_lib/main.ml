@@ -96,6 +96,17 @@ let main () =
   in
 
   let args = iter_initial_args (List.tl args ) in
+  let args = List.map (fun arg ->
+      let len = String.length arg in
+      if len > 20 && arg.[0] = '-' &&
+         match arg.[1] with
+         '1'..'9' when String.contains arg ':' -> true
+         | _ -> false
+      then
+        "0" ^ arg
+      else
+        arg
+    ) args in
   let argv = Array.of_list ( Sys.argv.(0) :: args ) in
   (* OpambinMisc.global_log "args: %s"
          (String.concat " " (Array.to_list Sys.argv)); *)
