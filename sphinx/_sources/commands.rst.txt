@@ -452,6 +452,8 @@ Where options are:
 
 * :code:`--import CONTRACT`   Deploy contract CONTRACT
 
+* :code:`--intf-abi CONTRACT|FILE`   Output ABI of contract CONTRACT as Solidity Interface 
+
 * :code:`--list`   List known contracts
 
 * :code:`--new NAME`   Create template file for contract NAME
@@ -466,7 +468,7 @@ Where options are:
 
 * :code:`--sign ACCOUNT`   Deploy using this keypair
 
-* :code:`--sol-abi CONTRACT`   Output ABI of contract CONTRACT as Solidity 
+* :code:`--sol-abi CONTRACT|FILE`   Output ABI of contract CONTRACT as Solidity 
 
 
 ft crawler
