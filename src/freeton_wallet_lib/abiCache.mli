@@ -18,7 +18,7 @@ val replace_addr : abis:t -> address:string -> string
 val create : Types.config -> abis:string list -> t
 
 val parse_message_body :
-  client:Ton_types.client ->
+  client:Ton_sdk.TYPES.client ->
   abis:t ->
   Ton_encoding.message ->
   string option

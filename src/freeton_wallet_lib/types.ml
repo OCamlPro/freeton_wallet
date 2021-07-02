@@ -19,7 +19,7 @@ type account = {
 type key = {
   key_name : string ;                           [@key "name"]
   mutable key_passphrase : string option ;      [@key "passphrase"]
-  mutable key_pair : Ton_types.keypair option ; [@key "pair"]
+  mutable key_pair : Ton_sdk.TYPES.keypair option ; [@key "pair"]
   mutable key_account : account option ;        [@key "account"]
 } [@@deriving json_encoding]
 
