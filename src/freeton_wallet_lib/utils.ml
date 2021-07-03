@@ -401,8 +401,8 @@ let call_run config ?client ~wait
 let call_contract
     config ~address ~contract ~meth ~params
     ?client ?src ?(local=false) ?subst ?(wait=false)  () =
-  Misc.with_contract contract
-    (fun ~contract_tvc:_ ~contract_abi ->
+  Misc.with_contract_abi contract
+    (fun ~contract_abi ->
        if Globals.use_ton_sdk then
          let node = Config.current_node config in
          let keypair = match src with

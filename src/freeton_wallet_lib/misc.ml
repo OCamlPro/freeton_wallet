@@ -353,6 +353,12 @@ let with_contract contract f =
 
   f ~contract_tvc ~contract_abi
 
+let with_contract_abi contract f =
+
+  let contract_abi = get_contract_abifile contract in
+
+  f ~contract_abi
+
 let delete_account config net name =
   let found = ref false in
   net.net_keys <- List.filter (fun key ->
