@@ -459,7 +459,8 @@ let call_contract
                )
     )
 
-let deploy_contract config ~key ?sign ~contract ~params ~wc ?client () =
+let deploy_contract config ~key ?sign ~contract ~params
+     ~wc ?initial_data ?client () =
   let sign = match sign with
     | None -> key
     | Some sign -> sign
@@ -485,6 +486,7 @@ let deploy_contract config ~key ?sign ~contract ~params ~wc ?client () =
                    ~abi: contract_abi
                    ~params
                    ~keypair
+                   ?initial_data
                    ()
                in
                Printf.eprintf "Contract deployed at %s\n%!" addr;
@@ -512,6 +514,7 @@ let deploy_contract config ~key ?sign ~contract ~params ~wc ?client () =
            key.key_account <- Some { acc_address ;
                                      acc_contract = Some contract ;
                                      acc_workchain = wc ;
+                                     acc_static_vars = initial_data ;
                                    };
            config.modified <- true
         )

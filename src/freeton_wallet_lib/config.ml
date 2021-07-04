@@ -32,7 +32,9 @@ let remote_account ?key_pair ?key_passphrase key_name ?contract:acc_contract acc
     key_account = Some
         { acc_address ;
           acc_contract ;
-          acc_workchain = None } ;
+          acc_workchain = None ;
+          acc_static_vars = None ;
+        } ;
   }
 
 let mainnet_keys = [
@@ -40,6 +42,13 @@ let mainnet_keys = [
     "0:9ce35b55a00da91cfc70f649b2a2a58414d3e21ee8d1eb80dab834d442f33606" ;
 ]
 
+let surf_account acc_address =
+
+  Some  { acc_address ;
+          acc_contract = Some "SetcodeMultisigWallet2" ;
+          acc_workchain = None ;
+          acc_static_vars = None ;
+        }
 let sandbox_keys = [
   remote_account "giver"
     "0:841288ed3b55d9cdafa806807f02a0ae0c169aa5edfe88a789a6482429756a94"
@@ -67,12 +76,9 @@ let sandbox_keys = [
             "a327b480cb40bdd0593b23ca85777ac9582ad250d67990b0dee778a1e2766382";
           secret = Some
               "32582b1650409f5025454d57329a7bc05ecbd0303ff0080154f0f965d12437d8" };
-    key_account = Some
-        { acc_address =
-            "0:d0eeb6beda8c7ef8e190cfc859fdb1d642f59c08ad9d52b117262d2fcc910f17" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:d0eeb6beda8c7ef8e190cfc859fdb1d642f59c08ad9d52b117262d2fcc910f17" ;
   };
   { key_name = "user8" ;
     key_passphrase = Some
@@ -82,12 +88,9 @@ let sandbox_keys = [
             "d207f8fb2fccf047245e7b86866b39ac655c5f28baae3a02eafbae6d6427221d" ;
           secret = Some
               "8973bbcd27e6e8eced2c734e326498a57b906bf4a8d61659a2ef58fb2c453afb" };
-    key_account = Some
-        { acc_address =
-            "0:dd343a443b3cb7542d6f0d6fafae3bbd36329c32d33b0ca9113f399150acd3bc" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:dd343a443b3cb7542d6f0d6fafae3bbd36329c32d33b0ca9113f399150acd3bc" ;
   };
   { key_name = "user7" ;
     key_passphrase = Some
@@ -97,12 +100,9 @@ let sandbox_keys = [
             "675a6987fbf9d6e5ed26936795492dc319e1c39fe4145745d73896c277542d52" ;
           secret = Some
               "14c354b9c554d68129cff59c1b9cbbe2950c0c8391eb9273001e1cbb45194a33" };
-    key_account = Some
-        { acc_address =
-            "0:beb854d8de3a9845fa8139563af47cad4dcefbda7991f4e5f577743f73994d71" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:beb854d8de3a9845fa8139563af47cad4dcefbda7991f4e5f577743f73994d71" ;
   };
   { key_name = "user6" ;
     key_passphrase = Some
@@ -112,12 +112,9 @@ let sandbox_keys = [
             "a1155f4dad62d2936e2ee1da26f7e352a6574625cb0d9c4431f5bc4e4879fcc2" ;
           secret = Some
               "3a741642e6c01014d7c359a6548c216c118d9612d9d734dac11ed6c4217e43c6" };
-    key_account = Some
-        { acc_address =
-            "0:649ac71c032f04894d19fd0467deee43ac84db5fc5ebfc298974850502b1fdb5" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:649ac71c032f04894d19fd0467deee43ac84db5fc5ebfc298974850502b1fdb5" ;
   };
   { key_name = "user5" ;
     key_passphrase = Some
@@ -127,12 +124,9 @@ let sandbox_keys = [
             "43c9873928299e674c37f41b11b8fbf92b4131fcf5102fcce19e59469a8ab747" ;
           secret = Some
               "30b74dd563917bafe3269f298350cdfc5d10eb44efee4d7623a9635536d2af54" };
-    key_account = Some
-        { acc_address =
+    key_account =
+      surf_account
             "0:215879e44133ad2dbf62816fdaefeccd3ced279ab4324966736d9a6cb5532c47" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
   };
   { key_name = "user4" ;
     key_passphrase = Some
@@ -142,12 +136,8 @@ let sandbox_keys = [
             "c5f199fd3a88385901eab994fddbf90ff9899495e9fe3fb1ccbc076d134abf35" ;
           secret = Some
               "06090e0a7c3b9dacc64da8047096f81046736f28c49629f2f26ab8ae8e506bf0" };
-    key_account = Some
-        { acc_address =
-            "0:b52e00b619de1c2b002aef084cbf9d66efa0b58f94897d72ad586f7b2ed9a2f3" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account = surf_account
+        "0:b52e00b619de1c2b002aef084cbf9d66efa0b58f94897d72ad586f7b2ed9a2f3" ;
   };
   { key_name = "user3" ;
     key_passphrase = Some
@@ -157,12 +147,8 @@ let sandbox_keys = [
             "e950bca31326f661144c918020a10bfd6e1f3a6bd16dba504856c5983ae1363f" ;
           secret = Some
               "0138839a4d388ed882aaf4bed56841c5e3bd701884e791067e33e428f19a11e0" };
-    key_account = Some
-        { acc_address =
-            "0:e4fe3af7e0afc23fb1209dd956dd74cfaf7b805b16d6809047de7aa9ad65c354" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account = surf_account
+        "0:e4fe3af7e0afc23fb1209dd956dd74cfaf7b805b16d6809047de7aa9ad65c354" ;
   };
   { key_name = "user2" ;
     key_passphrase = Some
@@ -172,12 +158,9 @@ let sandbox_keys = [
             "d183edabfa08d900dd1b177948351817771cdd57ac9ff8576925ad76856689eb" ;
           secret = Some
               "6b51fc5b9419696f18252e2cf067e4a604bb8c06554718e289aa7724f8625753" };
-    key_account = Some
-        { acc_address =
-            "0:c0788ae1d2f2e698ef95cfe9c2221e1f334d69779bfdbd5c1bf22aa95eb91f4f" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:c0788ae1d2f2e698ef95cfe9c2221e1f334d69779bfdbd5c1bf22aa95eb91f4f" ;
   };
   { key_name = "user1" ;
     key_passphrase = Some
@@ -187,12 +170,9 @@ let sandbox_keys = [
             "0857aea8cc2c96b955095ee2ceaf71f6708db009caa720ca8cd962ca1aecb4f2" ;
           secret = Some
               "df0620047586fae3be0dc9f8c6b0191f5e70c6774642317ef452c835d36b3b37" };
-    key_account = Some
-        { acc_address =
-            "0:f89872394a383dc289f27ded48f02a6269e19d02be5821ba8081c67a1070588a" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:f89872394a383dc289f27ded48f02a6269e19d02be5821ba8081c67a1070588a" ;
   };
   { key_name = "user0" ;
     key_passphrase = Some
@@ -202,12 +182,9 @@ let sandbox_keys = [
             "fd9ee2babfa35b65917f732316dbb3d31935ccacd2a0aa92e043f8c762e0da28" ;
           secret = Some
               "7883b5b2962f1a2d4891f52a16f125b855b6be61f84b162a4476a2f240c9e2c9" } ;
-    key_account = Some
-        { acc_address =
-            "0:108f6113fb0cad8c98b70e8ea3cfd12b52710ec20441d05ceb78cacb4f5566b7" ;
-          acc_contract = Some "SetcodeMultisigWallet2" ;
-          acc_workchain = None ;
-        }
+    key_account =
+      surf_account
+        "0:108f6113fb0cad8c98b70e8ea3cfd12b52710ec20441d05ceb78cacb4f5566b7" ;
   }
 ]
 

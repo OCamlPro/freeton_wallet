@@ -238,7 +238,7 @@ let gen_keypair config passphrase =
     Sys.remove tmpfile;
     keypair
 
-let gen_address config keypair contract ~wc =
+let gen_address config keypair contract ~initial_data ~wc =
   Misc.with_contract contract
     (fun ~contract_tvc ~contract_abi ->
 
@@ -246,25 +246,27 @@ let gen_address config keypair contract ~wc =
          let abi = EzFile.read_file contract_abi in
          Ton_sdk.CRYPTO.generate_address
            ~tvc_file:contract_tvc
-           ~abi ~keypair
+           ~abi ~keypair ?initial_data
            ()
        else
+         match initial_data with
+         | Some _ -> Error.raise "Cannot use FT_USE_TONOS with initial data"
+         | None ->
+             Misc.with_keypair keypair (fun ~keypair_file ->
 
-       Misc.with_keypair keypair (fun ~keypair_file ->
+                 let stdout = Misc.call_stdout_lines @@
+                   Utils.tonoscli config ["genaddr" ;
+                                          contract_tvc ;
+                                          contract_abi ;
+                                          "--setkey" ; keypair_file ;
+                                          "--wc" ; Misc.string_of_workchain wc
+                                         ] in
+                 Misc.find_line_ok (function
+                     | [ "Raw" ; "address:" ; s ] -> Some s
+                     | _ -> None) stdout
+               ))
 
-           let stdout = Misc.call_stdout_lines @@
-             Utils.tonoscli config ["genaddr" ;
-                                   contract_tvc ;
-                                   contract_abi ;
-                                   "--setkey" ; keypair_file ;
-                                   "--wc" ; Misc.string_of_workchain wc
-                                  ] in
-           Misc.find_line_ok (function
-               | [ "Raw" ; "address:" ; s ] -> Some s
-               | _ -> None) stdout
-         ))
-
-let genaddr config contract key ~wc =
+let genaddr config contract ~initial_data key ~wc =
 
   let key_pair =
     match key.key_pair with
@@ -272,7 +274,7 @@ let genaddr config contract key ~wc =
         Error.raise "Cannot genaddr without  keypair for %S" key.key_name
     | Some key_pair -> key_pair
   in
-  let addr = gen_address config key_pair contract ~wc in
+  let addr = gen_address config key_pair contract ~initial_data ~wc in
   Printf.printf "Address (%s for %s=%s...): %s\n%!"
     contract key.key_name
     (String.sub key_pair.public 0 10) addr;
@@ -280,10 +282,11 @@ let genaddr config contract key ~wc =
       acc_address = addr ;
       acc_contract = Some contract ;
       acc_workchain = wc ;
+      acc_static_vars = initial_data ;
     };
   config.modified <- true
 
-let add_account config
+let add_account config ~initial_data
     ~name ~passphrase ~address ~contract ~wc ~keyfile ~force =
   let net = Config.current_network config in
   let key_name = name in
@@ -318,12 +321,17 @@ let add_account config
     | Some acc_address, _ , _ ->
         Some { acc_address ;
                acc_contract = contract ;
-               acc_workchain = wc ; }
+               acc_workchain = wc ;
+               acc_static_vars = initial_data ;
+             }
     | None, Some contract, Some keypair ->
-        let acc_address = gen_address config keypair contract ~wc in
+        let acc_address = gen_address config keypair contract
+            ~initial_data ~wc in
         Some { acc_address ;
                acc_contract = Some contract ;
-               acc_workchain = wc ;}
+               acc_workchain = wc ;
+               acc_static_vars = initial_data ;
+             }
     | None, Some _, None ->
         Error.raise "--contract CONTRACT requires either --address, --keyfile or --passphrase"
     | None, None, None -> None
@@ -337,7 +345,7 @@ let add_account config
   ()
 
 let change_account config
-    ~name ?passphrase ?address ?contract ?keyfile ?wc () =
+    ~name ?passphrase ?address ?contract ~initial_data ?keyfile ?wc () =
   let net = Config.current_network config in
   let key = match Misc.find_key net name with
     | None -> Error.raise "Unknown account %S cannot be modified\n%!" name
@@ -446,14 +454,24 @@ let change_account config
               | Some { acc_workchain ; _ } -> acc_workchain
         in
 
+        let initial_data = match initial_data with
+          | Some _ -> initial_data
+          | None ->
+              match key.key_account with
+              | None -> None
+              | Some { acc_static_vars ; _ } -> acc_static_vars
+        in
+
         let key_account =
           match acc_contract with
           | None -> None
           | Some contract ->
-              let acc_address = gen_address config key_pair contract ~wc in
+              let acc_address = gen_address config key_pair contract
+                  ~initial_data ~wc in
               Some { acc_address ;
                      acc_contract = Some contract ;
-                     acc_workchain = wc
+                     acc_workchain = wc ;
+                     acc_static_vars = initial_data ;
                    }
         in
 
@@ -498,14 +516,25 @@ let change_account config
               | Some { acc_workchain ; _ } -> acc_workchain
         in
 
+        let initial_data = match initial_data with
+          | Some _ -> initial_data
+          | None ->
+              match key.key_account with
+              | None -> None
+              | Some { acc_static_vars ; _ } -> acc_static_vars
+        in
+
         let key_account =
           match acc_contract with
           | None -> None
           | Some contract ->
-              let acc_address = gen_address config key_pair contract ~wc in
+              let acc_address = gen_address config key_pair contract
+                  ~initial_data ~wc in
               Some { acc_address ;
                      acc_contract = Some contract ;
-                     acc_workchain = wc }
+                     acc_workchain = wc ;
+                     acc_static_vars = initial_data ;
+                   }
         in
 
         begin
@@ -542,6 +571,14 @@ let change_account config
               | Some { acc_workchain ; _ } -> acc_workchain
         in
 
+        let initial_data = match initial_data with
+          | Some _ -> initial_data
+          | None ->
+              match key.key_account with
+              | None -> None
+              | Some { acc_static_vars ; _ } -> acc_static_vars
+        in
+
         match address, acc_contract, key.key_pair with
         | Some _,  _, Some _ ->
             Error.raise
@@ -550,7 +587,9 @@ let change_account config
 
             key.key_account <- Some { acc_address ;
                                       acc_contract ;
-                                      acc_workchain = wc };
+                                      acc_workchain = wc ;
+                                      acc_static_vars = initial_data ;
+                                    };
             config.modified <- true
 
         | None, Some _, None ->
@@ -567,11 +606,14 @@ let change_account config
             if key.key_account <> None then
               Error.raise "You must clear address before changing contract";
 
-            let acc_address = gen_address config key_pair contract ~wc in
+            let acc_address = gen_address config key_pair contract
+                ~initial_data ~wc in
             key.key_account <-
               Some { acc_address ;
                      acc_contract = Some contract ;
-                     acc_workchain = wc };
+                     acc_workchain = wc ;
+                     acc_static_vars = initial_data ;
+                   };
             config.modified <- true
 
   end;
@@ -598,7 +640,7 @@ let get_live accounts =
     ) accounts
 
 
-let genkey ?name ?contract config ~force =
+let genkey ?name ?contract ?initial_data config ~force =
   let net = Config.current_network config in
   begin
     match name with
@@ -652,11 +694,11 @@ let genkey ?name ?contract config ~force =
       match contract with
       | None -> ()
       | Some contract ->
-          change_account config ~name ~contract ()
+          change_account config ~name ~contract ~initial_data ()
 
 let action accounts ~list ~info
     ~create ~delete ~passphrase ~address ~contract ~keyfile ~live ~wc
-    ~force =
+    ~force ~initial_data =
   let config = Config.config () in
   match passphrase, address, contract, keyfile, wc with
   | None, None, _, None, None when
@@ -667,7 +709,7 @@ let action accounts ~list ~info
         | _ ->
             let contract = Option.map Misc.fully_qualified_contract contract in
             List.iter (fun name ->
-                genkey ~name config ?contract ~force
+                genkey ~name config ?contract ?initial_data ~force
               ) accounts;
       else
       if delete then
@@ -691,9 +733,11 @@ let action accounts ~list ~info
           if create then
             add_account config
               ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
+              ~initial_data
           else
             change_account config
-              ~name ?passphrase ?address ?contract ?keyfile ?wc ()
+              ~name ?passphrase ?address ?contract ?keyfile ?wc
+              ~initial_data ()
 
 let cmd =
   let passphrase = ref None in
@@ -708,6 +752,7 @@ let cmd =
   let live = ref false in
   let wc = ref None in
   let force = ref false in
+  let static_vars = ref None in
   EZCMD.sub
     "account"
     (fun () -> action
@@ -723,6 +768,7 @@ let cmd =
         ~live:!live
         ~wc:!wc
         ~force:!force
+        ~initial_data:!static_vars
     )
     ~args:
       [ [],
@@ -761,6 +807,10 @@ let cmd =
         [ "contract"],
         Arg.String (fun s -> contract := Some s),
         EZCMD.info ~docv:"CONTRACT" "Contract for account";
+
+        [ "static-vars"],
+        Arg.String (fun s -> static_vars := Some s),
+        EZCMD.info ~docv:"JSON" "Set static vars for account";
 
         [ "surf" ],
         Arg.Unit (fun () -> contract := Some "SetcodeMultisigWallet2"),

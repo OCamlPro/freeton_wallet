@@ -14,6 +14,7 @@ type account = {
   acc_address : string ;                 [@key "address"]
   mutable acc_contract : string option ; [@key "contract"]
   mutable acc_workchain : int option ;   [@key "workchain"]
+  mutable acc_static_vars : string option ; [@key "static_vars"]
 } [@@deriving json_encoding]
 
 type key = {
