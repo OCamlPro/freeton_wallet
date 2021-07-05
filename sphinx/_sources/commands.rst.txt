@@ -200,6 +200,8 @@ Where options are:
 
 * :code:`--passphrase PASSPHRASE`   BIP39 Passphrase for account
 
+* :code:`--static-vars JSON`   Set static vars for account
+
 * :code:`--surf`   Contract should be TON Surf contract
 
 * :code:`--wc WORKCHAIN`   The workchain (default is 0)
@@ -470,6 +472,8 @@ Where options are:
 
 * :code:`--sol-abi CONTRACT|FILE`   Output ABI of contract CONTRACT as Solidity 
 
+* :code:`--static-vars JSON`   Set static vars for account
+
 
 ft crawler
 ~~~~~~~~~~~~
@@ -620,6 +624,8 @@ Where options are:
 * :code:`--create`   Create new key
 
 * :code:`--force` or :code:`-f`   Override existing contracts with --create
+
+* :code:`--static-vars JSON`   Set static vars for account
 
 * :code:`--surf`   Use TON Surf contract
 
