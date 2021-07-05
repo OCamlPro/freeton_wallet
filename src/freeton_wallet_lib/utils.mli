@@ -34,6 +34,7 @@ val deploy_contract :
   key:Types.key ->
   ?sign:Types.key ->
   contract:string -> params:string -> wc:int option ->
+  ?initial_data: string ->
   ?client:Ton_sdk.TYPES.client ->
   unit -> unit
 

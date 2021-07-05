@@ -70,6 +70,7 @@ let check_account ?(unknown=ref []) config ~abis ~address =
                     acc_address = address ;
                     acc_contract ;
                     acc_workchain = None ;
+                    acc_static_vars = None ;
                   } ;
               } :: net.net_keys ;
             config.modified <- true

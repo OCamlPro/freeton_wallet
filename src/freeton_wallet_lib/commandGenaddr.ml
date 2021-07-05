@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action name contract create wc ~force =
+let action name contract create wc initial_data ~force =
   let config = Config.config () in
   let net = Config.current_network config in
   match name with
@@ -32,7 +32,8 @@ let action name contract create wc ~force =
         | Some key ->
             if create then
               Error.raise "Key %S alreay exists and cannot be created" name;
-            CommandAccount.genaddr config contract key ~wc
+            CommandAccount.genaddr config contract key
+              ~initial_data ~wc
 
       in
       iter create
@@ -43,9 +44,11 @@ let cmd =
   let create = ref false in
   let wc = ref None in
   let force = ref false in
+  let static_vars = ref None in
   EZCMD.sub
     "genaddr"
-    (fun () -> action !name !contract !create !wc ~force:!force)
+    (fun () -> action !name !contract !create !wc
+        !static_vars ~force:!force)
     ~args:
       [
         [],
@@ -66,6 +69,10 @@ let cmd =
         [ "create" ],
         Arg.Set create,
         EZCMD.info "Create new key";
+
+        [ "static-vars"],
+        Arg.String (fun s -> static_vars := Some s),
+        EZCMD.info ~docv:"JSON" "Set static vars for account";
 
         [ "force" ; "f" ], Arg.Set force,
         EZCMD.info "Override existing contracts with --create";

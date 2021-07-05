@@ -307,7 +307,7 @@ let create_new_version contract num =
   contract_dir // num
 
 let action ~todo ~force ~params ~wc ?create ?sign ~deployer
-    ?contract () =
+    ?initial_data ?contract () =
   match todo with
   | ListContracts -> CommandList.list_contracts ()
   | ShowABI contract ->
@@ -472,7 +472,8 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
             let sign =
               match sign with
               | None ->
-                  CommandAccount.genkey ~name:dst ~contract config ~force:false;
+                  CommandAccount.genkey ~name:dst
+                    ~contract ?initial_data config ~force:false;
                   None
               | Some sign ->
                   let sign = Misc.find_key_exn net sign in
@@ -482,12 +483,14 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
                     | Some key_pair -> key_pair
                   in
                   let acc_address =
-                    CommandAccount.gen_address config key_pair contract ~wc:None
+                    CommandAccount.gen_address config key_pair contract
+                      ~initial_data ~wc:None
                   in
                   let key_account = Some {
                       acc_address ;
                       acc_contract = Some contract ;
                       acc_workchain = None;
+                      acc_static_vars = initial_data ;
                     } in
                   let key = { key_name = dst ;
                               key_account = key_account ;
@@ -507,23 +510,35 @@ let action ~todo ~force ~params ~wc ?create ?sign ~deployer
               ~amount:"1" ();
             Config.save config;
             dst, sign
-        | UseAccount dst -> dst, None
+        | UseAccount dst ->
+            begin
+              match initial_data with
+              | None -> ()
+              | Some _ ->
+                  Error.raise "--initial_data can only be used with --create"
+            end;
+            dst, None
       in
       let key = Misc.find_key_exn net dst in
       begin
         match key.key_account with
-        | Some { acc_contract = Some acc_contract ; _ } ->
-            if acc_contract <> contract then
-              Error.raise "Wrong contract %S for dest %S" acc_contract dst
+        | Some { acc_contract = Some acc_contract ; _ } when
+            acc_contract <> contract ->
+            Error.raise "Wrong contract %S for dest %S" acc_contract dst;
         | _ -> ()
       end;
+      let initial_data = match key.key_account with
+        | Some { acc_static_vars ; _ } -> acc_static_vars
+        | None -> Error.raise "Destination %S has no address" dst
+      in
       let sign = match sign with
         | None -> key
         | Some sign -> sign
       in
       Subst.with_substituted config params (fun params ->
           Printf.eprintf "Deploying contract %S to %s\n%!" contract dst;
-          Utils.deploy_contract config ~key ~sign ~contract ~params ~wc ())
+          Utils.deploy_contract config ~key ~sign ~contract ~params
+            ?initial_data ~wc ())
 
 let tab = '\t'
 
@@ -642,6 +657,7 @@ let cmd =
   let force = ref false in
   let params = ref "{}" in
   let wc = ref None in
+  let static_vars = ref None in
   let create = ref None in
   let deployer = ref None in
   let sign = ref None in
@@ -659,6 +675,7 @@ let cmd =
                ?sign:!sign
                ~deployer:!deployer
                ?contract:!contract
+               ?initial_data:!static_vars
                ()
            )
     )
@@ -724,6 +741,10 @@ let cmd =
 
         [ "sign" ], Arg.String (fun s -> sign := Some s),
         EZCMD.info ~docv:"ACCOUNT" "Deploy using this keypair";
+
+        [ "static-vars"],
+        Arg.String (fun s -> static_vars := Some s),
+        EZCMD.info ~docv:"JSON" "Set static vars for account";
 
         [ "deployer" ], Arg.String (fun s -> deployer := Some s),
         EZCMD.info ~docv:"ACCOUNT"
