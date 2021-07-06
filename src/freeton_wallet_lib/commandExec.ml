@@ -13,6 +13,8 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
+(* TODO: we should do something special to remove the need for -- *)
+
 let cmd =
   let args = ref [] in
   let stdout = ref None in
