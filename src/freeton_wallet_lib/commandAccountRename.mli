@@ -10,17 +10,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val save : Types.config -> unit
-val config : unit -> Types.config
-val sandbox_keys : Types.key list
-
-val print : unit -> unit
-
-val set_temporary_switch : string -> unit
-val set_switch : Types.config -> string -> unit
-
-val current_network : Types.config -> Types.network
-val current_node : Types.config -> Types.node
-val loaded : unit -> bool
-
-val load_wallet : Types.network -> unit
+val cmd : Ezcmd.V2.EZCMD.TYPES.sub

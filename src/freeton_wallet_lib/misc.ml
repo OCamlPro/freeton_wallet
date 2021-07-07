@@ -165,7 +165,7 @@ let find_key net name =
 
 let find_key_exn net name =
   match find_key net name with
-  | None -> Error.raise "Key %S does not exist in network %s"
+  | None -> Error.raise "Key %S does not exist in network %S"
               name net.net_name
   | Some key -> key
 

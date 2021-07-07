@@ -46,6 +46,8 @@ let main () =
       [ "list" ], CommandList.cmd;    (* DEPRECATED *)
 *)
 
+      [ "account" ; "copy" ; "from" ], CommandAccountCopyFrom.cmd;
+      [ "account" ; "rename" ], CommandAccountRename.cmd;
       [ "account" ; "create" ], CommandAccountCreate.cmd;
       [ "account" ; "whois" ], CommandAccountWhois.cmd;
       [ "account" ; "info" ], CommandAccountInfo.cmd;

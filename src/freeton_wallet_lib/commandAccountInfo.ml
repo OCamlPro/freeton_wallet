@@ -95,7 +95,7 @@ let string_of_nanoton v =
 let get_account_info config ~name ~address =
   match get_account_info config address with
   | None ->
-      Printf.printf "Account %S: not yet created\n%!" name
+      Printf.printf "Account %S: not yet created (empty balance)\n%!" name
   | Some account ->
       Printf.printf "Account %S: %s\n%!" name
         (match account.acc_balance with
@@ -200,9 +200,9 @@ let cmd =
         Arg.Anons (fun args -> accounts := args),
         EZCMD.info "Name of account" ;
 
-        [ "info" ] ,
+        [ "all" ] ,
         Arg.Set info,
-        EZCMD.info "Display account parameters" ;
+        EZCMD.info "Display all account parameters" ;
 
         [ "live" ],
         Arg.Set live,
@@ -212,45 +212,12 @@ let cmd =
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "This command can perform the following actions:";
-        `I ("1.", "Display information on given accounts, either locally or from the blockchain");
-        `I ("2.", "Create new accounts");
-        `I ("3.", "Add information to existing accounts");
-        `I ("4.", "Delete existing accounts");
-      ];
-      `S "DISPLAY LOCAL INFORMATION";
-      `Blocks [
+        `P "This command displays information on given accounts, either locally or from the blockchain";
         `P "Examples:";
-        `Pre {|ft account --list|};
-        `Pre {|ft account my-account --info|}
-      ];
-      `S "DISPLAY BLOCKCHAIN INFORMATION";
-      `Blocks [
-        `P "Accounts must have an address on the blockchain.";
-        `P "Examples:";
-        `Pre {|ft account my-account|};
-        `Pre {|ft account|};
-      ];
-      `S "CREATE NEW ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account --create account1 account2 account3|};
-        `Pre {|ft account --create new-account --passphrase "some known passphrase"|};
-        `Pre {|ft account --create new-account --contract SafeMultisigWallet|};
-        `Pre {|ft account --create new-address --address 0:1234...|};
-        `P "Only the last one will compute an address on the blockchain, since the contract must be known.";
-      ];
-      `S "COMPLETE EXISTING ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account old-account --contract SafeMultisigWallet|};
-      ];
-      `S "DELETE EXISTING ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account --delete account1 account2|};
+        `Pre {|ft account info my-account|};
+        `Pre {|ft account info my-account --all|}
       ];
 
     ]
     ~doc:
-      "Get account info (local or from blockchain), or create/modify/delete accounts."
+      "Get account info (local or from blockchain)."
