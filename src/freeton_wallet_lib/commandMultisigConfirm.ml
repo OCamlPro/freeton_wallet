@@ -38,43 +38,33 @@ let send_confirm ~account ?src ~tx_id () =
     ~src
     ()
 
-let action account ~confirm ~src =
-
-  let account = match account with
-    | None ->
-        Error.raise "You must provide the account"
-    | Some account -> account
-  in
-  match confirm with
-  | None ->
-      Error.raise "You must provide the transaction number to confirm"
-  | Some tx_id ->
-        send_confirm ~account ~tx_id ?src ()
+let action ~account ~transactions ~src =
+  List.iter (fun tx_id ->
+      send_confirm ~account ~tx_id ?src ()
+    ) transactions
 
 let cmd =
-  let account = ref None in
-  let confirm = ref None in
+  let args = ref [] in
   let src = ref None in
   EZCMD.sub
     "multisig confirm"
     (fun () ->
-       action !account
-         ~confirm:!confirm
-         ~src:!src
+       match !args with
+       | [] | [ _ ] ->
+           Error.raise "You must at least provide the ACCOUNT and the TX_ID"
+       | account :: transactions ->
+           action ~account ~transactions ~src:!src
     )
     ~args:
       [
-        [], Arg.Anon (0, fun s -> account := Some s),
-        EZCMD.info ~docv:"ACCOUNT" "The multisig account";
+        [], Arg.Anons ( fun list -> args := list),
+        EZCMD.info ~docv:"ACCOUNT TX_ID" "The multisig account and the TX_ID";
 
         [ "src" ], Arg.String (fun s -> src := Some s),
         EZCMD.info ~docv:"ACCOUNT" "The multisig account";
 
-        [], Arg.Anon (1, fun s -> confirm := Some s),
-        EZCMD.info ~docv:"TX_ID" "Confirm transaction";
-
       ]
-    ~doc: "Manage a multisig-wallet (create, confirm, send)"
+    ~doc: "Confirm transactions on a multisig-wallet"
     ~man:[
       `S "DESCRIPTION";
       `P "This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.";
