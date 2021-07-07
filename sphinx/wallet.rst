@@ -11,7 +11,7 @@ Creating Accounts
 
 To create a new account, you may use::
 
-  $ ft account --create user10
+  $ ft account create user10
   { "public": "fcb4663820d060d605d8642f590ea68b69e2bc039168a5887325e749385afe05",
   "secret": "b6056a37deac87aa4889ed092d593762fed7641adff1621281337ae2fa8da26b" }
   Key for user "user10" generated
@@ -19,7 +19,7 @@ To create a new account, you may use::
 To be able to use this account, you may want to associate a contract
 with that account::
 
-  $ ft account user10 --surf
+  $ ft account set user10 --surf
   {
   "name": "user10",
   "passphrase": "pumpkin juice main spray accident wisdom scene organ lesson suit pen swear",
@@ -41,7 +41,7 @@ use :code:`ft list` to check the full list).
   
 It is possible to query the balance for such an account::
 
-  $  ft account user10
+  $  ft account info user10
   Account "user10": 999.944_105_999 TONs
 
 You can use the argument :code:`-v` to display more information.
@@ -55,7 +55,7 @@ perform these operations in the following Multisig section.
 Note that you may create an account by providing only its address and
 contract::
 
-  $ ft account --create user13 \
+  $ ft account create user13 \
     --address 0:28b049f29b97c5a473f68198f413d0e516509c60a842020ed5e92185eeae0ada \
     --contract SetcodeMultisigWallet2
   Account created.
@@ -96,27 +96,27 @@ some tokens on it to pay for the smart contract deployment.
 To create a single-owner multisig
 ::
   
-  # ft multisig -a my-account --create
+  # ft multisig create my-account
 
 To create a multi-owners multisig:
 ::
   
-  # ft multisig -a my-account --create owner2 owner3 owner4
+  # ft multisig create my-account owner2 owner3 owner4
 
 To create a multi-owners multisig with 2 signs required:
 ::
   
-  # ft multisig -a my-account --create owner2 owner3 --req 2
+  # ft multisig create my-account owner2 owner3 --req 2
 
 To create a multi-owners multisig not self-owning:
 ::
   
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
+  # ft multisig create my-account owner1 owner2 owner3 --not-owner
 
 Verify that it worked:
 ::
   
-  # ft account my-account -v
+  # ft account info my-account -v
 
 
 **GET CUSTODIANS**
@@ -125,7 +125,7 @@ Verify that it worked:
 To get the list of signers:
 ::
   
-  # ft multisig -a my-account --custodians"
+  # ft multisig list custodians my-account
 
 
 **SEND TOKENS**
@@ -134,17 +134,17 @@ To get the list of signers:
 Should be like that:
 ::
   
-  # ft multisig -a my-account --transfer 100.000 --to other-account
+  # ft multisig transfer 100.000 --from my-account --to other-account
 
 If the target is not an active account:
 ::
   
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
+  # ft multisig transfer 100.000 --from my-account --to other-account --parrain
 
 To send all the balance:
 ::
   
-  # ft multisig -a my-account --transfer all --to other-account
+  # ft multisig transfer all --from my-account --to other-account
 
 
 **LIST WAITING TRANSACTIONS**
@@ -153,7 +153,7 @@ To send all the balance:
 Display transactions waiting for confirmations:
 ::
   
-  # ft multisig -a my-account --waiting
+  # ft multisig list transactions my-account
 
 
 **CONFIRM TRANSACTION**
@@ -162,7 +162,7 @@ Display transactions waiting for confirmations:
 Get the transaction ID from above, and use:
 ::
   
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig confirm my-account TX_ID
 
 
 

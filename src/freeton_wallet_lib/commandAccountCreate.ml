@@ -14,19 +14,6 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-(*
-Known code hashes:
-* DePool:
-14e20e304f53e6da152eb95fffc993dbd28245a775d847eed043f7c78a503885
-* SetcodeMultisigWallet2:
-207dc560c5956de1a2c1479356f8f3ee70a59767db2bf4788b1d61ad42cdad82
-* Giver:
-fdfab26e1359ddd0c247b0fb334c2cc3943256a263e75d33e5473567cbe2c124
-
-*)
-
-type account_type = Uninit
-
 let get_account_info config address =
   let addr = Misc.raw_address address in
   let open Ton_sdk in
@@ -127,90 +114,6 @@ let get_key_info config key ~info =
     in
     get_account_info config ~address ~name:key.key_name
 
-let shorten_key s =
-  let len = String.length s in
-  Printf.sprintf "%s/%s" (String.sub s 0 4) (String.sub s (len-4) 4)
-
-let shorten_addr s =
-  let len = String.length s in
-  Printf.sprintf "%s/%s" (String.sub s 0 6) (String.sub s (len-4) 4)
-
-let get_account_info accounts ~list ~info =
-
-  let config = Config.config () in
-  let net = Config.current_network config in
-  if list then
-    List.iter (fun key ->
-        Printf.printf "* %S%s%s%s\n"
-          key.key_name
-          (match key.key_passphrase with
-           | Some _ -> " P"
-           | None -> "")
-          (match key.key_pair with
-           | None -> ""
-           | Some pair ->
-               Printf.sprintf " %s%s"
-                 (shorten_key pair.public)
-                 (match pair.secret with
-                  | None -> ""
-                  | Some _ -> " P"))
-          (match key.key_account with
-           | None -> ""
-           | Some acc ->
-               Printf.sprintf " %s%s" (shorten_addr acc.acc_address)
-                 (match acc.acc_contract with
-                  | None -> ""
-                  | Some s -> Printf.sprintf " (%s)" s)
-          )
-      ) net.net_keys
-  else
-  if info then
-    match accounts with
-    | [] -> List.iter (fun key ->
-        match key.key_account with
-        | None -> ()
-        | Some _ ->
-            get_key_info config key ~info
-      ) net.net_keys
-    | names ->
-        List.iter (fun name ->
-            match Misc.find_key net name with
-            | None ->
-                Error.raise "No key %S in network %S" name net.net_name
-            | Some key ->
-                get_key_info config key ~info
-          ) names
-  else
-    match accounts with
-    | [] ->
-        List.iter (fun key ->
-            match key.key_account with
-            | None -> ()
-            | Some account ->
-                get_account_info config
-                  ~address:( Account account ) ~name:key.key_name
-          ) net.net_keys
-    | _ ->
-        List.iter (fun account ->
-            let address = Utils.address_of_account config account in
-            get_account_info config ~address ~name:account
-          ) accounts
-
-let whois address =
-  let config = Config.config () in
-  let net = Config.current_network config in
-  let re = Re.Str.regexp address in
-  List.iter (fun key ->
-      match key.key_account with
-      | None -> ()
-      | Some acc ->
-          match Re.Str.search_forward re acc.acc_address 0 with
-          | exception Not_found -> ()
-          | _ ->
-              Printf.printf "%s is %S\n%!" acc.acc_address key.key_name)
-    net.net_keys ;
-  exit 0
-
 let gen_passphrase config =
   if Globals.use_ton_sdk then
     Ton_sdk.CRYPTO.generate_mnemonic ()
@@ -265,26 +168,6 @@ let gen_address config keypair contract ~initial_data ~wc =
                      | [ "Raw" ; "address:" ; s ] -> Some s
                      | _ -> None) stdout
                ))
-
-let genaddr config contract ~initial_data key ~wc =
-
-  let key_pair =
-    match key.key_pair with
-    | None ->
-        Error.raise "Cannot genaddr without  keypair for %S" key.key_name
-    | Some key_pair -> key_pair
-  in
-  let addr = gen_address config key_pair contract ~initial_data ~wc in
-  Printf.printf "Address (%s for %s=%s...): %s\n%!"
-    contract key.key_name
-    (String.sub key_pair.public 0 10) addr;
-  key.key_account <- Some {
-      acc_address = addr ;
-      acc_contract = Some contract ;
-      acc_workchain = wc ;
-      acc_static_vars = initial_data ;
-    };
-  config.modified <- true
 
 let add_account config ~initial_data
     ~name ~passphrase ~address ~contract ~wc ~keyfile ~force =
@@ -623,22 +506,6 @@ let change_account config
     get_key_info config key ~info:true
   end
 
-let get_live accounts =
-  let config = Config.config () in
-  let net = Config.current_network config in
-  let host = match net.net_name with
-    | "mainnet" -> "ton.live"
-    | "testnet" -> "net.ton.live"
-    | _ -> assert false
-  in
-  List.iter (fun account ->
-      let address = Utils.address_of_account config account in
-      let addr = Misc.raw_address address in
-      let url = Printf.sprintf
-          "https://%s/accounts/accountDetails?id=%s" host addr in
-      Misc.call [ "xdg-open" ; url ]
-    ) accounts
-
 
 let genkey ?name ?contract ?initial_data config ~force =
   let net = Config.current_network config in
@@ -696,14 +563,13 @@ let genkey ?name ?contract ?initial_data config ~force =
       | Some contract ->
           change_account config ~name ~contract ~initial_data ()
 
-let action accounts ~list ~info
-    ~create ~delete ~passphrase ~address ~contract ~keyfile ~live ~wc
+let action accounts ~passphrase ~address ~contract ~keyfile ~wc
     ~force ~initial_data =
   let config = Config.config () in
   match passphrase, address, contract, keyfile, wc with
   | None, None, _, None, None when
-    ( contract = None || create ) ->
-      if create then
+      ( contract = None ) ->
+      begin
         match accounts with
           [] -> genkey config ~force
         | _ ->
@@ -711,18 +577,7 @@ let action accounts ~list ~info
             List.iter (fun name ->
                 genkey ~name config ?contract ?initial_data ~force
               ) accounts;
-      else
-      if delete then
-        let net = Config.current_network config in
-        List.iter (fun name ->
-            Misc.delete_account config net name
-          ) accounts;
-        Printf.eprintf "All provided accounts deleted.\n%!"
-      else
-      if live then
-        get_live accounts
-      else
-        get_account_info accounts ~list ~info
+      end
   | _ ->
       match accounts with
       | _ :: _ :: _ ->
@@ -730,42 +585,28 @@ let action accounts ~list ~info
             "Only one account can be created/specified with advanced options"
       | [] -> Error.raise "A new key name must be provided"
       | [ name ] ->
-          if create then
-            add_account config
-              ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
-              ~initial_data
-          else
-            change_account config
-              ~name ?passphrase ?address ?contract ?keyfile ?wc
-              ~initial_data ()
+          add_account config
+            ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
+            ~initial_data
 
 let cmd =
+  let accounts = ref [] in
   let passphrase = ref None in
   let address = ref None in
   let contract = ref None in
   let keyfile = ref None in
-  let accounts = ref [] in
-  let list = ref false in
-  let info = ref false in
-  let create = ref false in
-  let delete = ref false in
-  let live = ref false in
   let wc = ref None in
   let force = ref false in
   let static_vars = ref None in
   EZCMD.sub
-    "account"
-    (fun () -> action
+    "account create"
+    (fun () ->
+       action
         !accounts
-        ~list:!list
-        ~info:!info
-        ~create:!create
-        ~delete:!delete
         ~passphrase:!passphrase
         ~address:!address
         ~contract:!contract
         ~keyfile:!keyfile
-        ~live:!live
         ~wc:!wc
         ~force:!force
         ~initial_data:!static_vars
@@ -774,22 +615,6 @@ let cmd =
       [ [],
         Arg.Anons (fun args -> accounts := args),
         EZCMD.info "Name of account" ;
-
-        [ "list" ] ,
-        Arg.Set list,
-        EZCMD.info "List all accounts" ;
-
-        [ "info" ] ,
-        Arg.Set info,
-        EZCMD.info "Display account parameters" ;
-
-        [ "create" ] ,
-        Arg.Set create,
-        EZCMD.info "Create new account" ;
-
-        [ "delete" ; "remove" ] ,
-        Arg.Set delete,
-        EZCMD.info "Delete old accounts" ;
 
         [ "passphrase"],
         Arg.String (fun s -> passphrase := Some s),
@@ -824,15 +649,8 @@ let cmd =
         Arg.String (fun s -> keyfile := Some s),
         EZCMD.info ~docv:"KEYFILE" "Key file for account";
 
-        [ "live" ],
-        Arg.Set live,
-        EZCMD.info "Open block explorer on address";
-
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
         EZCMD.info ~docv:"WORKCHAIN" "The workchain (default is 0)";
-
-        [ "whois" ], Arg.String whois,
-        EZCMD.info ~docv:"ADDRESS" "Returns corresponding key name";
 
         [ "force" ; "f" ], Arg.Set force,
         EZCMD.info "Override existing contracts with --create";

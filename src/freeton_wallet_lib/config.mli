@@ -22,3 +22,5 @@ val set_switch : Types.config -> string -> unit
 val current_network : Types.config -> Types.network
 val current_node : Types.config -> Types.node
 val loaded : unit -> bool
+
+val load_wallet : Types.network -> unit

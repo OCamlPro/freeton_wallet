@@ -10,8 +10,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
+
+type cmd_node =
+  {
+    mutable node_cmd : sub option ;
+    mutable node_map : cmd_node StringMap.t ref ;
+    mutable node_commands : sub list ;
+  }
 
 let echo () =
   Printf.eprintf "CMD: \x1B[1;33m %s \x1B[0m \n%!"
@@ -28,27 +36,101 @@ let main () =
   Printexc.record_backtrace false;
   let commands =
     [
-      CommandSwitch.cmd;
-      CommandGenaddr.cmd; (* DEPRECATED *)
-      CommandList.cmd;    (* DEPRECATED *)
-      CommandAccount.cmd;
-      CommandClient.cmd;
-      CommandExec.cmd;
-      CommandOutput.cmd;
-      CommandMultisig.cmd;
-      CommandContract.cmd;
-      CommandTest.cmd;
-      CommandInit.cmd;
-      CommandNode.cmd;
-      CommandConfig.cmd;
-      CommandCall.cmd;
-      CommandUtils.cmd;
-      CommandWatch.cmd;
-      CommandInspect.cmd;
-      CommandCrawler.cmd;
-      CommandDebot.cmd;
+      [ "switch" ; "list" ], CommandSwitchList.cmd;
+      [ "switch" ; "to" ], CommandSwitchTo.cmd;
+      [ "switch" ; "create" ], CommandSwitchCreate.cmd;
+      [ "switch" ; "remove" ], CommandSwitchRemove.cmd;
+
+(*
+      [ "genaddr" ], CommandGenaddr.cmd; (* DEPRECATED *)
+      [ "list" ], CommandList.cmd;    (* DEPRECATED *)
+*)
+
+      [ "account" ; "copy" ; "from" ], CommandAccountCopyFrom.cmd;
+      [ "account" ; "rename" ], CommandAccountRename.cmd;
+      [ "account" ; "create" ], CommandAccountCreate.cmd;
+      [ "account" ; "whois" ], CommandAccountWhois.cmd;
+      [ "account" ; "info" ], CommandAccountInfo.cmd;
+      [ "account" ; "list" ], CommandAccountList.cmd;
+      [ "account" ; "set" ], CommandAccountSet.cmd;
+      [ "account" ; "remove" ], CommandAccountRemove.cmd;
+
+      [ "client" ], CommandClient.cmd;
+      [ "exec" ], CommandExec.cmd;
+      [ "output" ], CommandOutput.cmd;
+      [ "print"; "error" ], CommandPrintError.cmd;
+
+
+      [ "multisig" ; "create" ], CommandMultisigCreate.cmd;
+      [ "multisig" ; "transfer" ], CommandMultisigTransfer.cmd;
+      [ "multisig" ; "list" ; "transactions" ],
+      CommandMultisigListTransactions.cmd;
+      [ "multisig" ; "list" ; "custodians" ],
+      CommandMultisigListCustodians.cmd;
+      [ "multisig" ; "confirm" ], CommandMultisigConfirm.cmd;
+      [ "multisig" ; "debot" ], CommandMultisigDebot.cmd;
+
+      [ "contract"; "list" ], CommandContractList.cmd;
+      [ "contract"; "new" ], CommandContractNew.cmd;
+      [ "contract"; "new" ; "intf" ], CommandContractNewIntf.cmd;
+      [ "contract"; "build" ], CommandContractBuild.cmd;
+      [ "contract"; "deploy" ], CommandContractDeploy.cmd;
+      [ "contract"; "import" ], CommandContractImport.cmd;
+      [ "contract"; "abi" ], CommandContractAbi.cmd;
+      [ "contract"; "abi" ; "impl" ], CommandContractAbiImpl.cmd;
+      [ "contract"; "abi" ; "intf" ], CommandContractAbiIntf.cmd;
+
+      [ "test" ], CommandTest.cmd;
+      [ "init" ], CommandInit.cmd;
+
+      [ "node" ; "start" ], CommandNodeStart.cmd;
+      [ "node" ; "stop" ], CommandNodeStop.cmd;
+      [ "node" ; "give" ], CommandNodeGive.cmd;
+      [ "node" ; "live" ], CommandNodeLive.cmd;
+      [ "node" ; "web" ], CommandNodeWeb.cmd;
+      [ "node" ; "update" ], CommandNodeUpdate.cmd;
+
+      [ "config" ], CommandConfig.cmd;
+      [ "call" ], CommandCall.cmd;
+      [ "utils" ], CommandUtils.cmd;
+      [ "watch" ], CommandWatch.cmd;
+      [ "inspect" ], CommandInspect.cmd;
+      [ "crawler" ], CommandCrawler.cmd;
+      [ "debot" ], CommandDebot.cmd;
     ]
   in
+
+  let cmdmap =
+    let cmdmap = ref StringMap.empty in
+    let rec add_cmd map path cmd =
+      match path with
+        [] -> assert false
+      | name :: path ->
+          let node = match StringMap.find name !map with
+            | exception Not_found ->
+                let node = {
+                  node_cmd = None ;
+                  node_map = ref StringMap.empty ;
+                  node_commands = [] ;
+                } in
+                map := StringMap.add name node !map;
+                node
+            | node -> node
+          in
+          node.node_commands <- cmd :: node.node_commands ;
+          match path with
+          | [] ->
+              assert ( node.node_cmd = None );
+              node.node_cmd <- Some cmd
+          | _ -> add_cmd node.node_map path cmd
+    in
+    List.iter (fun ( path, cmd ) ->
+        add_cmd cmdmap path cmd
+      ) commands ;
+    !cmdmap
+  in
+
+  let ez_commands = List.map snd commands in
   let common_args =
     [
       [ "v"; "verbose" ],
@@ -65,18 +147,24 @@ let main () =
     ]
   in
   let args = Array.to_list Sys.argv in
-  let rec iter_initial_args args =
+
+  let rec iter_initial_args path map commands args =
     match args with
     | [] ->
-        Printf.eprintf "Use 'ft --help' for help on commands\n%!";
-        Config.print ();
-        []
+        begin
+          match path with
+          | [] ->
+              Printf.eprintf "Use 'ft --help' for help on commands\n%!";
+              Config.print ();
+              exit 0
+          | _ -> path, args, commands
+        end
     | "--switch" :: switch :: args ->
         Config.set_temporary_switch switch;
-        iter_initial_args args
+        iter_initial_args path map commands args
     | "--echo" :: args ->
         echo () ;
-        iter_initial_args args
+        iter_initial_args path map commands args
     | [ "--version" ] ->
         Printf.printf "%s\n%!" Version.version;
         exit 0
@@ -85,17 +173,29 @@ let main () =
         exit 0
     | ( "-v" | "--verbose" ) :: args ->
         increase_verbosity ();
-        iter_initial_args args
+        iter_initial_args path map commands args
     | ( "-q" | "--quiet" ) :: args ->
         Globals.verbosity := 0;
-        iter_initial_args args
+        iter_initial_args path map commands args
     | [ "rst" ] ->
-        Printf.printf "%s%!" ( EZCMD.to_rst commands common_args );
+        Printf.printf "%s%!" ( EZCMD.to_rst ez_commands common_args );
         exit 0
-    | _ -> args
+    | name :: rem_args ->
+        match StringMap.find name map with
+        | exception Not_found -> path, args, commands
+        | node ->
+            iter_initial_args
+              ( name :: path ) (! (node.node_map) )
+              node.node_commands
+              rem_args
   in
 
-  let args = iter_initial_args (List.tl args ) in
+  let path, args, ez_commands =
+    iter_initial_args [] cmdmap ez_commands (List.tl args ) in
+  let args = match path with
+    | [] -> args
+    | path -> ( String.concat " " (List.rev path) ) :: args
+  in
   let args = List.map (fun arg ->
       let len = String.length arg in
       if len > 20 && arg.[0] = '-' &&
@@ -117,7 +217,7 @@ let main () =
       | _ ->
           EZCMD.main_with_subcommands
             ~name:Globals.command ~version:Version.version
-            ~doc:"Create and manage an OCaml project" ~man:[] ~argv commands
+            ~doc:"Create and manage an OCaml project" ~man:[] ~argv ez_commands
             ~common_args;
     end;
     if Config.loaded () then
