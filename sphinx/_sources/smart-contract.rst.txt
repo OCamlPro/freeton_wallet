@@ -17,7 +17,7 @@ Let's suppose that we have a simple Free TON Solidity smart contract::
 
 First, let's try to compile it::
 
-  ─➤ ft contract --build Basic.sol
+  ─➤ ft contract build Basic.sol
   
   Calling /home/user/.ft/bin/solc Basic.sol
   Code was generated and saved to file Basic.code
@@ -42,7 +42,7 @@ then copied in the contract database of :code:`ft` under the name
 We will now try to run it locally. For that, let's create a sandbox
 network on the current computer::
 
-  ╰─➤ ft switch --create sandbox1
+  ╰─➤ ft switch create sandbox1
   
   Config loaded from /home/user/.ft/config.json
   Network: mainnet
@@ -58,7 +58,7 @@ constraint is for the name to start with :code:`sandbox`.
 
 Now, let's start the node::
   
-  ─➤ ft node --start
+  ─➤ ft node start
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1
@@ -68,7 +68,7 @@ Now, let's start the node::
 
 It is possible to check that the node is running using::
 
-  ─➤ ft node --web
+  ─➤ ft node web
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1
@@ -81,7 +81,7 @@ the server.
 Now, we also have a set of preconfigured users, but we will need some
 coins to be able to deploy the smart contract::
 
-  ─➤ ft account
+  ─➤ ft account info
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1
@@ -100,7 +100,7 @@ coins to be able to deploy the smart contract::
 
 So, let's ask the giver for some coins::
 
-  ╰─➤ ft node --give user1
+  ╰─➤ ft node give user1
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1
@@ -119,7 +119,7 @@ So, let's ask the giver for some coins::
 
 We can now check the account of :code:`user1`::
 
-  ╰─➤ ft account user1
+  ╰─➤ ft account info user1
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1
@@ -133,7 +133,7 @@ Now, let's deploy the contract :code:`Basic`. For that, we will create
 an account :code:`basic` and call the constructor with the argument
 :code:`"Hello World"`::
 
-  ─➤ ft contract --deploy Basic --create basic --params '{ "arg": "%{hex:string:Hello World}" }'
+  ─➤ ft contract deploy Basic --create basic --params '{ "arg": "%{hex:string:Hello World}" }'
   
   Config loaded from /home/user/.ft/config.json
   Network: sandbox1

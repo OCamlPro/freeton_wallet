@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Managing Multiple Accounts &mdash; freeton_wallet master
- (39f7955
-) (2021/07/05 12:46) documentation</title>
+ (4304577
+) (2021/07/07 17:51) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (39f7955
+ (4304577
 )
               </div>
             
@@ -182,7 +182,7 @@ and query information for such accounts.</p>
 <div class="section" id="creating-accounts">
 <h2>Creating Accounts<a class="headerlink" href="#creating-accounts" title="Permalink to this headline">¶</a></h2>
 <p>To create a new account, you may use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">user10</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">create</span> <span class="n">user10</span>
 <span class="o">{</span> <span class="s2">&quot;public&quot;</span><span class="o">:</span> <span class="s2">&quot;fcb4663820d060d605d8642f590ea68b69e2bc039168a5887325e749385afe05&quot;</span><span class="o">,</span>
 <span class="s2">&quot;secret&quot;</span><span class="o">:</span> <span class="s2">&quot;b6056a37deac87aa4889ed092d593762fed7641adff1621281337ae2fa8da26b&quot;</span> <span class="o">}</span>
 <span class="nc">Key</span> <span class="k">for</span> <span class="n">user</span> <span class="s2">&quot;user10&quot;</span> <span class="n">generated</span>
@@ -190,7 +190,7 @@ and query information for such accounts.</p>
 </div>
 <p>To be able to use this account, you may want to associate a contract
 with that account:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">user10</span> <span class="o">--</span><span class="n">surf</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">set</span> <span class="n">user10</span> <span class="o">--</span><span class="n">surf</span>
 <span class="o">{</span>
 <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;user10&quot;</span><span class="o">,</span>
 <span class="s2">&quot;passphrase&quot;</span><span class="o">:</span> <span class="s2">&quot;pumpkin juice main spray accident wisdom scene organ lesson suit pen swear&quot;</span><span class="o">,</span>
@@ -211,7 +211,7 @@ that on the Surf wallet. It is equivalent to using <code class="code docutils li
 predefined set of contracts, among which the one used by Surf (you can
 use <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">list</span></code> to check the full list).</p>
 <p>It is possible to query the balance for such an account:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span>  <span class="n">ft</span> <span class="n">account</span> <span class="n">user10</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span>  <span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="n">user10</span>
 <span class="nc">Account</span> <span class="s2">&quot;user10&quot;</span><span class="o">:</span> <span class="mi">999</span><span class="o">.</span><span class="mi">944_105_999</span> <span class="nc">TONs</span>
 </pre></div>
 </div>
@@ -223,7 +223,7 @@ depends on the size of the smart contract. We will explain how to
 perform these operations in the following Multisig section.</p>
 <p>Note that you may create an account by providing only its address and
 contract:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>$ ft account --create user13 \
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>$ ft account create user13 \
   --address 0:28b049f29b97c5a473f68198f413d0e516509c60a842020ed5e92185eeae0ada \
   --contract SetcodeMultisigWallet2
 Account created.
@@ -258,51 +258,51 @@ sub-command.</p>
 <p>To create a Multisig account, the account address must already have
 some tokens on it to pay for the smart contract deployment.</p>
 <p>To create a single-owner multisig</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">create</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
 <p>To create a multi-owners multisig:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="n">owner4</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">create</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="n">owner4</span>
 </pre></div>
 </div>
 <p>To create a multi-owners multisig with 2 signs required:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">req</span> <span class="mi">2</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">create</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">req</span> <span class="mi">2</span>
 </pre></div>
 </div>
 <p>To create a multi-owners multisig not self-owning:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner1</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">not</span><span class="o">-</span><span class="n">owner</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">create</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="n">owner1</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">not</span><span class="o">-</span><span class="n">owner</span>
 </pre></div>
 </div>
 <p>Verify that it worked:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">-</span><span class="n">v</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
 </div>
 <p><strong>GET CUSTODIANS</strong></p>
 <p>To get the list of signers:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">custodians</span><span class="s2">&quot;</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="kt">list</span> <span class="n">custodians</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
 <p><strong>SEND TOKENS</strong></p>
 <p>Should be like that:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="n">from</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
 <p>If the target is not an active account:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">parrain</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="n">from</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">parrain</span>
 </pre></div>
 </div>
 <p>To send all the balance:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="n">from</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
 <p><strong>LIST WAITING TRANSACTIONS</strong></p>
 <p>Display transactions waiting for confirmations:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">waiting</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="kt">list</span> <span class="n">transactions</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
 </pre></div>
 </div>
 <p><strong>CONFIRM TRANSACTION</strong></p>
 <p>Get the transaction ID from above, and use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">confirm</span> <span class="nc">TX_ID</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">confirm</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="nc">TX_ID</span>
 </pre></div>
 </div>
 </div>

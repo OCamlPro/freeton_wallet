@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Simple Use Cases &mdash; freeton_wallet master
- (39f7955
-) (2021/07/05 12:46) documentation</title>
+ (4304577
+) (2021/07/07 17:51) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (39f7955
+ (4304577
 )
               </div>
             
@@ -182,17 +182,17 @@
 <h2>List and Confirm Transactions on a Multisig<a class="headerlink" href="#list-and-confirm-transactions-on-a-multisig" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example of interactions with a Multisig contract:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span># switch to mainnet network
-ft switch mainnet
+ft switch to mainnet
 
 # register the contract
-ft account --create formet_subgov --contract SetcodeMultisigWallet2 \
+ft account create formet_subgov --contract SetcodeMultisigWallet2 \
     --address 0:1ec958fd022ab1d479dd722283fe5fd1d9de7196ee7f09f96b68e435776548c1
 
 # show available methods for this ABI
-ft contract --show-abi SetcodeMultisigWallet2
+ft contract abi SetcodeMultisigWallet2
 
 # start a transaction with payload
-ft multisig -a formet_subgov --transfer 10 --to other-account \
+ft multisig transfer 10 from formet_subgov --to other-account \
     this-method &#39;{ &quot;src&quot;: &quot;%{account:address:formet_subgov}&quot; }&#39;
 
 # list awaiting transactions
@@ -211,23 +211,23 @@ ft call formet_subgov  --sign me-as-custodian \
 list of commands will deploy and start the debot.</p>
 <p>First, let’s start by preparing a local network with TONOS SE:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="nc">Create</span> <span class="n">a</span> <span class="n">sandbox</span> <span class="n">network</span><span class="o">,</span> <span class="n">called</span> <span class="n">sandbox1</span>
-<span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="n">sandbox1</span>
+<span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="n">sandbox1</span>
 
 <span class="o">#</span> <span class="nc">Start</span> <span class="n">the</span> <span class="n">corresponding</span> <span class="n">node</span>
-<span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">start</span>
+<span class="n">ft</span> <span class="n">node</span> <span class="n">start</span>
 <span class="o">#</span> <span class="n">wait</span> <span class="mi">5</span> <span class="n">seconds</span> <span class="k">for</span> <span class="n">the</span> <span class="n">node</span> <span class="k">to</span> <span class="n">start</span>
 <span class="n">sleep</span> <span class="mi">5</span>
 
 <span class="o">#</span> <span class="n">user1</span> <span class="n">is</span> <span class="n">the</span> <span class="s2">&quot;deployer&quot;</span> <span class="k">for</span> <span class="n">contracts</span><span class="o">,</span> <span class="n">give</span> <span class="n">it</span> <span class="n">some</span> <span class="n">tokens</span>
-<span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">give</span> <span class="n">user1</span>
+<span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="n">user1</span>
 </pre></div>
 </div>
 <p>Now, we can build and deploy the debot:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span># build the contract
-ft contract --build helloDebot.sol -f
+ft contract build helloDebot.sol -f
 
 #deploy the contract
-ft contract --deploy helloDebot --create my-first-debot -f
+ft contract deploy helloDebot --create my-first-debot -f
 
 # set the ABI of the debot
 ft call my-first-debot setABI &#39;{ &quot;dabi&quot;: &quot;%{hex:read:contract:abi:helloDebot}&quot; }&#39;
@@ -246,7 +246,7 @@ ft client -- debot fetch %{account:address:my-first-debot}
 <p>The <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">watch</span></code> sub-command can be used to watch messages
 received by an account. It can be very useful when debugging smart
 contracts:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">watch</span> <span class="o">--</span><span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">contract</span> <span class="o">[--</span><span class="n">from</span> <span class="nc">BLOCKID</span><span class="o">]</span> <span class="o">[--</span><span class="n">timeout</span> <span class="nc">DELAY</span><span class="o">]</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">watch</span> <span class="n">my</span><span class="o">-</span><span class="n">contract</span> <span class="o">[--</span><span class="n">from</span> <span class="nc">BLOCKID</span><span class="o">]</span> <span class="o">[--</span><span class="n">timeout</span> <span class="nc">DELAY</span><span class="o">]</span>
 </pre></div>
 </div>
 <p>The account is either an account managed by the wallet, or an address.</p>

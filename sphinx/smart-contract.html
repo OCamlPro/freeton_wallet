@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Deploying a Solidity Contract &mdash; freeton_wallet master
- (39f7955
-) (2021/07/05 12:46) documentation</title>
+ (4304577
+) (2021/07/07 17:51) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (39f7955
+ (4304577
 )
               </div>
             
@@ -187,7 +187,7 @@
 </pre></div>
 </div>
 <p>First, let’s try to compile it:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract --build Basic.sol
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract build Basic.sol
 
 Calling /home/user/.ft/bin/solc Basic.sol
 Code was generated and saved to file Basic.code
@@ -211,7 +211,7 @@ then copied in the contract database of <code class="code docutils literal notra
 <code class="code docutils literal notranslate"><span class="pre">Basic</span></code> (as extracted from the filename).</p>
 <p>We will now try to run it locally. For that, let’s create a sandbox
 network on the current computer:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft switch --create sandbox1
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft switch create sandbox1
 
 Config loaded from /home/user/.ft/config.json
 Network: mainnet
@@ -226,7 +226,7 @@ Saving config file /home/user/.ft/config.json
 <p>It is possible to create as many sandboxes as wanted, the only
 constraint is for the name to start with <code class="code docutils literal notranslate"><span class="pre">sandbox</span></code>.</p>
 <p>Now, let’s start the node:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node --start
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node start
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1
@@ -236,7 +236,7 @@ local-node-7081
 </pre></div>
 </div>
 <p>It is possible to check that the node is running using:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node --web
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft node web
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1
@@ -248,7 +248,7 @@ Calling xdg-open http://0.0.0.0:7081/graphql
 the server.</p>
 <p>Now, we also have a set of preconfigured users, but we will need some
 coins to be able to deploy the smart contract:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft account
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft account info
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1
@@ -267,7 +267,7 @@ Account &quot;user0&quot;: not yet created
 </pre></div>
 </div>
 <p>So, let’s ask the giver for some coins:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft node --give user1
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft node give user1
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1
@@ -286,7 +286,7 @@ Saving config file /home/user/.ft/config.json
 </pre></div>
 </div>
 <p>We can now check the account of <code class="code docutils literal notranslate"><span class="pre">user1</span></code>:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft account user1
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>╰─➤ ft account info user1
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1
@@ -299,7 +299,7 @@ complete view of the account, with all other fields)</p>
 <p>Now, let’s deploy the contract <code class="code docutils literal notranslate"><span class="pre">Basic</span></code>. For that, we will create
 an account <code class="code docutils literal notranslate"><span class="pre">basic</span></code> and call the constructor with the argument
 <code class="code docutils literal notranslate"><span class="pre">&quot;Hello</span> <span class="pre">World&quot;</span></code>:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract --deploy Basic --create basic --params &#39;{ &quot;arg&quot;: &quot;%{hex:string:Hello World}&quot; }&#39;
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span>─➤ ft contract deploy Basic --create basic --params &#39;{ &quot;arg&quot;: &quot;%{hex:string:Hello World}&quot; }&#39;
 
 Config loaded from /home/user/.ft/config.json
 Network: sandbox1

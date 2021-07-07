@@ -10,7 +10,7 @@ network, also called switches.
 
 The sub-command to switch between networks is :code:`ft switch`::
   
-  $ ft switch
+  $ ft switch list
   Loading wallet file /home/lefessan/.ft/mainnet/wallet.json
   * testnet
     - tonlabs (current if network was selected)
@@ -40,7 +40,7 @@ uses the (predefined) node called :code:`tonlabs` at URL
 
 It is then possible to switch to a different network with::
 
-  $ ft switch testnet
+  $ ft switch to testnet
   Switched to network "testnet"
 
 Now, all commands would apply to the :code:`testnet` network by default.
@@ -59,7 +59,7 @@ Creating and Removing Public Networks
 
 It is possible to create a new network using::
 
-  $ ft switch --create fabnet --url https://fab.ton.dev 
+  $ ft switch create fabnet --url https://fab.ton.dev 
 
 This will create a new public network called :code:`fabnet`, with a
 node called :code:`node` with the URL :code:`https://fab.ton.dev`.
@@ -67,7 +67,7 @@ This network is immediately promoted as the default network.
 
 It is possible to remove an existing network using::
 
-  $ ft switch --remove fabnet
+  $ ft switch remove fabnet
 
 However, this command will fail if the network is the current one, so
 you must switch to another network before using it.
@@ -94,24 +94,24 @@ networks.
 
 Creating the network will not start the node. Instead, you must call::
 
-  $ ft node --start
+  $ ft node start
 
 to start the network.
 
 To stop it, you must use::
 
-  $ ft node --stop
+  $ ft node stop
 
 If you want to query its Graphql playground interface, you may use::
 
-  $ ft node --web
+  $ ft node web
 
 Finally, you may want to give tokens to local accounts (such as
 :code:`user0`, etc.).
 
 For that, you may use::
 
-  $ ft node --give all
+  $ ft node give 
 
 By default, this command will give 1000 TON to every local account
 with a balance smaller than this amount, and try to deploy a Surf
@@ -119,7 +119,7 @@ smart contract if the account is not initialized.
 
 You may also specify a given account, and a minimal balance in TON::
 
-  $ ft node --giver user0:100000
+  $ ft node give user0 --amount 100000
 
 
   

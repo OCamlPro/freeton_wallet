@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Managing Multiple Networks &mdash; freeton_wallet master
- (39f7955
-) (2021/07/05 12:46) documentation</title>
+ (4304577
+) (2021/07/07 17:51) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (39f7955
+ (4304577
 )
               </div>
             
@@ -182,7 +182,7 @@
 <p>All accounts managed by <code class="code docutils literal notranslate"><span class="pre">ft</span></code> are associated with a given
 network, also called switches.</p>
 <p>The sub-command to switch between networks is <code class="code docutils literal notranslate"><span class="pre">ft</span> <span class="pre">switch</span></code>:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="kt">list</span>
 <span class="nc">Loading</span> <span class="n">wallet</span> <span class="n">file</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">lefessan</span><span class="o">/.</span><span class="n">ft</span><span class="o">/</span><span class="n">mainnet</span><span class="o">/</span><span class="n">wallet</span><span class="o">.</span><span class="n">json</span>
 <span class="o">*</span> <span class="n">testnet</span>
   <span class="o">-</span> <span class="n">tonlabs</span> <span class="o">(</span><span class="n">current</span> <span class="k">if</span> <span class="n">network</span> <span class="n">was</span> <span class="n">selected</span><span class="o">)</span>
@@ -210,7 +210,7 @@ local one called <code class="code docutils literal notranslate"><span class="pr
 uses the (predefined) node called <code class="code docutils literal notranslate"><span class="pre">tonlabs</span></code> at URL
 <code class="code docutils literal notranslate"><span class="pre">https://main.ton.dev</span></code>.</p>
 <p>It is then possible to switch to a different network with:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">testnet</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="k">to</span> <span class="n">testnet</span>
 <span class="nc">Switched</span> <span class="k">to</span> <span class="n">network</span> <span class="s2">&quot;testnet&quot;</span>
 </pre></div>
 </div>
@@ -228,14 +228,14 @@ applies using the early <code class="code docutils literal notranslate"><span cl
 <div class="section" id="creating-and-removing-public-networks">
 <h2>Creating and Removing Public Networks<a class="headerlink" href="#creating-and-removing-public-networks" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to create a new network using:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="n">fabnet</span> <span class="o">--</span><span class="n">url</span> <span class="n">https</span><span class="o">://</span><span class="n">fab</span><span class="o">.</span><span class="n">ton</span><span class="o">.</span><span class="n">dev</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="n">fabnet</span> <span class="o">--</span><span class="n">url</span> <span class="n">https</span><span class="o">://</span><span class="n">fab</span><span class="o">.</span><span class="n">ton</span><span class="o">.</span><span class="n">dev</span>
 </pre></div>
 </div>
 <p>This will create a new public network called <code class="code docutils literal notranslate"><span class="pre">fabnet</span></code>, with a
 node called <code class="code docutils literal notranslate"><span class="pre">node</span></code> with the URL <code class="code docutils literal notranslate"><span class="pre">https://fab.ton.dev</span></code>.
 This network is immediately promoted as the default network.</p>
 <p>It is possible to remove an existing network using:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">remove</span> <span class="n">fabnet</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">remove</span> <span class="n">fabnet</span>
 </pre></div>
 </div>
 <p>However, this command will fail if the network is the current one, so
@@ -257,29 +257,29 @@ accounts always have the same public and secret keys and raw addresses
 on all sandbox networks, to ease debugging when restarting the
 networks.</p>
 <p>Creating the network will not start the node. Instead, you must call:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">start</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">start</span>
 </pre></div>
 </div>
 <p>to start the network.</p>
 <p>To stop it, you must use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">stop</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">stop</span>
 </pre></div>
 </div>
 <p>If you want to query its Graphql playground interface, you may use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">web</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">web</span>
 </pre></div>
 </div>
 <p>Finally, you may want to give tokens to local accounts (such as
 <code class="code docutils literal notranslate"><span class="pre">user0</span></code>, etc.).</p>
 <p>For that, you may use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">give</span> <span class="n">all</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">give</span>
 </pre></div>
 </div>
 <p>By default, this command will give 1000 TON to every local account
 with a balance smaller than this amount, and try to deploy a Surf
 smart contract if the account is not initialized.</p>
 <p>You may also specify a given account, and a minimal balance in TON:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">giver</span> <span class="n">user0</span><span class="o">:</span><span class="mi">100000</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="n">user0</span> <span class="o">--</span><span class="n">amount</span> <span class="mi">100000</span>
 </pre></div>
 </div>
 </div>
