@@ -112,5 +112,5 @@ let cmd =
       [], Arg.Anons (fun l -> list := l),
       EZCMD.info ~docv:"CONTRACT" "Create contract file for CONTRACT" ;
     ]
-    ~doc: "Generate a new contract"
+    ~doc: "Generate a new contract source file"
     ~man:[]

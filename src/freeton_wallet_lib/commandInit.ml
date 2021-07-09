@@ -13,6 +13,7 @@
 open Ezcmd.V2
 open EzFile.OP
 open EZCMD.TYPES
+open Types
 
 let hardcoded_code_hashes = [
   "a491804ca55dd5b28cffdff48cb34142930999621a54acee6be83c342051d884",
@@ -29,12 +30,15 @@ let bin_install file =
   let basename = Filename.basename file in
   Misc.call [ "cp" ; "-f" ; file ; Globals.bin_dir // basename ]
 
-let install_tonos_cli () =
+let install_tonos_cli config ~distclean =
   Unix.chdir Globals.git_dir ;
   let dir = Globals.git_dir // "tonos-cli" in
+  if distclean then Misc.call [ "rm"; "-rf"; dir ];
+
   let exists = Sys.file_exists dir in
   if not exists then
-    Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/tonos-cli.git" ];
+    Misc.call [ "git" ; "clone"; ( Config.repos config ).repo_tonos_cli ;
+                "tonos-cli" ];
   Unix.chdir dir;
   if exists then begin
     Misc.call [ "git" ; "pull" ];
@@ -45,12 +49,14 @@ let install_tonos_cli () =
   Misc.call [ "cargo"; "clean" ];
   ()
 
-let install_solc () =
+let install_solc config ~distclean =
   Unix.chdir Globals.git_dir ;
   let dir = Globals.git_dir // "TON-Solidity-Compiler" in
+  if distclean then Misc.call [ "rm"; "-rf"; dir ];
   let exists = Sys.file_exists dir in
   if not exists then
-    Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/TON-Solidity-Compiler.git" ];
+    Misc.call [ "git" ; "clone";
+                ( Config.repos config ).repo_solc ;  "TON-Solidity-Compiler" ];
   Unix.chdir dir;
   if exists then
     Misc.call [ "git" ; "pull" ];
@@ -68,12 +74,15 @@ let install_solc () =
   bin_install "lib/stdlib_sol.tvm" ;
   ()
 
-let install_tvm_linker () =
+let install_tvm_linker config ~distclean =
   Unix.chdir Globals.git_dir ;
   let dir = Globals.git_dir // "TVM-linker" in
+  if distclean then Misc.call [ "rm"; "-rf"; dir ];
+
   let exists = Sys.file_exists dir in
   if not exists then
-    Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/TVM-linker.git" ];
+    Misc.call [ "git" ; "clone";
+                ( Config.repos config) .repo_tvm_linker ;  "TVM-linker" ];
   Unix.chdir dir;
   if exists then
     Misc.call [ "git" ; "pull" ];
@@ -101,20 +110,24 @@ let install_code_hashes () =
   ()
 
 let action ~distclean ~client ~solc ~linker ~code_hashes =
+  let config = Config.config () in
+
   if code_hashes then install_code_hashes ();
 
   if Globals.is_alpine then begin
     Printf.eprintf
       "Docker detected. Use 'docker pull ocamlpro/ft:latest' to upgrade\n%!";
   end else begin
-    if distclean then
-      Misc.call [ "rm"; "-rf"; Globals.git_dir ];
     EzFile.make_dir ~p:true Globals.git_dir ;
     EzFile.make_dir ~p:true Globals.bin_dir ;
 
-    if client then install_tonos_cli ();
-    if solc then install_solc ();
-    if linker then install_tvm_linker ();
+    if distclean && not (client || solc || linker ) then
+      Misc.call [ "rm"; "-rf"; Globals.git_dir ];
+
+    if client then
+      install_tonos_cli config ~distclean ;
+    if solc then install_solc config ~distclean ;
+    if linker then install_tvm_linker config ~distclean ;
   end;
   ()
 

@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action ~switch ~url =
+let action ~switch ~url ~image =
   match switch with
   | None ->
       Error.raise
@@ -60,7 +60,7 @@ let action ~switch ~url =
             "--name"; CommandNodeStart.container_of_node node_local ;
             "-e" ; "USER_AGREEMENT=yes" ;
             Printf.sprintf "-p%d:80" local_port ;
-            "tonlabs/local-node"
+            image
           ];
           add_network
             ~net_keys:Config.sandbox_keys
@@ -74,20 +74,27 @@ let action ~switch ~url =
 let cmd =
   let switch = ref None in
   let url = ref None in
+  let image = ref "tonlabs/local-node" in
   EZCMD.sub
     "switch create"
     (fun () ->
        action
          ~switch:!switch
          ~url:!url
+         ~image:!image
     )
     ~args: (
-      [ ( [],
-          Arg.Anon (0, fun s -> switch := Some s),
-          EZCMD.info ~docv:"NETWORK" "Name of network switch to create" );
+      [
+        [], Arg.Anon (0, fun s -> switch := Some s),
+        EZCMD.info ~docv:"NETWORK" "Name of network switch to create" ;
 
-        ( [ "url" ], Arg.String ( fun s -> url := Some s ),
-          EZCMD.info ~docv:"URL" "URL of the default node in this network" );
+        [ "url" ], Arg.String ( fun s -> url := Some s ),
+        EZCMD.info ~docv:"URL" "URL of the default node in this network" ;
+
+        [ "image" ], Arg.String ( fun s -> image := s ),
+        EZCMD.info ~docv:"DOCKER" "Docker image to use for sandboxes" ;
+
+
       ] )
     ~doc: "Display or change current network"
     ~man:[

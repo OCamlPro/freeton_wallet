@@ -197,7 +197,7 @@ let cmd =
       `Blocks [
         `P "This command builds a Solidity contract and store it in the contract database";
         `P "Example:";
-        `Pre {|ft contract --build Foobar.sol|};
+        `Pre {|ft contract build Foobar.sol|};
         `P "After this command, the contract will be known as 'Foobar' in the contract database";
       ];
     ]

@@ -24,3 +24,5 @@ val current_node : Types.config -> Types.node
 val loaded : unit -> bool
 
 val load_wallet : Types.network -> unit
+
+val repos : Types.config -> Types.repos

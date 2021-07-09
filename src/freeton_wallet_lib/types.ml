@@ -43,13 +43,42 @@ type network = {
   mutable net_deployer : string ; [@dft "deployer"] [@key "deployer"]
 } [@@deriving json_encoding]
 
+type repos = {
+  mutable repo_tonos_cli : string ; [@dft ""]
+  mutable repo_solc : string ; [@dft ""]
+  mutable repo_tvm_linker : string ; [@dft ""]
+} [@@deriving json_encoding]
+
 type config = {
   mutable version : int ;             [@dft 0]
   mutable modified : bool ;           [@dft true]
   mutable current_network : string ;  [@key "network"]
   mutable networks : network list ;
+  mutable repos : repos option ;
 } [@@deriving json_encoding]
 
 type address =
   | RawAddress of string
   | Account of account
+
+
+module MULTISIG = struct
+
+  type transaction = {
+    id : int64 ;
+    confirmationsMask : int ;
+    signsRequired : int ;
+    signsReceived : int ;
+    creator : string ; (* 0x pubkey *)
+    index : int ;  (* index of custodian creator *)
+    dest : string ;
+    value : string;
+    sendFlags : int;
+    payload : string ;
+    bounce : bool;
+  } [@@deriving json_encoding]
+
+  type transactions = transaction list
+  [@@deriving json_encoding]
+
+end

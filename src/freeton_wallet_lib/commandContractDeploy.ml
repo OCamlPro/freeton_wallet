@@ -20,7 +20,7 @@ type create =
 
 
 let action ~contract ~force ~params ~wc ?create ?sign ~deployer
-    ?initial_data () =
+    ?initial_data ~credit () =
   let config = Config.config () in
   let net = Config.current_network config in
   let create =
@@ -78,11 +78,13 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
           | None -> net.net_deployer
           | Some deployer -> deployer
         in
-        Printf.eprintf "Sending 1 TON from deployer %S\n%!" deployer;
-        CommandMultisigTransfer.send_transfer
-          ~account:deployer
-          ~dst
-          ~amount:"1" ();
+        if credit > 0 then begin
+          Printf.eprintf "Sending %d TON from deployer %S\n%!" credit deployer;
+          CommandMultisigTransfer.send_transfer
+            ~account:deployer
+            ~dst
+            ~amount:(string_of_int credit) ();
+        end;
         Config.save config;
         dst, sign
     | UseAccount dst ->
@@ -125,6 +127,7 @@ let cmd =
   let deployer = ref None in
   let sign = ref None in
   let contract = ref None in
+  let credit = ref 1 in
   EZCMD.sub
     "contract deploy"
     (fun () ->
@@ -141,6 +144,7 @@ let cmd =
                ?sign:!sign
                ~deployer:!deployer
                ?initial_data:!static_vars
+               ~credit:!credit
                ()
     )
     ~args:
@@ -185,8 +189,8 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT"
           "Replace ACCOUNT when deploying contract (with --deploy)";
 
-        [ "value" ], Arg.String (fun s -> params := s),
-        EZCMD.info ~docv:"PARAMS" "Constructor/call Arguments ({} by default)";
+        [ "credit" ], Arg.Int (fun s -> credit := s),
+        EZCMD.info ~docv:"TONS" "Initial credit of the account by the deployer";
 
       ]
     ~doc: "Deploy contracts"
@@ -195,15 +199,15 @@ let cmd =
       `Blocks [
         `P "This command deploys a known contract to the blockchain";
         `P "Examples:";
-        `Pre {|ft contract --deploy Forbar|};
+        `Pre {|ft contract deploy Forbar|};
         `P "Create an account 'Foorbar', deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract --deploy Forbar --create foo|};
+        `Pre {|ft contract deploy Forbar --create foo|};
         `P "Create an account 'foo', deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract --deploy Forbar --replace foo|};
+        `Pre {|ft contract deploy Forbar --replace foo|};
         `P "Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract --deploy Forbar --create foo --sign admin|};
+        `Pre {|ft contract deploy Forbar --create foo --sign admin|};
         `P "Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.";
-        `Pre {|ft contract --deploy Forbar --dst foo|};
+        `Pre {|ft contract deploy Forbar --dst foo|};
         `P "Deploy a contract 'Foobar' an existing account 'foo' using its keypair.";
         `P "";
         `P "With --create and --replace, 1 TON is transferred to the initial account using a 'deployer' multisig account. The deployer account can either be set switch wide (ft config --deployer 'account') or in the deploy command (using the --deployer 'account' argument)";

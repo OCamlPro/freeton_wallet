@@ -109,7 +109,8 @@ let cmd =
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "This command displays information on given accounts, either locally or from the blockchain";
+        `P "This command copies accounts from another switch to the \
+            current one";
         `P "Examples:";
         `Pre {|ft account copy mainnet my-account|};
         `Pre {|ft --switch testnet account copy my-account|}
@@ -117,4 +118,4 @@ let cmd =
 
     ]
     ~doc:
-      "Get account info (local or from blockchain)."
+      "Copy accounts from another switch to the current one"
