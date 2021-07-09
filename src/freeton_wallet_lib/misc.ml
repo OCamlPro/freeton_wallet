@@ -405,3 +405,35 @@ let fully_qualified_contract contract : string =
     contract // version
   else
     contract
+
+
+let cut v =
+  let rem = Int64.rem v 1_000L in
+  let v = Int64.div v 1_000L in
+  v, rem
+
+let string_of_nanoton v =
+  let v, nanotons = cut v in
+  let v, mutons = cut v in
+  let v, millitons = cut v in
+  let v, tons = cut v in
+  let v, thousandtons = cut v in
+  let v, milliontons = cut v in
+  let v, billiontons = cut v in
+  assert (v = 0L);
+  let tons =
+    match billiontons, milliontons, thousandtons with
+    | 0L, 0L, 0L -> Int64.to_string tons
+    | 0L, 0L, _ -> Printf.sprintf "%Ld_%03Ld" thousandtons tons
+    | 0L, _, _ -> Printf.sprintf "%Ld_%03Ld_%03Ld" milliontons thousandtons tons
+    | _, _, _ -> Printf.sprintf "%Ld_%03Ld_%03Ld_%03Ld"
+                   billiontons milliontons thousandtons tons
+  in
+  let nanotons = match nanotons, mutons, millitons with
+    | 0L, 0L, 0L -> ""
+    | 0L, 0L, _ -> Printf.sprintf "%03Ld" millitons
+    | 0L, _, _ -> Printf.sprintf "%03Ld_%03Ld" millitons mutons
+    | _, _, _ -> Printf.sprintf "%03Ld_%03Ld_%03Ld" millitons mutons nanotons
+  in
+  let s = Printf.sprintf "%s.%s" tons nanotons in
+  s

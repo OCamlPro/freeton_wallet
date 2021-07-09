@@ -37,7 +37,6 @@ let cmd =
     ~doc:  "Open Node Live block explorer webpage"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command performs operations on nodes running TONOS SE \
-          in sandbox networks. It can start and stop nodes, and send \
-          tokens to accounts.";
+      `P "Open the block explorer available on the sandbox switch \
+          running TONOS SE";
     ]

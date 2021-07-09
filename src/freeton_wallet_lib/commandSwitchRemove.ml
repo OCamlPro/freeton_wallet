@@ -71,11 +71,11 @@ let cmd =
       [ "f" ; "force" ], Arg.Set force,
       EZCMD.info "Remove network even in case of failure" ;
     ]
-    ~doc: "Remove a network configuration"
+    ~doc: "Remove a network configurations/switches"
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "Remove network configuration";
+        `P "Remove network configurations";
       ];
       `S "EXAMPLES";
       `Blocks [

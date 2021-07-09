@@ -13,28 +13,28 @@ Common arguments to all sub-commands:
 Overview of sub-commands::
   
   account copy from
-    Get account info (local or from blockchain).
+    Copy accounts from another switch to the current one
   
   account create
-    Get account info (local or from blockchain), or create/modify/delete accounts.
+    Create new accounts in the wallet
   
   account info
     Get account info (local or from blockchain).
   
   account list
-    Get account info (local or from blockchain), or create/modify/delete accounts.
+    List all known accounts in the current switch
   
   account remove
-    Get account info (local or from blockchain), or create/modify/delete accounts.
+    Delete accounts from the wallet
   
   account rename
-    Get account info (local or from blockchain).
+    This command renames accounts in the wallet
   
   account set
-    Get account info (local or from blockchain), or create/modify/delete accounts.
+    Modify the information associated with accounts in the wallet
   
   account whois
-    Get account info (local or from blockchain), or create/modify/delete accounts.
+    Find accounts matching a string
   
   call
     Call contracts
@@ -49,10 +49,10 @@ Overview of sub-commands::
     Print contract ABI
   
   contract abi impl
-    Generate implementation from contract ABI
+    Generate an implementation source file from a contract ABI
   
   contract abi intf
-    Generate an interface from a contract ABI
+    Generate an interface source file from a contract ABI
   
   contract build
     Build a contract
@@ -67,10 +67,10 @@ Overview of sub-commands::
     List known contracts
   
   contract new
-    Generate a new contract
+    Generate a new contract source file
   
   contract new interface
-    Generate a new contract interface
+    Generate a new contract interface source file
   
   crawler
     Crawl all transactions to an address and fill a psql database
@@ -94,16 +94,16 @@ Overview of sub-commands::
     Manage a multisig-wallet (create, confirm, send)
   
   multisig debot
-    Manage a multisig-wallet (create, confirm, send)
+    Executes the multisig debot
   
   multisig list custodians
-    Manage a multisig-wallet (create, confirm, send)
+    List owners/custodians of a multisig wallet
   
   multisig list transactions
-    Manage a multisig-wallet (create, confirm, send)
+    Display waiting transactions in a multisig wallet
   
   multisig transfer
-    Manage a multisig-wallet (create, confirm, send)
+    Transfer TONs from a multisig wallet to another account
   
   node give
     Give TONs to accounts on sandbox networks
@@ -112,10 +112,10 @@ Overview of sub-commands::
     Open Node Live block explorer webpage
   
   node start
-    Manage local nodes
+    Start the node of a local sandbox switch
   
   node stop
-    Manage local nodes
+    Stop the local node of a sandbox switch
   
   node update
     Update Docker image of TONOS SE for new features. You must recreate sandbox switches to benefit from the new image.
@@ -130,16 +130,16 @@ Overview of sub-commands::
     Display error codes
   
   switch create
-    Display or change current network
+    Create a new switch for an existing network, or create a sandbox local network
   
   switch list
-    Display or change current network
+    List the current switches/networks
   
   switch remove
-    Remove a network configuration
+    Remove a network configurations/switches
   
   switch to
-    Display or change current network
+    Switch to another network/switch
   
   test
     For testing only
@@ -154,14 +154,14 @@ Overview of sub-commands::
 ft account copy from
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain).
+Copy accounts from another switch to the current one
 
 
 
 **DESCRIPTION**
 
 
-This command displays information on given accounts, either locally or from the blockchain
+This command copies accounts from another switch to the current one
 
 Examples:
 ::
@@ -191,100 +191,30 @@ Where options are:
 ft account create
 ~~~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain), or create/modify/delete accounts.
+Create new accounts in the wallet
 
 
 
 **DESCRIPTION**
 
 
-This command can perform the following actions:
-
-* 1.
-  Display information on given accounts, either locally or from the blockchain
-
-* 2.
-  Create new accounts
-
-* 3.
-  Add information to existing accounts
-
-* 4.
-  Delete existing accounts
-
-
-**DISPLAY LOCAL INFORMATION**
-
+This command creates new accounts in the wallet
 
 Examples:
 ::
 
-  ft account --list
+  ft account create account1 account2 account3
 
 ::
 
-  ft account my-account --info
-
-
-
-**DISPLAY BLOCKCHAIN INFORMATION**
-
-
-Accounts must have an address on the blockchain.
-
-Examples:
-::
-
-  ft account my-account
+  ft account create new-account --passphrase "some known passphrase" --contract SetcodeMultisigWallet2
 
 ::
 
-  ft account
+  ft account create new-address --address 0:1234... --surf
 
 
-
-**CREATE NEW ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --create account1 account2 account3
-
-::
-
-  ft account --create new-account --passphrase "some known passphrase"
-
-::
-
-  ft account --create new-account --contract SafeMultisigWallet
-
-::
-
-  ft account --create new-address --address 0:1234...
-
-
-Only the last one will compute an address on the blockchain, since the contract must be known.
-
-
-**COMPLETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account old-account --contract SafeMultisigWallet
-
-
-
-**DELETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --delete account1 account2
-
+The accounts are created in the wallet, not in the blockchain. To create accounts on the blockchain, you need to transfer funds to the account address and deploy a contract (for example, with 'ft multisig create')
 
 **USAGE**
 ::
@@ -330,11 +260,11 @@ This command displays information on given accounts, either locally or from the 
 Examples:
 ::
 
-  ft account info my-account
+  ft account info MY-ACCOUNT
 
 ::
 
-  ft account info my-account --all
+  ft account info MY-ACCOUNT --all
 
 
 **USAGE**
@@ -355,100 +285,28 @@ Where options are:
 ft account list
 ~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain), or create/modify/delete accounts.
+List all known accounts in the current switch
 
 
 
 **DESCRIPTION**
 
 
-This command can perform the following actions:
-
-* 1.
-  Display information on given accounts, either locally or from the blockchain
-
-* 2.
-  Create new accounts
-
-* 3.
-  Add information to existing accounts
-
-* 4.
-  Delete existing accounts
-
-
-**DISPLAY LOCAL INFORMATION**
-
+This command lists all known accounts in the wallet.
 
 Examples:
 ::
 
-  ft account --list
-
-::
-
-  ft account my-account --info
+  ft account list
 
 
+pass: passphrase known
 
-**DISPLAY BLOCKCHAIN INFORMATION**
+secr: secret key known
 
+pk: public key
 
-Accounts must have an address on the blockchain.
-
-Examples:
-::
-
-  ft account my-account
-
-::
-
-  ft account
-
-
-
-**CREATE NEW ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --create account1 account2 account3
-
-::
-
-  ft account --create new-account --passphrase "some known passphrase"
-
-::
-
-  ft account --create new-account --contract SafeMultisigWallet
-
-::
-
-  ft account --create new-address --address 0:1234...
-
-
-Only the last one will compute an address on the blockchain, since the contract must be known.
-
-
-**COMPLETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account old-account --contract SafeMultisigWallet
-
-
-
-**DELETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --delete account1 account2
-
+ad: address known
 
 **USAGE**
 ::
@@ -462,99 +320,19 @@ Where options are:
 ft account remove
 ~~~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain), or create/modify/delete accounts.
+Delete accounts from the wallet
 
 
 
 **DESCRIPTION**
 
 
-This command can perform the following actions:
-
-* 1.
-  Display information on given accounts, either locally or from the blockchain
-
-* 2.
-  Create new accounts
-
-* 3.
-  Add information to existing accounts
-
-* 4.
-  Delete existing accounts
-
-
-**DISPLAY LOCAL INFORMATION**
-
+This command deletes known accounts from the wallet.
 
 Examples:
 ::
 
-  ft account --list
-
-::
-
-  ft account my-account --info
-
-
-
-**DISPLAY BLOCKCHAIN INFORMATION**
-
-
-Accounts must have an address on the blockchain.
-
-Examples:
-::
-
-  ft account my-account
-
-::
-
-  ft account
-
-
-
-**CREATE NEW ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --create account1 account2 account3
-
-::
-
-  ft account --create new-account --passphrase "some known passphrase"
-
-::
-
-  ft account --create new-account --contract SafeMultisigWallet
-
-::
-
-  ft account --create new-address --address 0:1234...
-
-
-Only the last one will compute an address on the blockchain, since the contract must be known.
-
-
-**COMPLETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account old-account --contract SafeMultisigWallet
-
-
-
-**DELETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --delete account1 account2
+  ft account remove account1 account2
 
 
 **USAGE**
@@ -571,23 +349,23 @@ Where options are:
 ft account rename
 ~~~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain).
+This command renames accounts in the wallet
 
 
 
 **DESCRIPTION**
 
 
-This command displays information on given accounts, either locally or from the blockchain
+This command renames accounts in the wallet
 
 Examples:
 ::
 
-  ft account copy mainnet my-account
+  ft account rename old-name new-name
 
 ::
 
-  ft --switch testnet account copy my-account
+  ft account rename test1 test2 test3 --prefix old-
 
 
 **USAGE**
@@ -606,99 +384,19 @@ Where options are:
 ft account set
 ~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain), or create/modify/delete accounts.
+Modify the information associated with accounts in the wallet
 
 
 
 **DESCRIPTION**
 
 
-This command can perform the following actions:
-
-* 1.
-  Display information on given accounts, either locally or from the blockchain
-
-* 2.
-  Create new accounts
-
-* 3.
-  Add information to existing accounts
-
-* 4.
-  Delete existing accounts
-
-
-**DISPLAY LOCAL INFORMATION**
-
+This command adds information to existing accounts in the wallet
 
 Examples:
 ::
 
-  ft account --list
-
-::
-
-  ft account my-account --info
-
-
-
-**DISPLAY BLOCKCHAIN INFORMATION**
-
-
-Accounts must have an address on the blockchain.
-
-Examples:
-::
-
-  ft account my-account
-
-::
-
-  ft account
-
-
-
-**CREATE NEW ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --create account1 account2 account3
-
-::
-
-  ft account --create new-account --passphrase "some known passphrase"
-
-::
-
-  ft account --create new-account --contract SafeMultisigWallet
-
-::
-
-  ft account --create new-address --address 0:1234...
-
-
-Only the last one will compute an address on the blockchain, since the contract must be known.
-
-
-**COMPLETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account old-account --contract SafeMultisigWallet
-
-
-
-**DELETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --delete account1 account2
+  ft account set old-account --contract SafeMultisigWallet
 
 
 **USAGE**
@@ -731,99 +429,27 @@ Where options are:
 ft account whois
 ~~~~~~~~~~~~~~~~~~
 
-Get account info (local or from blockchain), or create/modify/delete accounts.
+Find accounts matching a string
 
 
 
 **DESCRIPTION**
 
 
-This command can perform the following actions:
-
-* 1.
-  Display information on given accounts, either locally or from the blockchain
-
-* 2.
-  Create new accounts
-
-* 3.
-  Add information to existing accounts
-
-* 4.
-  Delete existing accounts
-
-
-**DISPLAY LOCAL INFORMATION**
-
+This command searches existing accounts for a field matching the string
 
 Examples:
 ::
 
-  ft account --list
+  ft account whois 1234
 
 ::
 
-  ft account my-account --info
-
-
-
-**DISPLAY BLOCKCHAIN INFORMATION**
-
-
-Accounts must have an address on the blockchain.
-
-Examples:
-::
-
-  ft account my-account
+  ft account whois 0:1234
 
 ::
 
-  ft account
-
-
-
-**CREATE NEW ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --create account1 account2 account3
-
-::
-
-  ft account --create new-account --passphrase "some known passphrase"
-
-::
-
-  ft account --create new-account --contract SafeMultisigWallet
-
-::
-
-  ft account --create new-address --address 0:1234...
-
-
-Only the last one will compute an address on the blockchain, since the contract must be known.
-
-
-**COMPLETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account old-account --contract SafeMultisigWallet
-
-
-
-**DELETE EXISTING ACCOUNTS**
-
-
-Examples:
-::
-
-  ft account --delete account1 account2
+  ft account whois setcode
 
 
 **USAGE**
@@ -903,7 +529,7 @@ This command calls the tonos-cli executable while performing substitutions on ar
 or:
 ::
 
-  $ ft init client
+  $ ft init --client
 
 
 The available substitutions on the arguments can be listed using:
@@ -984,14 +610,14 @@ Where options are:
 ft contract abi impl
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Generate implementation from contract ABI
+Generate an implementation source file from a contract ABI
 
 
 
 **DESCRIPTION**
 
 
-This command generates an implementation from a contract ABI
+This command generates an implementation source file xfrom a contract ABI
 
 **USAGE**
 ::
@@ -1007,14 +633,14 @@ Where options are:
 ft contract abi intf
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Generate an interface from a contract ABI
+Generate an interface source file from a contract ABI
 
 
 
 **DESCRIPTION**
 
 
-This command generates an interface from a contract ABI
+This command generates an interface source file from a contract ABI
 
 **USAGE**
 ::
@@ -1042,7 +668,7 @@ This command builds a Solidity contract and store it in the contract database
 Example:
 ::
 
-  ft contract --build Foobar.sol
+  ft contract build Foobar.sol
 
 
 After this command, the contract will be known as 'Foobar' in the contract database
@@ -1077,31 +703,31 @@ This command deploys a known contract to the blockchain
 Examples:
 ::
 
-  ft contract --deploy Forbar
+  ft contract deploy Forbar
 
 
 Create an account 'Foorbar', deploy a contract 'Foobar' to it.
 ::
 
-  ft contract --deploy Forbar --create foo
+  ft contract deploy Forbar --create foo
 
 
 Create an account 'foo', deploy a contract 'Foobar' to it.
 ::
 
-  ft contract --deploy Forbar --replace foo
+  ft contract deploy Forbar --replace foo
 
 
 Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.
 ::
 
-  ft contract --deploy Forbar --create foo --sign admin
+  ft contract deploy Forbar --create foo --sign admin
 
 
 Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.
 ::
 
-  ft contract --deploy Forbar --dst foo
+  ft contract deploy Forbar --dst foo
 
 
 Deploy a contract 'Foobar' an existing account 'foo' using its keypair.
@@ -1124,6 +750,8 @@ Where options are:
 
 * :code:`--create ACCOUNT`   Create ACCOUNT by deploying contract (with --deploy)
 
+* :code:`--credit TONS`   Initial credit of the account by the deployer
+
 * :code:`--deployer ACCOUNT`   Deployer is this account (pays creation fees)
 
 * :code:`--dst ACCOUNT`   Deploy to this account, using the existing keypair
@@ -1137,8 +765,6 @@ Where options are:
 * :code:`--sign ACCOUNT`   Deploy using this keypair
 
 * :code:`--static-vars JSON`   Set static vars for account
-
-* :code:`--value PARAMS`   Constructor/call Arguments ({} by default)
 
 
 ft contract import
@@ -1156,7 +782,7 @@ This command imports a contract into the contract database
 Example:
 ::
 
-  ft contract --import src/Foo.tvm
+  ft contract import src/Foo.tvm
 
 
 Import the given contract into the contract database. Two files are mandatory: the ABI file and the TVM file. They should be stored in the same directory. The ABI file must use either a '.abi' or '.abi.json' extension, whereas the TVM file must use either '.tvc' or '.tvm. If a source file (.sol, .cpp, .hpp) is also present, it is copied in the database.
@@ -1190,7 +816,7 @@ Where options are:
 ft contract new
 ~~~~~~~~~~~~~~~~~
 
-Generate a new contract
+Generate a new contract source file
 
 
 **USAGE**
@@ -1207,7 +833,7 @@ Where options are:
 ft contract new interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Generate a new contract interface
+Generate a new contract interface source file
 
 
 **USAGE**
@@ -1468,100 +1094,7 @@ Confirm transactions on a multisig-wallet
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
-
-
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account
-
-
-If the target is not an active account:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
-
-
-To send all the balance:
-::
-
-  # ft multisig -a my-account --transfer all --to other-account
-
-
-
-**CALL WITH TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
+This command is used to confirm transactions on a multisig wallet.
 
 
 **LIST WAITING TRANSACTIONS**
@@ -1570,7 +1103,7 @@ Should be like that:
 Display transactions waiting for confirmations:
 ::
 
-  # ft multisig -a my-account --waiting
+  # ft multisig list transactions MY-ACCOUNT
 
 
 
@@ -1580,7 +1113,7 @@ Display transactions waiting for confirmations:
 Get the transaction ID from above, and use:
 ::
 
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig confirm MY-ACCOUNT TX_ID
 
 
 **USAGE**
@@ -1606,17 +1139,12 @@ Manage a multisig-wallet (create, confirm, send)
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
-
-
-**CREATE MULTISIG**
-
+This command deploys a multisig contract on a credited account.
 
 Create an account and get its address:
 ::
 
-  # ft account --create my-account
-  # ft genaddr my-account
+  # ft account create MY-ACCOUNT
 
 
 Backup the account info off-computer.
@@ -1626,99 +1154,37 @@ The second command will give you an address in 0:XXX format. Send some tokens on
 Check its balance with:
 ::
 
-  # ft account my-account
+  # ft account info MY-ACCOUNT
 
 
 Then, to create a single-owner multisig:
 ::
 
-  # ft multisig -a my-account --create
+  # ft multisig create MY-ACCOUNT
 
 
 To create a multi-owners multisig:
 ::
 
-  # ft multisig -a my-account --create owner2 owner3 owner4
+  # ft multisig create MY-ACCOUNT owner2 owner3 owner4
 
 
 To create a multi-owners multisig with 2 signs required:
 ::
 
-  # ft multisig -a my-account --create owner2 owner3 --req 2
+  # ft multisig create MY-ACCOUNT owner2 owner3 --req 2
 
 
 To create a multi-owners multisig not self-owning:
 ::
 
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
+  # ft multisig create MY-ACCOUNT owner1 owner2 owner3 --not-owner
 
 
 Verify that it worked:
 ::
 
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account
-
-
-If the target is not an active account:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
-
-
-To send all the balance:
-::
-
-  # ft multisig -a my-account --transfer all --to other-account
-
-
-
-**CALL WITH TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
-
-
-**LIST WAITING TRANSACTIONS**
-
-
-Display transactions waiting for confirmations:
-::
-
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
+  # ft account info MY-ACCOUNT -v
 
 
 **USAGE**
@@ -1745,127 +1211,14 @@ Where options are:
 ft multisig debot
 ~~~~~~~~~~~~~~~~~~~
 
-Manage a multisig-wallet (create, confirm, send)
+Executes the multisig debot
 
 
 
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
-
-
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account
-
-
-If the target is not an active account:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
-
-
-To send all the balance:
-::
-
-  # ft multisig -a my-account --transfer all --to other-account
-
-
-
-**CALL WITH TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
-
-
-**LIST WAITING TRANSACTIONS**
-
-
-Display transactions waiting for confirmations:
-::
-
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
-
+This command executes the multisig debot, whose address is in the 'debot-multisig' account. 
 
 **USAGE**
 ::
@@ -1881,126 +1234,19 @@ Where options are:
 ft multisig list custodians
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Manage a multisig-wallet (create, confirm, send)
+List owners/custodians of a multisig wallet
 
 
 
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
-
-
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
+This command can be used to display the pubkeys of the owners/custodians of a multisig wallet
 
 To get the list of signers:
 ::
 
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account
-
-
-If the target is not an active account:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
-
-
-To send all the balance:
-::
-
-  # ft multisig -a my-account --transfer all --to other-account
-
-
-
-**CALL WITH TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
-
-
-**LIST WAITING TRANSACTIONS**
-
-
-Display transactions waiting for confirmations:
-::
-
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig list custodians MY-ACCOUNT"
 
 
 **USAGE**
@@ -2017,107 +1263,14 @@ Where options are:
 ft multisig list transactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Manage a multisig-wallet (create, confirm, send)
+Display waiting transactions in a multisig wallet
 
 
 
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
-
-
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account
-
-
-If the target is not an active account:
-::
-
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
-
-
-To send all the balance:
-::
-
-  # ft multisig -a my-account --transfer all --to other-account
-
-
-
-**CALL WITH TOKENS**
-
-
-Should be like that:
-::
-
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
+This command can be used to display the currently waiting transactions in a multisig wallet
 
 
 **LIST WAITING TRANSACTIONS**
@@ -2126,17 +1279,7 @@ Should be like that:
 Display transactions waiting for confirmations:
 ::
 
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig list transactions MY-ACCOUNT
 
 
 **USAGE**
@@ -2153,126 +1296,45 @@ Where options are:
 ft multisig transfer
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Manage a multisig-wallet (create, confirm, send)
+Transfer TONs from a multisig wallet to another account
 
 
 
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
+This command is used to send tokens from a multisig wallet to another account (or to submit a transaction if multiple confirmations are required).
 
 
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
+**SIMPLE TRANSFER**
 
 
 Should be like that:
 ::
 
-  # ft multisig -a my-account --transfer 100.000 --to other-account
+  # ft multisig transfer 100.000 -from MY-ACCOUNT --to OTHER-ACCOUNT
 
 
 If the target is not an active account:
 ::
 
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
+  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain
 
 
 To send all the balance:
 ::
 
-  # ft multisig -a my-account --transfer all --to other-account
+  # ft multisig transfer all --from MY-ACCOUNT --to OTHER-ACCOUNT
 
 
 
-**CALL WITH TOKENS**
+**CALL WITH PARAMS**
 
 
 Should be like that:
 ::
 
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
-
-
-**LIST WAITING TRANSACTIONS**
-
-
-Display transactions waiting for confirmations:
-::
-
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig transfer 100 --from MY-ACCOUNT --to CONTRACT set '{ "x": "100" }
 
 
 **USAGE**
@@ -2308,7 +1370,7 @@ Give TONs to accounts on sandbox networks
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to create initial accounts with tokens on sandbox networks running TONOS SE (created using 'ft switch create sandboxNN').
 
 **USAGE**
 ::
@@ -2333,7 +1395,7 @@ Open Node Live block explorer webpage
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+Open the block explorer available on the sandbox switch running TONOS SE
 
 **USAGE**
 ::
@@ -2347,14 +1409,14 @@ Where options are:
 ft node start
 ~~~~~~~~~~~~~~~
 
-Manage local nodes
+Start the node of a local sandbox switch
 
 
 
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to start the node of a local sandbox network running TONOS SE and created using 'ft switch create sandboxNN'.
 
 **USAGE**
 ::
@@ -2368,14 +1430,14 @@ Where options are:
 ft node stop
 ~~~~~~~~~~~~~~
 
-Manage local nodes
+Stop the local node of a sandbox switch
 
 
 
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to stop the local node of a sandbox network running TONOS SE
 
 **USAGE**
 ::
@@ -2396,7 +1458,7 @@ Update Docker image of TONOS SE for new features. You must recreate sandbox swit
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to update the docker image that will be used to create new sandbox networks (tonlabs/local-node, or the one provide with --image)
 
 **USAGE**
 ::
@@ -2405,6 +1467,8 @@ This command performs operations on nodes running TONOS SE in sandbox networks. 
 
 Where options are:
 
+
+* :code:`--image DOCKER`   Docker image to use for sandboxes
 
 
 ft node web
@@ -2417,7 +1481,7 @@ Open Node GraphQL webpage
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to open the GraphQL webpage associated with the current local network
 
 **USAGE**
 ::
@@ -2515,14 +1579,16 @@ Where options are:
 ft switch create
 ~~~~~~~~~~~~~~~~~~
 
-Display or change current network
+Create a new switch for an existing network, or create a sandbox local network
 
 
 
 **DESCRIPTION**
 
 
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
+This command is used to create new switches, either for existing remote networks (mainnet, testnet, etc.) by providing their URL with --url, or to create new local networks running TONOS SE (such switches must be called 'sandboxNN' where NN is a number). Each switch includes its own set of accounts and nodes.
+
+When a new switch is created, it immediately becomes the current switch.
 
 
 **EXAMPLES**
@@ -2531,96 +1597,13 @@ Manage the different networks. Each switch includes a set of accounts and nodes.
 Display current network and other existing networks:
 ::
 
-  $ ft switch
+  $ ft switch list
 
 
 Change current network to an existing network NETWORK:
 ::
 
-  $ ft switch NETWORK
-
-
-Create a new network with name NETWORK and url URL, and switch to that network:
-::
-
-  $ ft switch --create NETWORK --url URL
-
-
-Removing a created network:
-::
-
-  $ ft switch --remove NETWORK
-
-
-
-**SANDBOXING**
-
-
-As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network 'sandboxN` where N is a number. The corresponding node will run on port 7080+N.
-
-Example of session (create network, start node, give user1 1000 TONs):
-::
-
-  $ ft switch --create sandbox1
-
-::
-
-  $ ft node --start
-
-::
-
-  $ ft node --give user1:1000
-
-
-When a local network is created, it is initialized with:
-
-* 1.
-  An account 'giver' corresponding to the Giver contract holding 5 billion TONS
-
-* 2.
-  A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
-
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
-
-**USAGE**
-::
-  
-  ft switch create NETWORK [OPTIONS]
-
-Where options are:
-
-
-* :code:`NETWORK`   Name of network switch to create
-
-* :code:`--url URL`   URL of the default node in this network
-
-
-ft switch list
-~~~~~~~~~~~~~~~~
-
-Display or change current network
-
-
-
-**DESCRIPTION**
-
-
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
-
-
-**EXAMPLES**
-
-
-Display current network and other existing networks:
-::
-
-  $ ft switch
-
-
-Change current network to an existing network NETWORK:
-::
-
-  $ ft switch NETWORK
+  $ ft switch to NETWORK
 
 
 Create a new network with name NETWORK and url URL, and switch to that network:
@@ -2652,7 +1635,7 @@ Example of session (create network, start node, give user1 1000 TONs):
 
 ::
 
-  $ ft node give user1:1000
+  $ ft node give user1 --amount 1000
 
 
 When a local network is created, it is initialized with:
@@ -2663,7 +1646,34 @@ When a local network is created, it is initialized with:
 * 2.
   A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
 
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
+The 10 accounts are not deployed, but it is possible to use 'ft node give ACCOUNT' to automatically deploy the account.
+
+**USAGE**
+::
+  
+  ft switch create NETWORK [OPTIONS]
+
+Where options are:
+
+
+* :code:`NETWORK`   Name of network switch to create
+
+* :code:`--image DOCKER`   Docker image to use for sandboxes
+
+* :code:`--url URL`   URL of the default node in this network
+
+
+ft switch list
+~~~~~~~~~~~~~~~~
+
+List the current switches/networks
+
+
+
+**DESCRIPTION**
+
+
+This command is used to list the known networks (switches) and the current configuration.
 
 **USAGE**
 ::
@@ -2677,14 +1687,14 @@ Where options are:
 ft switch remove
 ~~~~~~~~~~~~~~~~~~
 
-Remove a network configuration
+Remove a network configurations/switches
 
 
 
 **DESCRIPTION**
 
 
-Remove network configuration
+Remove network configurations
 
 
 **EXAMPLES**
@@ -2712,72 +1722,36 @@ Where options are:
 ft switch to
 ~~~~~~~~~~~~~~
 
-Display or change current network
+Switch to another network/switch
 
 
 
 **DESCRIPTION**
 
 
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
+This command is used to switch the current network configuration to the provided switch. To only switch to a new network for a particular command, it is possible to use the --switch argument instead.
 
 
-**EXAMPLES**
+**EXAMPLE**
 
 
 Display current network and other existing networks:
 ::
 
-  $ ft switch
+  $ ft switch list
 
 
 Change current network to an existing network NETWORK:
 ::
 
-  $ ft switch NETWORK
+  $ ft switch to NETWORK
 
 
-Create a new network with name NETWORK and url URL, and switch to that network:
+Call a command for another switch:
 ::
 
-  $ ft switch create NETWORK --url URL
+  $ ft --switch NETWORK call contract get '{}'
 
-
-Removing a created network:
-::
-
-  $ ft switch remove NETWORK
-
-
-
-**SANDBOXING**
-
-
-As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network 'sandboxN` where N is a number. The corresponding node will run on port 7080+N.
-
-Example of session (create network, start node, give user1 1000 TONs):
-::
-
-  $ ft switch create sandbox1
-
-::
-
-  $ ft node start
-
-::
-
-  $ ft node give user1:1000
-
-
-When a local network is created, it is initialized with:
-
-* 1.
-  An account 'giver' corresponding to the Giver contract holding 5 billion TONS
-
-* 2.
-  A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
-
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
 
 **USAGE**
 ::

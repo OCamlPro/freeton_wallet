@@ -33,8 +33,8 @@ let cmd =
     )
     ~args: [
 
-        [ "image" ], Arg.String ( fun s -> image := s ),
-        EZCMD.info ~docv:"DOCKER" "Docker image to use for sandboxes" ;
+      [ "image" ], Arg.String ( fun s -> image := s ),
+      EZCMD.info ~docv:"DOCKER" "Docker image to use for sandboxes" ;
 
     ]
     ~doc:  "Update Docker image of TONOS SE for new \
@@ -42,7 +42,7 @@ let cmd =
             benefit from the new image."
     ~man:[
       `S "DESCRIPTION";
-      `P "This command performs operations on nodes running TONOS SE \
-          in sandbox networks. It can start and stop nodes, and send \
-          tokens to accounts.";
+      `P "This command can be used to update the docker image that \
+          will be used to create new sandbox networks \
+          (tonlabs/local-node, or the one provide with --image)";
     ]

@@ -142,7 +142,8 @@ let cmd =
     ~doc: "Give TONs to accounts on sandbox networks"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command performs operations on nodes running TONOS SE \
-          in sandbox networks. It can start and stop nodes, and send \
-          tokens to accounts.";
+      `P "This command can be used to create initial accounts with \
+          tokens on sandbox networks running TONOS SE (created using \
+          'ft switch create sandboxNN').";
+
     ]
