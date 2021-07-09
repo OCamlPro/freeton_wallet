@@ -61,12 +61,11 @@ let cmd =
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "This command displays information on given accounts, either locally or from the blockchain";
+        `P "This command renames accounts in the wallet";
         `P "Examples:";
-        `Pre {|ft account copy mainnet my-account|};
-        `Pre {|ft --switch testnet account copy my-account|}
+        `Pre {|ft account rename old-name new-name|} ;
+        `Pre {|ft account rename test1 test2 test3 --prefix old-|} ;
       ];
 
     ]
-    ~doc:
-      "Get account info (local or from blockchain)."
+    ~doc: "This command renames accounts in the wallet"

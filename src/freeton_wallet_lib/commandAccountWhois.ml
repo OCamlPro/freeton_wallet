@@ -14,19 +14,47 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
+let matches re field =
+  match Re.Str.search_forward re field 0 with
+  | exception Not_found -> false
+  | _ -> true
+
 let action accounts =
   let config = Config.config () in
   let net = Config.current_network config in
   List.iter (fun address ->
-      let re = Re.Str.regexp address in
+      let re = Re.Str.regexp_string_case_fold address in
       List.iter (fun key ->
-          match key.key_account with
-          | None -> ()
-          | Some acc ->
-              match Re.Str.search_forward re acc.acc_address 0 with
-              | exception Not_found -> ()
-              | _ ->
-                  Printf.printf "%s is %S\n%!" acc.acc_address key.key_name)
+
+          if matches re key.key_name then
+            Printf.printf "account match: %S\n%!" key.key_name ;
+
+          begin
+            match key.key_pair with
+            | None -> ()
+            | Some { public ; _ } ->
+                if matches re public then
+                  Printf.printf "pubkey match: %s is %S\n%!"
+                    public key.key_name ;
+          end;
+
+          begin
+            match key.key_account with
+            | None -> ()
+            | Some acc ->
+                if matches re acc.acc_address then
+                  Printf.printf "address match: %s is %S\n%!"
+                    acc.acc_address key.key_name ;
+                begin
+                  match acc.acc_contract with
+                  | None -> ()
+                  | Some contract ->
+                      if matches re contract then
+                        Printf.printf "contract match: %S has contract %S\n%!"
+                          key.key_name contract ;
+                end
+          end ;
+        )
         net.net_keys ;
     ) accounts
 
@@ -46,45 +74,14 @@ let cmd =
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "This command can perform the following actions:";
-        `I ("1.", "Display information on given accounts, either locally or from the blockchain");
-        `I ("2.", "Create new accounts");
-        `I ("3.", "Add information to existing accounts");
-        `I ("4.", "Delete existing accounts");
-      ];
-      `S "DISPLAY LOCAL INFORMATION";
-      `Blocks [
+        `P "This command searches existing accounts for a field \
+            matching the string" ;
         `P "Examples:";
-        `Pre {|ft account --list|};
-        `Pre {|ft account my-account --info|}
-      ];
-      `S "DISPLAY BLOCKCHAIN INFORMATION";
-      `Blocks [
-        `P "Accounts must have an address on the blockchain.";
-        `P "Examples:";
-        `Pre {|ft account my-account|};
-        `Pre {|ft account|};
-      ];
-      `S "CREATE NEW ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account --create account1 account2 account3|};
-        `Pre {|ft account --create new-account --passphrase "some known passphrase"|};
-        `Pre {|ft account --create new-account --contract SafeMultisigWallet|};
-        `Pre {|ft account --create new-address --address 0:1234...|};
-        `P "Only the last one will compute an address on the blockchain, since the contract must be known.";
-      ];
-      `S "COMPLETE EXISTING ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account old-account --contract SafeMultisigWallet|};
-      ];
-      `S "DELETE EXISTING ACCOUNTS";
-      `Blocks [
-        `P "Examples:";
-        `Pre {|ft account --delete account1 account2|};
+        `Pre {|ft account whois 1234|} ;
+        `Pre {|ft account whois 0:1234|} ;
+        `Pre {|ft account whois setcode|} ;
       ];
 
     ]
     ~doc:
-      "Get account info (local or from blockchain), or create/modify/delete accounts."
+      "Find accounts matching a string"

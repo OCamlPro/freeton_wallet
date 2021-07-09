@@ -46,5 +46,5 @@ let cmd =
       [], Arg.Anons (List.iter create_interface),
       EZCMD.info ~docv:"CONTRACT" "Create interface file for contract" ;
     ]
-    ~doc: "Generate a new contract interface"
+    ~doc: "Generate a new contract interface source file"
     ~man:[]

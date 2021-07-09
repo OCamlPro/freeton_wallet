@@ -170,10 +170,11 @@ let cmd =
         EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
 
       ]
-    ~doc: "Generate implementation from contract ABI"
+    ~doc: "Generate an implementation source file from a contract ABI"
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "This command generates an implementation from a contract ABI";
+        `P "This command generates an implementation source file xfrom \
+            a contract ABI";
       ];
     ]

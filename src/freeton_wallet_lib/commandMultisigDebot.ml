@@ -37,52 +37,9 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT" "The debot account";
 
       ]
-    ~doc: "Manage a multisig-wallet (create, confirm, send)"
+    ~doc: "Executes the multisig debot"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.";
+      `P "This command executes the multisig debot, whose address is in the 'debot-multisig' account. ";
 
-      `S "CREATE MULTISIG";
-      `P "Create an account and get its address:";
-      `Pre {|# ft account --create my-account
-# ft genaddr my-account|};
-      `P "Backup the account info off-computer.";
-      `P "The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.";
-      `P "Check its balance with:";
-      `Pre {|# ft account my-account|};
-      `P "Then, to create a single-owner multisig:";
-      `Pre {|# ft multisig -a my-account --create|} ;
-      `P "To create a multi-owners multisig:";
-      `Pre {|# ft multisig -a my-account --create owner2 owner3 owner4|} ;
-      `P "To create a multi-owners multisig with 2 signs required:";
-      `Pre {|# ft multisig -a my-account --create owner2 owner3 --req 2|} ;
-      `P "To create a multi-owners multisig not self-owning:";
-      `Pre {|# ft multisig -a my-account --create owner1 owner2 owner3 --not-owner|} ;
-
-      `P "Verify that it worked:";
-      `Pre {|# ft account my-account -v|};
-
-      `S "GET CUSTODIANS";
-      `P "To get the list of signers:";
-      `Pre {|# ft multisig -a my-account --custodians"|};
-
-      `S "SEND TOKENS";
-      `P "Should be like that:";
-      `Pre {|# ft multisig -a my-account --transfer 100.000 --to other-account|};
-      `P "If the target is not an active account:";
-      `Pre {|# ft multisig -a my-account --transfer 100.000 --to other-account --parrain|};
-      `P "To send all the balance:";
-      `Pre {|# ft multisig -a my-account --transfer all --to other-account|};
-
-      `S "CALL WITH TOKENS";
-      `P "Should be like that:";
-      `Pre {|# ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }|};
-
-      `S "LIST WAITING TRANSACTIONS";
-      `P "Display transactions waiting for confirmations:";
-      `Pre {|# ft multisig -a my-account --waiting|};
-
-      `S "CONFIRM TRANSACTION";
-      `P "Get the transaction ID from above, and use:";
-      `Pre {|# ft multisig -a my-account --confirm TX_ID|};
     ]

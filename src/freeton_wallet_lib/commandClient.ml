@@ -78,7 +78,7 @@ let cmd =
             $HOME/.ft/bin/tonos-cli. To create this executable, use:";
         `Pre {|$ ft init|};
         `P "or:";
-        `Pre {|$ ft init client|};
+        `Pre {|$ ft init --client|};
         `P "The available substitutions on the arguments can be listed using:";
         `Pre {|$ ft output --list-subst|};
         `P "For example, to substitute the address of the account 'multisig-debot':";

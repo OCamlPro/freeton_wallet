@@ -106,7 +106,7 @@ let cmd =
       `Blocks [
         `P "This command imports a contract into the contract database";
         `P "Example:";
-        `Pre {|ft contract --import src/Foo.tvm|};
+        `Pre {|ft contract import src/Foo.tvm|};
         `P "Import the given contract into the contract database. Two files are mandatory: the ABI file and the TVM file. They should be stored in the same directory. The ABI file must use either a '.abi' or '.abi.json' extension, whereas the TVM file must use either '.tvc' or '.tvm. If a source file (.sol, .cpp, .hpp) is also present, it is copied in the database.";
       ];
     ]

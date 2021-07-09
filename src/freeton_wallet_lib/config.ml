@@ -248,6 +248,16 @@ let rustnet_network = {
   net_deployer = "deployer" ;
 }
 
+let repo_tonos_cli = "https://github.com/tonlabs/tonos-cli.git"
+let repo_solc = "https://github.com/tonlabs/TON-Solidity-Compiler.git"
+let repo_tvm_linker = "https://github.com/tonlabs/TVM-linker.git"
+
+let default_repos = {
+  repo_tonos_cli ;
+  repo_solc ;
+  repo_tvm_linker ;
+}
+
 let default_config = {
   modified = true ;
   version = 0;
@@ -257,7 +267,13 @@ let default_config = {
                rustnet_network ;
                fldnet_network ;
              ] ;
+  repos = Some default_repos ;
 }
+
+let repos config =
+  match config.repos with
+  | None -> default_repos
+  | Some repos -> repos
 
 let save config =
   EzFile.make_dir ~p:true Globals.ft_dir;
@@ -279,7 +295,10 @@ let save config =
                                Printf.eprintf "Saving wallet file %s\n%!" wallet_file ;
                        end ;
                        { net with net_keys = [] }
-                     ) config.networks
+                     ) config.networks ;
+                   repos = ( match config.repos with
+                       | None -> Some default_repos
+                       | _ -> config.repos ) ;
                  }
     in
     if !Globals.verbosity > 0 then
@@ -451,6 +470,26 @@ let load () =
                   (fun k -> k.key_name <> key.key_name ) net.net_keys
               ) mainnet_keys
       ) config.networks
+  end;
+
+  begin
+    match config.repos with
+    | None ->
+        config.repos <- Some default_repos ;
+        config.modified <- true
+    | Some repos ->
+        if repos.repo_tvm_linker = "" then begin
+          repos.repo_tvm_linker <- repo_tvm_linker ;
+          config.modified <- true ;
+        end ;
+        if repos.repo_solc = "" then begin
+          repos.repo_solc <- repo_solc ;
+          config.modified <- true ;
+        end ;
+        if repos.repo_tonos_cli = "" then begin
+          repos.repo_tonos_cli <- repo_tonos_cli ;
+          config.modified <- true ;
+        end
   end;
 
   EzFile.make_dir ~p:true Misc.temp_dir;
