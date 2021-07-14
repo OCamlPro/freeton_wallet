@@ -103,7 +103,7 @@ Overview of sub-commands::
     Display waiting transactions in a multisig wallet
   
   multisig transfer
-    Manage a multisig-wallet (create, confirm, send)
+    Transfer TONs from a multisig wallet to another account
   
   node give
     Give TONs to accounts on sandbox networks
@@ -112,10 +112,10 @@ Overview of sub-commands::
     Open Node Live block explorer webpage
   
   node start
-    Manage local nodes
+    Start the node of a local sandbox switch
   
   node stop
-    Manage local nodes
+    Stop the local node of a sandbox switch
   
   node update
     Update Docker image of TONOS SE for new features. You must recreate sandbox switches to benefit from the new image.
@@ -130,16 +130,16 @@ Overview of sub-commands::
     Display error codes
   
   switch create
-    Display or change current network
+    Create a new switch for an existing network, or create a sandbox local network
   
   switch list
-    Display or change current network
+    List the current switches/networks
   
   switch remove
-    Remove a network configuration
+    Remove a network configurations/switches
   
   switch to
-    Display or change current network
+    Switch to another network/switch
   
   test
     For testing only
@@ -260,11 +260,11 @@ This command displays information on given accounts, either locally or from the 
 Examples:
 ::
 
-  ft account info my-account
+  ft account info MY-ACCOUNT
 
 ::
 
-  ft account info my-account --all
+  ft account info MY-ACCOUNT --all
 
 
 **USAGE**
@@ -1296,126 +1296,45 @@ Where options are:
 ft multisig transfer
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Manage a multisig-wallet (create, confirm, send)
+Transfer TONs from a multisig wallet to another account
 
 
 
 **DESCRIPTION**
 
 
-This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.
+This command is used to send tokens from a multisig wallet to another account (or to submit a transaction if multiple confirmations are required).
 
 
-**CREATE MULTISIG**
-
-
-Create an account and get its address:
-::
-
-  # ft account --create my-account
-  # ft genaddr my-account
-
-
-Backup the account info off-computer.
-
-The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.
-
-Check its balance with:
-::
-
-  # ft account my-account
-
-
-Then, to create a single-owner multisig:
-::
-
-  # ft multisig -a my-account --create
-
-
-To create a multi-owners multisig:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 owner4
-
-
-To create a multi-owners multisig with 2 signs required:
-::
-
-  # ft multisig -a my-account --create owner2 owner3 --req 2
-
-
-To create a multi-owners multisig not self-owning:
-::
-
-  # ft multisig -a my-account --create owner1 owner2 owner3 --not-owner
-
-
-Verify that it worked:
-::
-
-  # ft account my-account -v
-
-
-
-**GET CUSTODIANS**
-
-
-To get the list of signers:
-::
-
-  # ft multisig -a my-account --custodians"
-
-
-
-**SEND TOKENS**
+**SIMPLE TRANSFER**
 
 
 Should be like that:
 ::
 
-  # ft multisig -a my-account --transfer 100.000 --to other-account
+  # ft multisig transfer 100.000 -from MY-ACCOUNT --to OTHER-ACCOUNT
 
 
 If the target is not an active account:
 ::
 
-  # ft multisig -a my-account --transfer 100.000 --to other-account --parrain
+  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain
 
 
 To send all the balance:
 ::
 
-  # ft multisig -a my-account --transfer all --to other-account
+  # ft multisig transfer all --from MY-ACCOUNT --to OTHER-ACCOUNT
 
 
 
-**CALL WITH TOKENS**
+**CALL WITH PARAMS**
 
 
 Should be like that:
 ::
 
-  # ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }
-
-
-
-**LIST WAITING TRANSACTIONS**
-
-
-Display transactions waiting for confirmations:
-::
-
-  # ft multisig -a my-account --waiting
-
-
-
-**CONFIRM TRANSACTION**
-
-
-Get the transaction ID from above, and use:
-::
-
-  # ft multisig -a my-account --confirm TX_ID
+  # ft multisig transfer 100 --from MY-ACCOUNT --to CONTRACT set '{ "x": "100" }
 
 
 **USAGE**
@@ -1451,7 +1370,7 @@ Give TONs to accounts on sandbox networks
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to create initial accounts with tokens on sandbox networks running TONOS SE (created using 'ft switch create sandboxNN').
 
 **USAGE**
 ::
@@ -1476,7 +1395,7 @@ Open Node Live block explorer webpage
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+Open the block explorer available on the sandbox switch running TONOS SE
 
 **USAGE**
 ::
@@ -1490,14 +1409,14 @@ Where options are:
 ft node start
 ~~~~~~~~~~~~~~~
 
-Manage local nodes
+Start the node of a local sandbox switch
 
 
 
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to start the node of a local sandbox network running TONOS SE and created using 'ft switch create sandboxNN'.
 
 **USAGE**
 ::
@@ -1511,14 +1430,14 @@ Where options are:
 ft node stop
 ~~~~~~~~~~~~~~
 
-Manage local nodes
+Stop the local node of a sandbox switch
 
 
 
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to stop the local node of a sandbox network running TONOS SE
 
 **USAGE**
 ::
@@ -1539,7 +1458,7 @@ Update Docker image of TONOS SE for new features. You must recreate sandbox swit
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to update the docker image that will be used to create new sandbox networks (tonlabs/local-node, or the one provide with --image)
 
 **USAGE**
 ::
@@ -1562,7 +1481,7 @@ Open Node GraphQL webpage
 **DESCRIPTION**
 
 
-This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.
+This command can be used to open the GraphQL webpage associated with the current local network
 
 **USAGE**
 ::
@@ -1660,14 +1579,16 @@ Where options are:
 ft switch create
 ~~~~~~~~~~~~~~~~~~
 
-Display or change current network
+Create a new switch for an existing network, or create a sandbox local network
 
 
 
 **DESCRIPTION**
 
 
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
+This command is used to create new switches, either for existing remote networks (mainnet, testnet, etc.) by providing their URL with --url, or to create new local networks running TONOS SE (such switches must be called 'sandboxNN' where NN is a number). Each switch includes its own set of accounts and nodes.
+
+When a new switch is created, it immediately becomes the current switch.
 
 
 **EXAMPLES**
@@ -1676,98 +1597,13 @@ Manage the different networks. Each switch includes a set of accounts and nodes.
 Display current network and other existing networks:
 ::
 
-  $ ft switch
+  $ ft switch list
 
 
 Change current network to an existing network NETWORK:
 ::
 
-  $ ft switch NETWORK
-
-
-Create a new network with name NETWORK and url URL, and switch to that network:
-::
-
-  $ ft switch --create NETWORK --url URL
-
-
-Removing a created network:
-::
-
-  $ ft switch --remove NETWORK
-
-
-
-**SANDBOXING**
-
-
-As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network 'sandboxN` where N is a number. The corresponding node will run on port 7080+N.
-
-Example of session (create network, start node, give user1 1000 TONs):
-::
-
-  $ ft switch --create sandbox1
-
-::
-
-  $ ft node --start
-
-::
-
-  $ ft node --give user1:1000
-
-
-When a local network is created, it is initialized with:
-
-* 1.
-  An account 'giver' corresponding to the Giver contract holding 5 billion TONS
-
-* 2.
-  A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
-
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
-
-**USAGE**
-::
-  
-  ft switch create NETWORK [OPTIONS]
-
-Where options are:
-
-
-* :code:`NETWORK`   Name of network switch to create
-
-* :code:`--image DOCKER`   Docker image to use for sandboxes
-
-* :code:`--url URL`   URL of the default node in this network
-
-
-ft switch list
-~~~~~~~~~~~~~~~~
-
-Display or change current network
-
-
-
-**DESCRIPTION**
-
-
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
-
-
-**EXAMPLES**
-
-
-Display current network and other existing networks:
-::
-
-  $ ft switch
-
-
-Change current network to an existing network NETWORK:
-::
-
-  $ ft switch NETWORK
+  $ ft switch to NETWORK
 
 
 Create a new network with name NETWORK and url URL, and switch to that network:
@@ -1799,7 +1635,7 @@ Example of session (create network, start node, give user1 1000 TONs):
 
 ::
 
-  $ ft node give user1:1000
+  $ ft node give user1 --amount 1000
 
 
 When a local network is created, it is initialized with:
@@ -1810,7 +1646,34 @@ When a local network is created, it is initialized with:
 * 2.
   A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
 
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
+The 10 accounts are not deployed, but it is possible to use 'ft node give ACCOUNT' to automatically deploy the account.
+
+**USAGE**
+::
+  
+  ft switch create NETWORK [OPTIONS]
+
+Where options are:
+
+
+* :code:`NETWORK`   Name of network switch to create
+
+* :code:`--image DOCKER`   Docker image to use for sandboxes
+
+* :code:`--url URL`   URL of the default node in this network
+
+
+ft switch list
+~~~~~~~~~~~~~~~~
+
+List the current switches/networks
+
+
+
+**DESCRIPTION**
+
+
+This command is used to list the known networks (switches) and the current configuration.
 
 **USAGE**
 ::
@@ -1824,14 +1687,14 @@ Where options are:
 ft switch remove
 ~~~~~~~~~~~~~~~~~~
 
-Remove a network configuration
+Remove a network configurations/switches
 
 
 
 **DESCRIPTION**
 
 
-Remove network configuration
+Remove network configurations
 
 
 **EXAMPLES**
@@ -1859,72 +1722,36 @@ Where options are:
 ft switch to
 ~~~~~~~~~~~~~~
 
-Display or change current network
+Switch to another network/switch
 
 
 
 **DESCRIPTION**
 
 
-Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).
+This command is used to switch the current network configuration to the provided switch. To only switch to a new network for a particular command, it is possible to use the --switch argument instead.
 
 
-**EXAMPLES**
+**EXAMPLE**
 
 
 Display current network and other existing networks:
 ::
 
-  $ ft switch
+  $ ft switch list
 
 
 Change current network to an existing network NETWORK:
 ::
 
-  $ ft switch NETWORK
+  $ ft switch to NETWORK
 
 
-Create a new network with name NETWORK and url URL, and switch to that network:
+Call a command for another switch:
 ::
 
-  $ ft switch create NETWORK --url URL
+  $ ft --switch NETWORK call contract get '{}'
 
-
-Removing a created network:
-::
-
-  $ ft switch remove NETWORK
-
-
-
-**SANDBOXING**
-
-
-As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network 'sandboxN` where N is a number. The corresponding node will run on port 7080+N.
-
-Example of session (create network, start node, give user1 1000 TONs):
-::
-
-  $ ft switch create sandbox1
-
-::
-
-  $ ft node start
-
-::
-
-  $ ft node give user1:1000
-
-
-When a local network is created, it is initialized with:
-
-* 1.
-  An account 'giver' corresponding to the Giver contract holding 5 billion TONS
-
-* 2.
-  A set of 10 accounts 'user0' to 'user9'. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.
-
-The 10 accounts are not deployed, but it is possible to use 'ft node --give ACCOUNT' to automatically deploy the account.
 
 **USAGE**
 ::

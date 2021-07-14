@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (3d98971
-) (2021/07/09 09:27) documentation</title>
+ (aec38be
+) (2021/07/14 14:04) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (3d98971
+ (aec38be
 )
               </div>
             
@@ -318,7 +318,7 @@
   <span class="nc">Display</span> <span class="n">waiting</span> <span class="n">transactions</span> <span class="k">in</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span>
 
 <span class="n">multisig</span> <span class="n">transfer</span>
-  <span class="nc">Manage</span> <span class="n">a</span> <span class="n">multisig</span><span class="o">-</span><span class="n">wallet</span> <span class="o">(</span><span class="n">create</span><span class="o">,</span> <span class="n">confirm</span><span class="o">,</span> <span class="n">send</span><span class="o">)</span>
+  <span class="nc">Transfer</span> <span class="nc">TONs</span> <span class="n">from</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span> <span class="k">to</span> <span class="n">another</span> <span class="n">account</span>
 
 <span class="n">node</span> <span class="n">give</span>
   <span class="nc">Give</span> <span class="nc">TONs</span> <span class="k">to</span> <span class="n">accounts</span> <span class="n">on</span> <span class="n">sandbox</span> <span class="n">networks</span>
@@ -327,10 +327,10 @@
   <span class="nc">Open</span> <span class="nc">Node</span> <span class="nc">Live</span> <span class="n">block</span> <span class="n">explorer</span> <span class="n">webpage</span>
 
 <span class="n">node</span> <span class="n">start</span>
-  <span class="nc">Manage</span> <span class="n">local</span> <span class="n">nodes</span>
+  <span class="nc">Start</span> <span class="n">the</span> <span class="n">node</span> <span class="k">of</span> <span class="n">a</span> <span class="n">local</span> <span class="n">sandbox</span> <span class="n">switch</span>
 
 <span class="n">node</span> <span class="n">stop</span>
-  <span class="nc">Manage</span> <span class="n">local</span> <span class="n">nodes</span>
+  <span class="nc">Stop</span> <span class="n">the</span> <span class="n">local</span> <span class="n">node</span> <span class="k">of</span> <span class="n">a</span> <span class="n">sandbox</span> <span class="n">switch</span>
 
 <span class="n">node</span> <span class="n">update</span>
   <span class="nc">Update</span> <span class="nc">Docker</span> <span class="n">image</span> <span class="k">of</span> <span class="nc">TONOS</span> <span class="nc">SE</span> <span class="k">for</span> <span class="k">new</span> <span class="n">features</span><span class="o">.</span> <span class="nc">You</span> <span class="n">must</span> <span class="n">recreate</span> <span class="n">sandbox</span> <span class="n">switches</span> <span class="k">to</span> <span class="n">benefit</span> <span class="n">from</span> <span class="n">the</span> <span class="k">new</span> <span class="n">image</span><span class="o">.</span>
@@ -345,16 +345,16 @@
   <span class="nc">Display</span> <span class="n">error</span> <span class="n">codes</span>
 
 <span class="n">switch</span> <span class="n">create</span>
-  <span class="nc">Display</span> <span class="ow">or</span> <span class="n">change</span> <span class="n">current</span> <span class="n">network</span>
+  <span class="nc">Create</span> <span class="n">a</span> <span class="k">new</span> <span class="n">switch</span> <span class="k">for</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">network</span><span class="o">,</span> <span class="ow">or</span> <span class="n">create</span> <span class="n">a</span> <span class="n">sandbox</span> <span class="n">local</span> <span class="n">network</span>
 
 <span class="n">switch</span> <span class="kt">list</span>
-  <span class="nc">Display</span> <span class="ow">or</span> <span class="n">change</span> <span class="n">current</span> <span class="n">network</span>
+  <span class="nc">List</span> <span class="n">the</span> <span class="n">current</span> <span class="n">switches</span><span class="o">/</span><span class="n">networks</span>
 
 <span class="n">switch</span> <span class="n">remove</span>
-  <span class="nc">Remove</span> <span class="n">a</span> <span class="n">network</span> <span class="n">configuration</span>
+  <span class="nc">Remove</span> <span class="n">a</span> <span class="n">network</span> <span class="n">configurations</span><span class="o">/</span><span class="n">switches</span>
 
 <span class="n">switch</span> <span class="k">to</span>
-  <span class="nc">Display</span> <span class="ow">or</span> <span class="n">change</span> <span class="n">current</span> <span class="n">network</span>
+  <span class="nc">Switch</span> <span class="k">to</span> <span class="n">another</span> <span class="n">network</span><span class="o">/</span><span class="n">switch</span>
 
 <span class="n">test</span>
   <span class="nc">For</span> <span class="n">testing</span> <span class="n">only</span>
@@ -429,10 +429,10 @@
 <p><strong>DESCRIPTION</strong></p>
 <p>This command displays information on given accounts, either locally or from the blockchain</p>
 <p>Examples:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span>
 </pre></div>
 </div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">all</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">info</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="n">all</span>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
@@ -1059,72 +1059,25 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </div>
 <div class="section" id="ft-multisig-transfer">
 <h2>ft multisig transfer<a class="headerlink" href="#ft-multisig-transfer" title="Permalink to this headline">¶</a></h2>
-<p>Manage a multisig-wallet (create, confirm, send)</p>
+<p>Transfer TONs from a multisig wallet to another account</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.</p>
-<p><strong>CREATE MULTISIG</strong></p>
-<p>Create an account and get its address:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
-<span class="o">#</span> <span class="n">ft</span> <span class="n">genaddr</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
-</pre></div>
-</div>
-<p>Backup the account info off-computer.</p>
-<p>The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.</p>
-<p>Check its balance with:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span>
-</pre></div>
-</div>
-<p>Then, to create a single-owner multisig:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span>
-</pre></div>
-</div>
-<p>To create a multi-owners multisig:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="n">owner4</span>
-</pre></div>
-</div>
-<p>To create a multi-owners multisig with 2 signs required:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">req</span> <span class="mi">2</span>
-</pre></div>
-</div>
-<p>To create a multi-owners multisig not self-owning:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">create</span> <span class="n">owner1</span> <span class="n">owner2</span> <span class="n">owner3</span> <span class="o">--</span><span class="n">not</span><span class="o">-</span><span class="n">owner</span>
-</pre></div>
-</div>
-<p>Verify that it worked:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">account</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-<p><strong>GET CUSTODIANS</strong></p>
-<p>To get the list of signers:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">custodians</span><span class="s2">&quot;</span>
-</pre></div>
-</div>
-<p><strong>SEND TOKENS</strong></p>
+<p>This command is used to send tokens from a multisig wallet to another account (or to submit a transaction if multiple confirmations are required).</p>
+<p><strong>SIMPLE TRANSFER</strong></p>
 <p>Should be like that:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">-</span><span class="n">from</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="k">to</span> <span class="nc">OTHER</span><span class="o">-</span><span class="nc">ACCOUNT</span>
 </pre></div>
 </div>
 <p>If the target is not an active account:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">parrain</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="mi">100</span><span class="o">.</span><span class="mi">000</span> <span class="o">--</span><span class="n">from</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="k">to</span> <span class="nc">OTHER</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="n">parrain</span>
 </pre></div>
 </div>
 <p>To send all the balance:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="k">to</span> <span class="n">other</span><span class="o">-</span><span class="n">account</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="n">all</span> <span class="o">--</span><span class="n">from</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="k">to</span> <span class="nc">OTHER</span><span class="o">-</span><span class="nc">ACCOUNT</span>
 </pre></div>
 </div>
-<p><strong>CALL WITH TOKENS</strong></p>
+<p><strong>CALL WITH PARAMS</strong></p>
 <p>Should be like that:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">transfer</span> <span class="mi">100</span> <span class="o">--</span><span class="k">to</span> <span class="n">contract</span> <span class="n">set</span> <span class="k">&#39;</span><span class="o">{</span> <span class="s2">&quot;x&quot;</span><span class="o">:</span> <span class="s2">&quot;100&quot;</span> <span class="o">}</span>
-</pre></div>
-</div>
-<p><strong>LIST WAITING TRANSACTIONS</strong></p>
-<p>Display transactions waiting for confirmations:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">waiting</span>
-</pre></div>
-</div>
-<p><strong>CONFIRM TRANSACTION</strong></p>
-<p>Get the transaction ID from above, and use:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">account</span> <span class="o">--</span><span class="n">confirm</span> <span class="nc">TX_ID</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">transfer</span> <span class="mi">100</span> <span class="o">--</span><span class="n">from</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="k">to</span> <span class="nc">CONTRACT</span> <span class="n">set</span> <span class="k">&#39;</span><span class="o">{</span> <span class="s2">&quot;x&quot;</span><span class="o">:</span> <span class="s2">&quot;100&quot;</span> <span class="o">}</span>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
@@ -1146,7 +1099,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <h2>ft node give<a class="headerlink" href="#ft-node-give" title="Permalink to this headline">¶</a></h2>
 <p>Give TONs to accounts on sandbox networks</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>This command can be used to create initial accounts with tokens on sandbox networks running TONOS SE (created using ‘ft switch create sandboxNN’).</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1161,7 +1114,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <h2>ft node live<a class="headerlink" href="#ft-node-live" title="Permalink to this headline">¶</a></h2>
 <p>Open Node Live block explorer webpage</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>Open the block explorer available on the sandbox switch running TONOS SE</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">live</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1170,9 +1123,9 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </div>
 <div class="section" id="ft-node-start">
 <h2>ft node start<a class="headerlink" href="#ft-node-start" title="Permalink to this headline">¶</a></h2>
-<p>Manage local nodes</p>
+<p>Start the node of a local sandbox switch</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>This command can be used to start the node of a local sandbox network running TONOS SE and created using ‘ft switch create sandboxNN’.</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">start</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1181,9 +1134,9 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </div>
 <div class="section" id="ft-node-stop">
 <h2>ft node stop<a class="headerlink" href="#ft-node-stop" title="Permalink to this headline">¶</a></h2>
-<p>Manage local nodes</p>
+<p>Stop the local node of a sandbox switch</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>This command can be used to stop the local node of a sandbox network running TONOS SE</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">stop</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1194,7 +1147,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <h2>ft node update<a class="headerlink" href="#ft-node-update" title="Permalink to this headline">¶</a></h2>
 <p>Update Docker image of TONOS SE for new features. You must recreate sandbox switches to benefit from the new image.</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>This command can be used to update the docker image that will be used to create new sandbox networks (tonlabs/local-node, or the one provide with –image)</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">update</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1208,7 +1161,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <h2>ft node web<a class="headerlink" href="#ft-node-web" title="Permalink to this headline">¶</a></h2>
 <p>Open Node GraphQL webpage</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>This command performs operations on nodes running TONOS SE in sandbox networks. It can start and stop nodes, and send tokens to accounts.</p>
+<p>This command can be used to open the GraphQL webpage associated with the current local network</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">node</span> <span class="n">web</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1270,69 +1223,17 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 </div>
 <div class="section" id="ft-switch-create">
 <h2>ft switch create<a class="headerlink" href="#ft-switch-create" title="Permalink to this headline">¶</a></h2>
-<p>Display or change current network</p>
+<p>Create a new switch for an existing network, or create a sandbox local network</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).</p>
+<p>This command is used to create new switches, either for existing remote networks (mainnet, testnet, etc.) by providing their URL with –url, or to create new local networks running TONOS SE (such switches must be called ‘sandboxNN’ where NN is a number). Each switch includes its own set of accounts and nodes.</p>
+<p>When a new switch is created, it immediately becomes the current switch.</p>
 <p><strong>EXAMPLES</strong></p>
 <p>Display current network and other existing networks:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="kt">list</span>
 </pre></div>
 </div>
 <p>Change current network to an existing network NETWORK:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="nc">NETWORK</span>
-</pre></div>
-</div>
-<p>Create a new network with name NETWORK and url URL, and switch to that network:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="nc">NETWORK</span> <span class="o">--</span><span class="n">url</span> <span class="nc">URL</span>
-</pre></div>
-</div>
-<p>Removing a created network:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">remove</span> <span class="nc">NETWORK</span>
-</pre></div>
-</div>
-<p><strong>SANDBOXING</strong></p>
-<p>As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network ‘sandboxN` where N is a number. The corresponding node will run on port 7080+N.</p>
-<p>Example of session (create network, start node, give user1 1000 TONs):</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="o">--</span><span class="n">create</span> <span class="n">sandbox1</span>
-</pre></div>
-</div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">start</span>
-</pre></div>
-</div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="o">--</span><span class="n">give</span> <span class="n">user1</span><span class="o">:</span><span class="mi">1000</span>
-</pre></div>
-</div>
-<p>When a local network is created, it is initialized with:</p>
-<ul class="simple">
-<li>1.
-An account ‘giver’ corresponding to the Giver contract holding 5 billion TONS</li>
-<li>2.
-A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.</li>
-</ul>
-<p>The 10 accounts are not deployed, but it is possible to use ‘ft node –give ACCOUNT’ to automatically deploy the account.</p>
-<p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="nc">NETWORK</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
-</pre></div>
-</div>
-<p>Where options are:</p>
-<ul class="simple">
-<li><code class="code docutils literal notranslate"><span class="pre">NETWORK</span></code>   Name of network switch to create</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--image</span> <span class="pre">DOCKER</span></code>   Docker image to use for sandboxes</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
-</ul>
-</div>
-<div class="section" id="ft-switch-list">
-<h2>ft switch list<a class="headerlink" href="#ft-switch-list" title="Permalink to this headline">¶</a></h2>
-<p>Display or change current network</p>
-<p><strong>DESCRIPTION</strong></p>
-<p>Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).</p>
-<p><strong>EXAMPLES</strong></p>
-<p>Display current network and other existing networks:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span>
-</pre></div>
-</div>
-<p>Change current network to an existing network NETWORK:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="nc">NETWORK</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="k">to</span> <span class="nc">NETWORK</span>
 </pre></div>
 </div>
 <p>Create a new network with name NETWORK and url URL, and switch to that network:</p>
@@ -1352,7 +1253,7 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">start</span>
 </pre></div>
 </div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="n">user1</span><span class="o">:</span><span class="mi">1000</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="n">user1</span> <span class="o">--</span><span class="n">amount</span> <span class="mi">1000</span>
 </pre></div>
 </div>
 <p>When a local network is created, it is initialized with:</p>
@@ -1362,7 +1263,23 @@ An account ‘giver’ corresponding to the Giver contract holding 5 billion TON
 <li>2.
 A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.</li>
 </ul>
-<p>The 10 accounts are not deployed, but it is possible to use ‘ft node –give ACCOUNT’ to automatically deploy the account.</p>
+<p>The 10 accounts are not deployed, but it is possible to use ‘ft node give ACCOUNT’ to automatically deploy the account.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="nc">NETWORK</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">NETWORK</span></code>   Name of network switch to create</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--image</span> <span class="pre">DOCKER</span></code>   Docker image to use for sandboxes</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
+</ul>
+</div>
+<div class="section" id="ft-switch-list">
+<h2>ft switch list<a class="headerlink" href="#ft-switch-list" title="Permalink to this headline">¶</a></h2>
+<p>List the current switches/networks</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command is used to list the known networks (switches) and the current configuration.</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="kt">list</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -1371,9 +1288,9 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 </div>
 <div class="section" id="ft-switch-remove">
 <h2>ft switch remove<a class="headerlink" href="#ft-switch-remove" title="Permalink to this headline">¶</a></h2>
-<p>Remove a network configuration</p>
+<p>Remove a network configurations/switches</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>Remove network configuration</p>
+<p>Remove network configurations</p>
 <p><strong>EXAMPLES</strong></p>
 <p>Removing a created network:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">remove</span> <span class="nc">NETWORK</span>
@@ -1391,46 +1308,22 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 </div>
 <div class="section" id="ft-switch-to">
 <h2>ft switch to<a class="headerlink" href="#ft-switch-to" title="Permalink to this headline">¶</a></h2>
-<p>Display or change current network</p>
+<p>Switch to another network/switch</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>Manage the different networks. Each switch includes a set of accounts and nodes. TONOS SE local networks can be created with this command (see the SANDBOXING section below).</p>
-<p><strong>EXAMPLES</strong></p>
+<p>This command is used to switch the current network configuration to the provided switch. To only switch to a new network for a particular command, it is possible to use the –switch argument instead.</p>
+<p><strong>EXAMPLE</strong></p>
 <p>Display current network and other existing networks:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="kt">list</span>
 </pre></div>
 </div>
 <p>Change current network to an existing network NETWORK:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="nc">NETWORK</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="k">to</span> <span class="nc">NETWORK</span>
 </pre></div>
 </div>
-<p>Create a new network with name NETWORK and url URL, and switch to that network:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="nc">NETWORK</span> <span class="o">--</span><span class="n">url</span> <span class="nc">URL</span>
+<p>Call a command for another switch:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="o">--</span><span class="n">switch</span> <span class="nc">NETWORK</span> <span class="n">call</span> <span class="n">contract</span> <span class="n">get</span> <span class="k">&#39;</span><span class="o">{}</span><span class="k">&#39;</span>
 </pre></div>
 </div>
-<p>Removing a created network:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">remove</span> <span class="nc">NETWORK</span>
-</pre></div>
-</div>
-<p><strong>SANDBOXING</strong></p>
-<p>As a specific feature, ft can create networks based on TONOS SE to run on the local computer. Such networks are automatically created by naming the network ‘sandboxN` where N is a number. The corresponding node will run on port 7080+N.</p>
-<p>Example of session (create network, start node, give user1 1000 TONs):</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">switch</span> <span class="n">create</span> <span class="n">sandbox1</span>
-</pre></div>
-</div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">start</span>
-</pre></div>
-</div>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">$</span> <span class="n">ft</span> <span class="n">node</span> <span class="n">give</span> <span class="n">user1</span><span class="o">:</span><span class="mi">1000</span>
-</pre></div>
-</div>
-<p>When a local network is created, it is initialized with:</p>
-<ul class="simple">
-<li>1.
-An account ‘giver’ corresponding to the Giver contract holding 5 billion TONS</li>
-<li>2.
-A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the same secret keys, so it is possible to define test scripts that will work on different instances of local networks.</li>
-</ul>
-<p>The 10 accounts are not deployed, but it is possible to use ‘ft node –give ACCOUNT’ to automatically deploy the account.</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="k">to</span> <span class="nc">NETWORK</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
