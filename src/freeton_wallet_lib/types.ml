@@ -30,7 +30,7 @@ type local_node = {
 
 type node = {
   node_name : string ; [@key "name"]
-  node_url : string ;  [@key "url" ]
+  mutable node_url : string ;  [@key "url" ]
   node_local : local_node option ;
 } [@@deriving json_encoding]
 
@@ -55,6 +55,7 @@ type config = {
   mutable current_network : string ;  [@key "network"]
   mutable networks : network list ;
   mutable repos : repos option ;
+  mutable multisigs : string list ;   [@dft []]
 } [@@deriving json_encoding]
 
 type address =

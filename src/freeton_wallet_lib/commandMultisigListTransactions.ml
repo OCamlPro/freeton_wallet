@@ -13,33 +13,13 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-open Types
 open Types.MULTISIG
-
-let is_multisig_contract = function
-  | "SafeMultisigWallet"
-  | "SetcodeMultisigWallet"
-  | "SetcodeMultisigWallet2"
-    -> true
-  | _ -> false
-
-let check_key_contract key =
-  match key.key_account with
-  | Some { acc_contract = Some acc_contract ; _ } ->
-      if is_multisig_contract acc_contract then
-        acc_contract
-      else
-        Error.raise "Account's contract %S is not multisig" acc_contract;
-
-      (* Account's contract is not set, let's use the minimal common ABI *)
-  | _ ->
-      "SafeMultisigWallet"
 
 let get_waiting account =
   let config = Config.config () in
   let net = Config.current_network config in
   let key = Misc.find_key_exn net account in
-  let contract = check_key_contract key in
+  let contract = CommandMultisigCreate.check_key_contract key in
   let address = Misc.get_key_address_exn key in
 
   let subst ~msg:_ _config res =

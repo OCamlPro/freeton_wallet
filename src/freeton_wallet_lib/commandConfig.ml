@@ -14,34 +14,95 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action ~deployer =
+let action ?client_repo ?solc_repo ?linker_repo ?(add_multisigs=[]) () =
   let config = Config.config () in
-  let net = Config.current_network config in
-  begin
-    match deployer with
-    | None -> ()
-    | Some deployer ->
-        net.net_deployer <- deployer ;
-        Printf.eprintf "Deployer set to %S\n5!" deployer;
-        config.modified <- true
-  end;
-  ()
+  let _net = Config.current_network config in
+  let repos = Config.repos config in
+  match client_repo, solc_repo, linker_repo, add_multisigs with
+  | None, None, None, [] ->
+      Printf.printf "Config:\n";
+      Printf.printf "  client-repo: %s\n" repos.repo_tonos_cli ;
+      Printf.printf "  solc-repo: %s\n" repos.repo_solc ;
+      Printf.printf "  linker-repo: %s\n" repos.repo_tvm_linker ;
+      Printf.printf "  multisigs: %s\n"
+        ( String.concat ", " config.multisigs );
+      Printf.printf "%!"
+
+  | _ ->
+      let maybe_set option name default setter =
+        match option with
+        | None -> ()
+        | Some s ->
+            let s =
+              match s with
+              | "" | "-" | "default" -> default
+              | _ -> s
+            in
+            setter s ;
+            Printf.eprintf "%s set to %S\n5!" name s;
+            config.modified <- true
+      in
+      maybe_set client_repo "client-repo" Config.default_repos.repo_tonos_cli
+        (fun s -> repos.repo_tonos_cli <- s ) ;
+      maybe_set solc_repo "solc-repo" Config.default_repos.repo_solc
+        (fun s -> repos.repo_solc <- s ) ;
+      maybe_set linker_repo "linker-repo" Config.default_repos.repo_tvm_linker
+        (fun s -> repos.repo_tvm_linker <- s ) ;
+      List.iter (fun s ->
+          if not ( List.mem s config.multisigs ) then begin
+            config.multisigs <- s :: config.multisigs ;
+            Printf.printf "%s added to multisigs\n%!" s;
+            config.modified <- true ;
+          end
+        ) add_multisigs ;
+      ()
 
 let cmd =
+  let client_repo = ref None in
+  let solc_repo = ref None in
+  let linker_repo = ref None in
+  let add_multisigs = ref [] in
   let deployer = ref None in
   EZCMD.sub
     "config"
     (fun () ->
+       begin
+         match !deployer with
+         | None -> ()
+         | Some deployer ->
+             CommandSwitchConfig.action ~deployer ()
+       end;
        action
-         ~deployer:!deployer
+         ?client_repo:!client_repo
+         ?solc_repo:!solc_repo
+         ?linker_repo:!linker_repo
+         ~add_multisigs:!add_multisigs
+         ()
     )
     ~args:
       [
+
+        [ "client-repo" ], Arg.String ( fun s -> client_repo := Some s ),
+        EZCMD.info ~docv:"GIT_URL"
+          "The URL of the GIT repo of tonos-cli for `ft init`" ;
+
+        [ "solc-repo" ], Arg.String ( fun s -> solc_repo := Some s ),
+        EZCMD.info ~docv:"GIT_URL"
+          "The URL of the GIT repo of TON-Solidity-Compiler for `ft init`" ;
+
+        [ "linker-repo" ], Arg.String ( fun s -> linker_repo := Some s ),
+        EZCMD.info ~docv:"GIT_URL"
+          "The URL of the GIT repo of TVM-linker for `ft init`" ;
+
+        [ "add-multisig" ], Arg.String ( fun s ->
+            add_multisigs := s :: !add_multisigs ),
+        EZCMD.info ~docv:"CONTRACT"
+          "Add a new multisig contract name" ;
+
         [ "deployer" ], Arg.String ( fun s -> deployer := Some s ),
         EZCMD.info ~docv:"ACCOUNT"
-          "Set deployer to account ACCOUNT. The deployer is the \
-           account used to credit the initial balance of an address \
-           before deploying a contract on it." ;
+          "DEPRECATED. Use `ft switch config --deployer` instead." ;
+
       ]
     ~doc: "Modify configuration"
     ~man:[
