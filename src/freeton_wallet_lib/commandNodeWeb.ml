@@ -37,7 +37,6 @@ let cmd =
     ~doc:  "Open Node GraphQL webpage"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command performs operations on nodes running TONOS SE \
-          in sandbox networks. It can start and stop nodes, and send \
-          tokens to accounts.";
+      `P "This command can be used to open the GraphQL webpage \
+          associated with the current local network"
     ]

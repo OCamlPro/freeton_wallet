@@ -197,52 +197,22 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT" "Target of a transfer";
 
       ]
-    ~doc: "Manage a multisig-wallet (create, confirm, send)"
+    ~doc: "Transfer TONs from a multisig wallet to another account"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command is used to manage a multisig wallet, i.e. create the wallet, send tokens and confirm transactions.";
+      `P "This command is used to send tokens from a multisig wallet \
+          to another account (or to submit a transaction if multiple \
+          confirmations are required).";
 
-      `S "CREATE MULTISIG";
-      `P "Create an account and get its address:";
-      `Pre {|# ft account --create my-account
-# ft genaddr my-account|};
-      `P "Backup the account info off-computer.";
-      `P "The second command will give you an address in 0:XXX format. Send some tokens on the address to be able to deploy the multisig.";
-      `P "Check its balance with:";
-      `Pre {|# ft account my-account|};
-      `P "Then, to create a single-owner multisig:";
-      `Pre {|# ft multisig -a my-account --create|} ;
-      `P "To create a multi-owners multisig:";
-      `Pre {|# ft multisig -a my-account --create owner2 owner3 owner4|} ;
-      `P "To create a multi-owners multisig with 2 signs required:";
-      `Pre {|# ft multisig -a my-account --create owner2 owner3 --req 2|} ;
-      `P "To create a multi-owners multisig not self-owning:";
-      `Pre {|# ft multisig -a my-account --create owner1 owner2 owner3 --not-owner|} ;
-
-      `P "Verify that it worked:";
-      `Pre {|# ft account my-account -v|};
-
-      `S "GET CUSTODIANS";
-      `P "To get the list of signers:";
-      `Pre {|# ft multisig -a my-account --custodians"|};
-
-      `S "SEND TOKENS";
+      `S "SIMPLE TRANSFER";
       `P "Should be like that:";
-      `Pre {|# ft multisig -a my-account --transfer 100.000 --to other-account|};
+      `Pre {|# ft multisig transfer 100.000 -from MY-ACCOUNT --to OTHER-ACCOUNT|};
       `P "If the target is not an active account:";
-      `Pre {|# ft multisig -a my-account --transfer 100.000 --to other-account --parrain|};
+      `Pre {|# ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain|};
       `P "To send all the balance:";
-      `Pre {|# ft multisig -a my-account --transfer all --to other-account|};
+      `Pre {|# ft multisig transfer all --from MY-ACCOUNT --to OTHER-ACCOUNT|};
 
-      `S "CALL WITH TOKENS";
+      `S "CALL WITH PARAMS";
       `P "Should be like that:";
-      `Pre {|# ft multisig -a my-account --transfer 100 --to contract set '{ "x": "100" }|};
-
-      `S "LIST WAITING TRANSACTIONS";
-      `P "Display transactions waiting for confirmations:";
-      `Pre {|# ft multisig -a my-account --waiting|};
-
-      `S "CONFIRM TRANSACTION";
-      `P "Get the transaction ID from above, and use:";
-      `Pre {|# ft multisig -a my-account --confirm TX_ID|};
+      `Pre {|# ft multisig transfer 100 --from MY-ACCOUNT --to CONTRACT set '{ "x": "100" }|};
     ]

@@ -34,10 +34,9 @@ let cmd =
     )
     ~args: [
     ]
-    ~doc: "Manage local nodes"
+    ~doc: "Stop the local node of a sandbox switch"
     ~man:[
       `S "DESCRIPTION";
-      `P "This command performs operations on nodes running TONOS SE \
-          in sandbox networks. It can start and stop nodes, and send \
-          tokens to accounts.";
+      `P "This command can be used to stop the local node of a sandbox \
+          network running TONOS SE"
     ]

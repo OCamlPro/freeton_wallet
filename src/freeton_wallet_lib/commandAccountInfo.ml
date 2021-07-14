@@ -61,37 +61,6 @@ let get_account_info config address =
   | _ -> assert false
 
 
-let cut v =
-  let rem = Int64.rem v 1_000L in
-  let v = Int64.div v 1_000L in
-  v, rem
-
-let string_of_nanoton v =
-  let v, nanotons = cut v in
-  let v, mutons = cut v in
-  let v, millitons = cut v in
-  let v, tons = cut v in
-  let v, thousandtons = cut v in
-  let v, milliontons = cut v in
-  let v, billiontons = cut v in
-  assert (v = 0L);
-  let tons =
-    match billiontons, milliontons, thousandtons with
-    | 0L, 0L, 0L -> Int64.to_string tons
-    | 0L, 0L, _ -> Printf.sprintf "%Ld_%03Ld" thousandtons tons
-    | 0L, _, _ -> Printf.sprintf "%Ld_%03Ld_%03Ld" milliontons thousandtons tons
-    | _, _, _ -> Printf.sprintf "%Ld_%03Ld_%03Ld_%03Ld"
-                   billiontons milliontons thousandtons tons
-  in
-  let nanotons = match nanotons, mutons, millitons with
-    | 0L, 0L, 0L -> ""
-    | 0L, 0L, _ -> Printf.sprintf "%03Ld" millitons
-    | 0L, _, _ -> Printf.sprintf "%03Ld_%03Ld" millitons mutons
-    | _, _, _ -> Printf.sprintf "%03Ld_%03Ld_%03Ld" millitons mutons nanotons
-  in
-  let s = Printf.sprintf "%s.%s" tons nanotons in
-  s
-
 let get_account_info config ~name ~address =
   match get_account_info config address with
   | None ->
@@ -102,7 +71,7 @@ let get_account_info config ~name ~address =
          | None -> "no balance"
          | Some n ->
              Printf.sprintf "%s TONs (%s)"
-               (string_of_nanoton (Z.to_int64 n))
+               (Misc.string_of_nanoton (Z.to_int64 n))
                (match account.acc_type_name with
                 | None -> "Non Exists"
                 | Some s ->
@@ -214,8 +183,8 @@ let cmd =
       `Blocks [
         `P "This command displays information on given accounts, either locally or from the blockchain";
         `P "Examples:";
-        `Pre {|ft account info my-account|};
-        `Pre {|ft account info my-account --all|}
+        `Pre {|ft account info MY-ACCOUNT|};
+        `Pre {|ft account info MY-ACCOUNT --all|}
       ];
 
     ]

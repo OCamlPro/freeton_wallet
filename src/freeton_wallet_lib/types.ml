@@ -65,20 +65,33 @@ type address =
 module MULTISIG = struct
 
   type transaction = {
-    id : int64 ;
-    confirmationsMask : int ;
-    signsRequired : int ;
-    signsReceived : int ;
+    id : string ;
+    confirmationsMask : string ;
+    signsRequired : string ;
+    signsReceived : string ;
     creator : string ; (* 0x pubkey *)
-    index : int ;  (* index of custodian creator *)
+    index : string ;  (* index of custodian creator *)
     dest : string ;
     value : string;
-    sendFlags : int;
+    sendFlags : string;
     payload : string ;
     bounce : bool;
   } [@@deriving json_encoding]
 
-  type transactions = transaction list
+  type transactions = {
+    transactions : transaction list ;
+  }
+  [@@deriving json_encoding]
+
+  type custodian = {
+    index : string ;
+    pubkey : string ;
+  }
+  [@@deriving json_encoding]
+
+  type custodians = {
+    custodians : custodian list ;
+  }
   [@@deriving json_encoding]
 
 end
