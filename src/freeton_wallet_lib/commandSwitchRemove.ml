@@ -23,12 +23,12 @@ let action ~switches ~force =
   | _ ->
       List.iter (fun net_name ->
           let config = Config.config () in
-          begin
-            match net_name with
-            | "mainnet" | "testnet" ->
-                Error.raise "Cannot remove predefined switch %S" net_name
-            | _ -> ()
-          end;
+          if not force then
+            List.iter (fun net ->
+                if net_name = net.net_name then
+                  Error.raise
+                    "Cannot remove predefined switch %S (use -f to force)" net_name
+              ) Config.known_networks ;
           if List.for_all (fun net -> net.net_name <> net_name )
               config.networks then
             Error.raise "Network %S does not exist" net_name ;

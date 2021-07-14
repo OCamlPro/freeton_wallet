@@ -26,3 +26,5 @@ val loaded : unit -> bool
 val load_wallet : Types.network -> unit
 
 val repos : Types.config -> Types.repos
+
+val known_networks : Types.network list

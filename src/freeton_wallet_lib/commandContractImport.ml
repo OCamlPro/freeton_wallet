@@ -43,15 +43,17 @@ let action ~filename () =
           match CommandContractBuild.get_current_version contract with
           | None -> Some 1
           | Some version ->
-              let contract_dir = Globals.contracts_dir // contract in
-              let contract_prefix = contract_dir // string_of_int version in
+              let contract = contract // string_of_int version in
+              let contract_prefix = Globals.contracts_dir // contract in
               if
                 CommandContractBuild.same_file
                   (contract_prefix ^ ".tvc")  tvc &&
                 CommandContractBuild.same_file
-                  (contract_prefix ^ ".abi.json") abi then
+                  (contract_prefix ^ ".abi.json") abi then begin
+                Printf.eprintf "Contract already known as %s\n%!"
+                  contract ;
                 None
-              else
+              end else
                 Some ( version + 1 )
         in
         begin

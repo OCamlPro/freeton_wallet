@@ -1,7 +1,7 @@
 all:
 	mkdir -p dockerbuild/bin
 	docker cp -L ft-build:/root/ft/bin/ dockerbuild/
-	docker cp -L ft-build:/bin/freeton-wallet/ft dockerbuild/bin/
+	docker cp -L ft-build:/freeton_wallet/ft dockerbuild/bin/
 	docker build -t "ocamlpro/ft:latest" dockerbuild/
 
 dev-create:

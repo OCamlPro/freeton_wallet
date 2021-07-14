@@ -1,0 +1,14 @@
+diff --git a/src/freeton_ocaml_sdk/dune b/src/freeton_ocaml_sdk/dune
+index 0987dc7..9a68443 100644
+--- a/src/freeton_ocaml_sdk/dune
++++ b/src/freeton_ocaml_sdk/dune
+@@ -8,7 +8,8 @@
+    (run cargo build --target-dir %{project_root}/../../_build/target --release)
+    (run sh -c
+      "mv %{project_root}/../../_build/target/release/libfreeton_ocaml_sdk.so ./dllfreeton_ocaml_sdk.so 2> /dev/null || \
+-      mv %{project_root}/../../_build/target/release/libfreeton_ocaml_sdk.dylib ./dllfreeton_ocaml_sdk.so")
++      mv %{project_root}/../../_build/target/release/libfreeton_ocaml_sdk.dylib ./dllfreeton_ocaml_sdk.so || \
++      cp %{project_root}/../../_build/target/release/libfreeton_ocaml_sdk.a  ./dllfreeton_ocaml_sdk.so")
+    (run mv %{project_root}/../../_build/target/release/libfreeton_ocaml_sdk.a libfreeton_ocaml_sdk.a))))
+ 
+ (library

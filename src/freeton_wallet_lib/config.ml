@@ -194,24 +194,6 @@ let mainnet_node = {
   node_local = None ;
 }
 
-let testnet_node = {
-  node_name = "tonlabs" ;
-  node_url = "https://net.ton.dev";
-  node_local = None ;
-}
-
-let rustnet_node = {
-  node_name = "tonlabs" ;
-  node_url = "https://rustnet.ton.dev";
-  node_local = None ;
-}
-
-let fldnet_node = {
-  node_name = "tonlabs" ;
-  node_url = "https://fld.ton.dev";
-  node_local = None ;
-}
-
 let mainnet_network = {
   net_name = "mainnet" ;
   current_node = "tonlabs" ;
@@ -219,6 +201,12 @@ let mainnet_network = {
   net_nodes = [ mainnet_node ] ;
   net_keys = [] ;
   net_deployer = "deployer" ;
+}
+
+let testnet_node = {
+  node_name = "tonlabs" ;
+  node_url = "https://net.ton.dev";
+  node_local = None ;
 }
 
 let testnet_network = {
@@ -230,13 +218,10 @@ let testnet_network = {
   net_deployer = "deployer" ;
 }
 
-let fldnet_network = {
-  net_name = "fldnet" ;
-  current_node = "tonlabs" ;
-  current_account = None ;
-  net_nodes = [ fldnet_node ] ;
-  net_keys = [ ];
-  net_deployer = "deployer" ;
+let rustnet_node = {
+  node_name = "tonlabs" ;
+  node_url = "https://rustnet.ton.dev";
+  node_local = None ;
 }
 
 let rustnet_network = {
@@ -247,6 +232,44 @@ let rustnet_network = {
   net_keys = [ ];
   net_deployer = "deployer" ;
 }
+
+let fldnet_node = {
+  node_name = "tonlabs" ;
+  node_url = "https://fld.ton.dev";
+  node_local = None ;
+}
+
+let fldnet_network = {
+  net_name = "fldnet" ;
+  current_node = "tonlabs" ;
+  current_account = None ;
+  net_nodes = [ fldnet_node ] ;
+  net_keys = [ ];
+  net_deployer = "deployer" ;
+}
+
+let nil_node = {
+  node_name = "NilFoundation" ;
+  node_url = "https://net.freeton.nil.foundation/" ;
+  node_local = None ;
+}
+
+let nil_network = {
+  net_name = "nil" ;
+  current_node = "NilFoundation" ;
+  current_account = None ;
+  net_nodes = [ nil_node ] ;
+  net_keys = [ ];
+  net_deployer = "deployer" ;
+}
+
+let known_networks = [
+  mainnet_network ;
+  testnet_network ;
+  fldnet_network ;
+  rustnet_network ;
+  nil_network ;
+]
 
 let repo_tonos_cli = "https://github.com/tonlabs/tonos-cli.git"
 let repo_solc = "https://github.com/tonlabs/TON-Solidity-Compiler.git"
@@ -264,8 +287,6 @@ let default_config = {
   current_network = "testnet" ;
   networks = [ testnet_network ;
                mainnet_network ;
-               rustnet_network ;
-               fldnet_network ;
              ] ;
   repos = Some default_repos ;
 }

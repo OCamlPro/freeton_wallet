@@ -311,8 +311,8 @@ On wallet accounts:
     Output an in-message to ACCOUNT with the given arguments
 
 On contracts:
-* contract:tvc:CONTRACT
-* contract:abi:CONTRACT
+* contract:tvc:CONTRACT Filename of corresponding contract TVC image
+* contract:abi:CONTRACT Filename of corresponding contract ABI
 * contract:payload:CONTRACT:METH:PARAMS Output payload base64
 
 Misc:

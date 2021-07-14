@@ -32,15 +32,12 @@ make dev
 
 Inside the prompt, we will need to install all dependencies:
 ```
-apk add --upgrade --no-cache make patch gcc curl coreutils musl-dev
+apk add --upgrade --no-cache make patch gcc curl coreutils musl-dev opam git  gmp-dev pkgconf libressl-dev emacs cmake 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # choose 1
-apk add opam
 opam init -a -y --comp 4.10.0 --disable-sandboxing
-apk add git
 opam repo add ocp git+https://github.com/OCamlPro/ocp-opam-repository --set-default --all
-apk add gmp-dev pkgconf libressl-dev
-opam install ssl.0.5.9
+opam install ssl.0.5.9 drom
 ```
 
 Finally, we can build ft:
@@ -53,6 +50,17 @@ cp -f $HOME/.opam/4.10.0/bin/ft /bin/ft
 or manually:
 ```
 source $HOME/.cargo/env
+```
+
+```
+git clone https://github.com/OCamlPro/freeton_ocaml_sdk
+cd freeton_ocaml_sdk
+patch -p1 < freeton_ocaml_sdk.patch
+drom install .
+cd ..
+```
+
+```
 git clone https://github.com/OCamlPro/freeton_wallet
 cd freeton_wallet
 emacs src/freeton_crawler_lib/dune
@@ -63,5 +71,7 @@ cp -f ft /bin/ft
 
 Finally, we can build all utilities:
 ```
+apk add g++ boost boost-dev boost-static
 FT_HOME=/root/ft ft init
 ```
+

@@ -47,9 +47,19 @@ let action ~switch ~url ~image =
       | Some _node_url, Some _ ->
           Error.raise "sandbox network %S URL cannot be specified" net_name
       | None, None ->
-          Error.raise
-            "New network %S must either be sandboxed 'sandboxN' or remote (--url)"
-            net_name
+          List.iter (fun net ->
+              if net_name = net.net_name then begin
+                config.networks <- config.networks @ [ net ] ;
+                config.current_network <- net_name ;
+                config.modified <- true ;
+              end
+            ) Config.known_networks ;
+          if not config.modified then
+            Error.raise
+              "New network %S must either be sandboxed 'sandboxN', remote (--url) or known (%s)"
+              net_name
+              (String.concat ", "
+                 ( List.map (fun net -> net.net_name ) Config.known_networks ))
 
       | None, Some n ->
           let n = int_of_string n in

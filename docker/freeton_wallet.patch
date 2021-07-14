@@ -1,0 +1,41 @@
+diff --git a/src/freeton_crawler_lib/dune b/src/freeton_crawler_lib/dune
+index 00f5b49..73a54fb 100644
+--- a/src/freeton_crawler_lib/dune
++++ b/src/freeton_crawler_lib/dune
+@@ -18,37 +18,4 @@
+ (documentation
+   (package freeton_crawler_lib))
+ 
+-(rule
+- (targets db.ml)
+- (deps
+-  (:src db.pp.ml)
+-  updated.ml
+-  (env_var PGDATABASE)
+-  (env_var PGCUSTOM_CONVERTERS_CONFIG))
+- (mode promote)
+- (action
+-  (with-stdout-to %{targets}
+-    (run %{lib:pgocaml_ppx:ppx.exe} %{src}))))
+-
+-(rule
+- (targets db_utils.ml)
+- (deps
+-  (:src db_utils.pp.ml)
+-  updated.ml
+-  (env_var PGDATABASE)
+-  (env_var PGCUSTOM_CONVERTERS_CONFIG))
+- (mode promote)
+- (action
+-  (with-stdout-to %{targets}
+-    (run %{lib:pgocaml_ppx:ppx.exe} %{src}))))
+-
+-(rule
+-  (targets updated.ml)
+-  (deps
+-    ../freeton_crawler_db_versions/main.ml
+-    %{bin:freeton_crawler_db_updater})
+-  (mode promote)
+-  (action
+-      (run %{bin:freeton_crawler_db_updater} updated.ml))
+-)
