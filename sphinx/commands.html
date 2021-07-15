@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (aec38be
-) (2021/07/14 14:04) documentation</title>
+ (95c856d
+) (2021/07/15 08:40) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (aec38be
+ (95c856d
 )
               </div>
             
@@ -143,6 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#ft-node-web">ft node web</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-output">ft output</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-print-error">ft print error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-switch-config">ft switch config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-switch-create">ft switch create</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-switch-list">ft switch list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-switch-remove">ft switch remove</a></li>
@@ -343,6 +344,9 @@
 
 <span class="n">print</span> <span class="n">error</span>
   <span class="nc">Display</span> <span class="n">error</span> <span class="n">codes</span>
+
+<span class="n">switch</span> <span class="n">config</span>
+  <span class="nc">Modify</span> <span class="n">configuration</span>
 
 <span class="n">switch</span> <span class="n">create</span>
   <span class="nc">Create</span> <span class="n">a</span> <span class="k">new</span> <span class="n">switch</span> <span class="k">for</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">network</span><span class="o">,</span> <span class="ow">or</span> <span class="n">create</span> <span class="n">a</span> <span class="n">sandbox</span> <span class="n">local</span> <span class="n">network</span>
@@ -627,7 +631,11 @@
 </div>
 <p>Where options are:</p>
 <ul class="simple">
-<li><code class="code docutils literal notranslate"><span class="pre">--deployer</span> <span class="pre">ACCOUNT</span></code>   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--add-multisig</span> <span class="pre">CONTRACT</span></code>   Add a new multisig contract name</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--client-repo</span> <span class="pre">GIT_URL</span></code>   The URL of the GIT repo of tonos-cli for <cite>ft init</cite></li>
+<li><code class="code docutils literal notranslate"><span class="pre">--deployer</span> <span class="pre">ACCOUNT</span></code>   DEPRECATED. Use <cite>ft switch config –deployer</cite> instead.</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--linker-repo</span> <span class="pre">GIT_URL</span></code>   The URL of the GIT repo of TVM-linker for <cite>ft init</cite></li>
+<li><code class="code docutils literal notranslate"><span class="pre">--solc-repo</span> <span class="pre">GIT_URL</span></code>   The URL of the GIT repo of TON-Solidity-Compiler for <cite>ft init</cite></li>
 </ul>
 </div>
 <div class="section" id="ft-contract-abi">
@@ -1090,6 +1098,7 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--bounce</span> <span class="pre">BOOL</span></code>   BOOL Transfer to inactive account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--from</span> <span class="pre">ACCOUNT</span></code>   The source of the transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--parrain</span></code>    Transfer to inactive account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--send</span></code>   Force sendTransaction() instead of submitTransaction()</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The custodian signing the multisig transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--to</span> <span class="pre">ACCOUNT</span></code>   Target of a transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wait</span></code>   Wait for all transactions to finish</li>
@@ -1219,6 +1228,21 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <p>Where options are:</p>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">ERROR</span> <span class="pre">CODe</span></code>   Error code to explain</li>
+</ul>
+</div>
+<div class="section" id="ft-switch-config">
+<h2>ft switch config<a class="headerlink" href="#ft-switch-config" title="Permalink to this headline">¶</a></h2>
+<p>Modify configuration</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>Change the global configuration or the network configuration.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">switch</span> <span class="n">config</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">--deployer</span> <span class="pre">ACCOUNT</span></code>   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   Node Url of this network (without /graphql)</li>
 </ul>
 </div>
 <div class="section" id="ft-switch-create">

@@ -129,6 +129,9 @@ Overview of sub-commands::
   print error
     Display error codes
   
+  switch config
+    Modify configuration
+  
   switch create
     Create a new switch for an existing network, or create a sandbox local network
   
@@ -581,7 +584,15 @@ Change the global configuration or the network configuration.
 Where options are:
 
 
-* :code:`--deployer ACCOUNT`   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.
+* :code:`--add-multisig CONTRACT`   Add a new multisig contract name
+
+* :code:`--client-repo GIT_URL`   The URL of the GIT repo of tonos-cli for `ft init`
+
+* :code:`--deployer ACCOUNT`   DEPRECATED. Use `ft switch config --deployer` instead.
+
+* :code:`--linker-repo GIT_URL`   The URL of the GIT repo of TVM-linker for `ft init`
+
+* :code:`--solc-repo GIT_URL`   The URL of the GIT repo of TON-Solidity-Compiler for `ft init`
 
 
 ft contract abi
@@ -1353,6 +1364,8 @@ Where options are:
 
 * :code:`--parrain`    Transfer to inactive account
 
+* :code:`--send`   Force sendTransaction() instead of submitTransaction()
+
 * :code:`--src ACCOUNT`   The custodian signing the multisig transfer
 
 * :code:`--to ACCOUNT`   Target of a transfer
@@ -1574,6 +1587,31 @@ Where options are:
 
 
 * :code:`ERROR CODe`   Error code to explain
+
+
+ft switch config
+~~~~~~~~~~~~~~~~~~
+
+Modify configuration
+
+
+
+**DESCRIPTION**
+
+
+Change the global configuration or the network configuration.
+
+**USAGE**
+::
+  
+  ft switch config [OPTIONS]
+
+Where options are:
+
+
+* :code:`--deployer ACCOUNT`   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.
+
+* :code:`--url URL`   Node Url of this network (without /graphql)
 
 
 ft switch create
