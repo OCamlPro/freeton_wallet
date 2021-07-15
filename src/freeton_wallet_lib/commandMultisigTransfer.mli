@@ -17,4 +17,5 @@ val send_transfer :
   ?src:string ->
   dst:string ->
   amount:string ->
-  ?bounce:bool -> ?args:string list -> ?wait:bool -> unit -> unit
+  ?bounce:bool -> ?args:string list -> ?wait:bool ->
+  ?send:bool -> unit -> unit

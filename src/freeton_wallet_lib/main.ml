@@ -40,6 +40,7 @@ let main () =
       [ "switch" ; "to" ], CommandSwitchTo.cmd;
       [ "switch" ; "create" ], CommandSwitchCreate.cmd;
       [ "switch" ; "remove" ], CommandSwitchRemove.cmd;
+      [ "switch" ; "config" ], CommandSwitchConfig.cmd;
 
 (*
       [ "genaddr" ], CommandGenaddr.cmd; (* DEPRECATED *)

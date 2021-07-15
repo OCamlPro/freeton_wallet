@@ -281,6 +281,14 @@ let default_repos = {
   repo_tvm_linker ;
 }
 
+let default_multisigs = [
+  "SafeMultisigWallet" ;
+  "SetcodeMultisigWallet" ;
+  "SafeMultisigWallet24" ;
+  "SetcodeMultisigWallet24" ;
+  "SetcodeMultisigWallet2" ;
+]
+
 let default_config = {
   modified = true ;
   version = 0;
@@ -289,11 +297,15 @@ let default_config = {
                mainnet_network ;
              ] ;
   repos = Some default_repos ;
+  multisigs = default_multisigs ;
 }
 
 let repos config =
   match config.repos with
-  | None -> default_repos
+  | None ->
+      config.repos <- Some default_repos ;
+      config.modified <- true ;
+      default_repos
   | Some repos -> repos
 
 let save config =
@@ -512,6 +524,11 @@ let load () =
           config.modified <- true ;
         end
   end;
+  if config.multisigs = [] then begin
+    config.multisigs <- default_multisigs ;
+    config.modified <- true
+  end;
+
 
   EzFile.make_dir ~p:true Misc.temp_dir;
   if config.modified then begin

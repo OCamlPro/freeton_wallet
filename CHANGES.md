@@ -1,4 +1,22 @@
 
+## v0.6.1
+* Add --send option to `ft multisig transfer` to force use of sendTransaction.
+  May be useful when submitTransaction fails with out-of-gas.
+* Add FT_DOCKER environment variable to pass extra arguments to the
+  Docker version of `ft`. Useful to pass env variables (FT_DOCKER='-e VAR')
+* Add option --image IMAGE to `ft switch create sandbox`
+* Find predefined networks with `ft switch create`
+* Add option `--static-vars` to `ft account create/set` and `ft contract deploy`
+  to be able to deploy with static variables
+* Add urls of GIT repos in `$HOME/.ft/config.json`
+* New sub-command `ft switch config` with options `--url` and `--deployer` to
+  modify network options
+* New options `--client-repo`, `--solc-repo`, `--linker-repo`, `--add-multisig`
+   to `ft config`
+
+## v0.6.0
+* New incompatible interface with multiple levels of subcommands
+
 ## v0.4.4
 
 * Add option --wait to ft call and ft multisig --transfer to wait for the

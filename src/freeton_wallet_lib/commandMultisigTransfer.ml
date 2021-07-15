@@ -13,29 +13,8 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-open Types
-
-let is_multisig_contract = function
-  | "SafeMultisigWallet"
-  | "SetcodeMultisigWallet"
-  | "SetcodeMultisigWallet2"
-    -> true
-  | _ -> false
-
-let check_key_contract key =
-  match key.key_account with
-  | Some { acc_contract = Some acc_contract ; _ } ->
-      if is_multisig_contract acc_contract then
-        acc_contract
-      else
-        Error.raise "Account's contract %S is not multisig" acc_contract;
-
-      (* Account's contract is not set, let's use the minimal common ABI *)
-  | _ ->
-      "SafeMultisigWallet"
-
 let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
-    ?(wait=false) () =
+    ?(wait=false) ?(send=false) () =
   let config = Config.config () in
   let net = Config.current_network config in
 
@@ -51,7 +30,8 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     | None ->
         let account_key = Misc.find_key_exn net account in
         let account_addr = Misc.get_key_address_exn account_key in
-        let account_contract = check_key_contract account_key in
+        let account_contract =
+          CommandMultisigCreate.check_key_contract account_key in
         ( account_addr, account_contract )
   in
   let dst_addr = Utils.address_of_account config dst in
@@ -102,7 +82,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
   in
 
   let meth, params =
-    if allBalance then
+    if send || allBalance then
       let meth = "sendTransaction" in
       let params = Printf.sprintf
           {|{"dest":"%s","value":0,"bounce":%b,"flags":128,"payload":"%s"}|}
@@ -132,7 +112,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     ~wait
     ()
 
-let action account args ~amount ~dst ~bounce ~src ~wait =
+let action account args ~amount ~dst ~bounce ~src ~wait ~send =
 
   let config = Config.config () in
 
@@ -145,7 +125,7 @@ let action account args ~amount ~dst ~bounce ~src ~wait =
   Subst.with_substituted_list config args (fun args ->
       match dst with
       | Some dst ->
-          send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ()
+          send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ()
       | _ ->
           Error.raise "The argument --to ACCOUNT is mandatory"
     )
@@ -157,7 +137,7 @@ let cmd =
   let bounce = ref true in
   let src = ref None in
   let wait = ref false in
-
+  let send = ref false in
   EZCMD.sub
     "multisig transfer"
     (fun () ->
@@ -171,6 +151,7 @@ let cmd =
              ~bounce:!bounce
              ~src:!src
              ~wait:!wait
+             ~send:!send
     )
     ~args:
       [
@@ -186,6 +167,9 @@ let cmd =
 
         [ "wait" ], Arg.Set wait,
         EZCMD.info "Wait for all transactions to finish";
+
+        [ "send" ], Arg.Set send,
+        EZCMD.info "Force sendTransaction() instead of submitTransaction()";
 
         [ "parrain" ], Arg.Clear bounce,
         EZCMD.info " Transfer to inactive account";

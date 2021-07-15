@@ -16,30 +16,22 @@ open EZCMD.TYPES
 
 open Types
 
-(*
-─➤ ft multisig --create validator validator validator2
-Calling /home/lefessan/.ft/testnet/bin/tonos-cli --config /home/lefessan/.ft/testnet/tonos-cli.config deploy /home/lefessan/.ft/contracts/SafeMultisigWallet.tvc {"owners":[ "0x422c6c4f9ab510a8e8622c09c31babffe91af6e496cffd144d1e041d8b6c34ff", "0xf5bfbf398959566b6b538c151e1644ffb188dbdec8bd0acdc136c74422b18400" ],"reqConfirms":1} --abi /home/lefessan/.ft/contracts/SafeMultisigWallet.abi.json --sign /home/lefessan/.ft/tmpfile8dc1f8.tmp --wc 0
-output:
- Config: /home/lefessan/.ft/testnet/tonos-cli.config
-Input arguments:
-     tvc: /home/lefessan/.ft/contracts/SafeMultisigWallet.tvc
-  params: {"owners":[ "0x422c6c4f9ab510a8e8622c09c31babffe91af6e496cffd144d1e041d8b6c34ff", "0xf5bfbf398959566b6b538c151e1644ffb188dbdec8bd0acdc136c74422b18400" ],"reqConfirms":1}
-     abi: /home/lefessan/.ft/contracts/SafeMultisigWallet.abi.json
-    keys: /home/lefessan/.ft/tmpfile8dc1f8.tmp
-      wc: 0
-Connecting to https://net.ton.dev
-Deploying...
-Transaction succeeded.
-Contract deployed at address: 0:2e87845a4b04137d59931198006e3dd4ef49a63b62299aea5425dcf222afa02cw
-*)
+let is_multisig_contract s =
+  let config = Config.config () in
+  let s,_ = EzString.cut_at s '/' in
+  List.mem s config.multisigs
 
+let check_key_contract key =
+  match key.key_account with
+  | Some { acc_contract = Some acc_contract ; _ } ->
+      if is_multisig_contract acc_contract then
+        acc_contract
+      else
+        Error.raise "Account's contract %S is not multisig" acc_contract;
 
-let is_multisig_contract = function
-  | "SafeMultisigWallet"
-  | "SetcodeMultisigWallet"
-  | "SetcodeMultisigWallet2"
-    -> true
-  | _ -> false
+      (* Account's contract is not set, let's use the minimal common ABI *)
+  | _ ->
+      "SafeMultisigWallet"
 
 let create_multisig
     ?client
