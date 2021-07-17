@@ -128,7 +128,7 @@ let action ?wc account custodians ~req ~not_owner ~contract =
 
   let config = Config.config () in
 
-  Subst.with_substituted_list config custodians (fun custodians ->
+  Subst.with_substituted_list ~config custodians (fun custodians ->
       create_multisig account ~custodians ~not_owner ~req ?wc ?contract
     )
 

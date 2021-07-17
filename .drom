@@ -2,17 +2,17 @@
 
 # hash of toml configuration files
 # used for generation of all files
-37fb0dd96d689b1c5deff1854075235e:.
+0678be83d01a6cc55cd5a00029020de4:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
 # file .github/workflows/doc-deploy.yml
-1dbdc1b61cad700333199020fc99aa21:.github/workflows/doc-deploy.yml
+a5fbc85906166b019a1c09cd76c01479:.github/workflows/doc-deploy.yml
 # end context for .github/workflows/doc-deploy.yml
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-857644688a268a29a61514d4c354aa21:.github/workflows/workflow.yml
+ddc268a4de6f09ad399f862df049572f:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -47,7 +47,7 @@ bb203bd782edcf9a04631b76387df826:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-816426b91a3b5bd469e93fbfb480e955:Makefile
+9eec47c287d9cd241b7571258c9176a9:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -87,7 +87,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for drom.toml
 # file drom.toml
-9ca44f80b3395e9e64e030be65d8fc60:drom.toml
+d8e1f86010b70962928b4fd5cad260e8:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -97,7 +97,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-45617558b990e55c7218396772b2bda6:dune-project
+d011ff4660078a31f97a3f3542f3602b:dune-project
 # end context for dune-project
 
 # begin context for freeton_crawler_db_updater.opam
@@ -115,9 +115,14 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 4c1da4deab41db9591e4a0bf0fed9561:freeton_crawler_lib.opam
 # end context for freeton_crawler_lib.opam
 
+# begin context for freeton_solidity_lib.opam
+# file freeton_solidity_lib.opam
+c8d831de22959de6adb2838a8a1d8201:freeton_solidity_lib.opam
+# end context for freeton_solidity_lib.opam
+
 # begin context for freeton_wallet_lib.opam
 # file freeton_wallet_lib.opam
-9b7fe4eed2a317bfbd9b90d62801eabb:freeton_wallet_lib.opam
+ba8ae6d1202fc09a7985a08485ee8f9c:freeton_wallet_lib.opam
 # end context for freeton_wallet_lib.opam
 
 # begin context for ft.opam
@@ -177,7 +182,7 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_db_updater/package.toml
 # file src/freeton_crawler_db_updater/package.toml
-509a5af3c261f82c79034d4231ca3602:src/freeton_crawler_db_updater/package.toml
+493279791d2e540d70d9db2a1fc3095b:src/freeton_crawler_db_updater/package.toml
 # end context for src/freeton_crawler_db_updater/package.toml
 
 # begin context for src/freeton_crawler_db_updater/version.mlt
@@ -197,7 +202,7 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_db_versions/package.toml
 # file src/freeton_crawler_db_versions/package.toml
-0acf47eb35cae1fe2533dd7af7f8a1ef:src/freeton_crawler_db_versions/package.toml
+8dde4942af0bedb13337aa4a28d13348:src/freeton_crawler_db_versions/package.toml
 # end context for src/freeton_crawler_db_versions/package.toml
 
 # begin context for src/freeton_crawler_db_versions/version.mlt
@@ -222,13 +227,38 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_lib/package.toml
 # file src/freeton_crawler_lib/package.toml
-b0942c634d77a08afe3d4f90cd7ff045:src/freeton_crawler_lib/package.toml
+0b4f36cc847ec193e229fb38a5501ee0:src/freeton_crawler_lib/package.toml
 # end context for src/freeton_crawler_lib/package.toml
 
 # begin context for src/freeton_crawler_lib/version.mlt
 # file src/freeton_crawler_lib/version.mlt
 82863218e3d7eba36d808ddbe41c3a77:src/freeton_crawler_lib/version.mlt
 # end context for src/freeton_crawler_lib/version.mlt
+
+# begin context for src/freeton_solidity_lib/dune
+# file src/freeton_solidity_lib/dune
+4fb7c5a2c14257e2255394b0e25d9d51:src/freeton_solidity_lib/dune
+# end context for src/freeton_solidity_lib/dune
+
+# begin context for src/freeton_solidity_lib/index.mld
+# file src/freeton_solidity_lib/index.mld
+a5031ea129fae9ca960536994189e4dd:src/freeton_solidity_lib/index.mld
+# end context for src/freeton_solidity_lib/index.mld
+
+# begin context for src/freeton_solidity_lib/main.ml
+# file src/freeton_solidity_lib/main.ml
+139a166abbebefcec3213e8d82bcf748:src/freeton_solidity_lib/main.ml
+# end context for src/freeton_solidity_lib/main.ml
+
+# begin context for src/freeton_solidity_lib/package.toml
+# file src/freeton_solidity_lib/package.toml
+57002bb663d09818b4ce9b3d3b2e41a2:src/freeton_solidity_lib/package.toml
+# end context for src/freeton_solidity_lib/package.toml
+
+# begin context for src/freeton_solidity_lib/version.mlt
+# file src/freeton_solidity_lib/version.mlt
+82863218e3d7eba36d808ddbe41c3a77:src/freeton_solidity_lib/version.mlt
+# end context for src/freeton_solidity_lib/version.mlt
 
 # begin context for src/freeton_wallet/package.toml
 # file src/freeton_wallet/package.toml
@@ -237,12 +267,12 @@ b0942c634d77a08afe3d4f90cd7ff045:src/freeton_crawler_lib/package.toml
 
 # begin context for src/freeton_wallet_lib/dune
 # file src/freeton_wallet_lib/dune
-cacb6652890bb0033933396e77961590:src/freeton_wallet_lib/dune
+662c1393c9fedfdb2998f7ba9c0b163b:src/freeton_wallet_lib/dune
 # end context for src/freeton_wallet_lib/dune
 
 # begin context for src/freeton_wallet_lib/package.toml
 # file src/freeton_wallet_lib/package.toml
-ef98acb147f21afdbbdff213713cd1df:src/freeton_wallet_lib/package.toml
+905ff3ce495c776bf1baf09b853cb5c5:src/freeton_wallet_lib/package.toml
 # end context for src/freeton_wallet_lib/package.toml
 
 # begin context for src/freeton_wallet_lib/version.mlt

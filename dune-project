@@ -27,6 +27,7 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt_ssl ( >= 1.1 ))
+   (freeton_solidity_lib (= version))
    (freeton_ocaml_sdk (and (>= 0.4.0) (< 1.0.0)))
    (freeton_crawler_lib (= version))
    ezjsonm
@@ -100,6 +101,23 @@
  (depends
    (ocaml (>= 4.08.0))
    ez_pgocaml
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name freeton_solidity_lib)
+ (synopsis "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)")
+ (description "The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.\n\nThe FreeTON blockchain is the open-source version of the Telegram Open\nNetwork. FreeTON is one of the only blockchains with dynamic sharding\nfor unlimited scalability and immediate finality for real-time\napplications. It also uses Proof-of-Stake with delegation through\nsmart contracts. Smart contracts are written in dialects of Solidity\nand C++ with asynchonous external calls.\n")
+ (depends
+   (ocaml (>= 4.08.0))
+   solidity-typechecker
+   (solidity-parser (and (>= 0.2.1) (< 1.0.0)))
+   ocplib_stuff
+   ez_file
    ppx_inline_test
    ppx_expect
    odoc

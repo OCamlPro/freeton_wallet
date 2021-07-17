@@ -337,7 +337,11 @@ Escaping of '}' is done using '\}'.
 |}
 
 
-let with_subst ?brace config f =
+let with_subst ?brace ?config f =
+  let config = match config with
+    | None -> Config.config ()
+    | Some config -> config
+  in
   let (subst, files) = subst_string ?brace config in
   let clean () = List.iter Sys.remove !files in
   match
@@ -346,13 +350,13 @@ let with_subst ?brace config f =
   | res -> clean (); res
   | exception exn -> clean () ; raise exn
 
-let with_substituted ?brace config params f =
-  with_subst ?brace config (fun subst ->
+let with_substituted ?brace ?config params f =
+  with_subst ?brace ?config (fun subst ->
       let params = subst params in
       f params)
 
-let with_substituted_list ?brace config args f =
-  with_subst ?brace config (fun subst ->
+let with_substituted_list ?brace ?config args f =
+  with_subst ?brace ?config (fun subst ->
       let args = List.map subst args in
       f args
     )
@@ -402,7 +406,7 @@ let subst_or_output ~msg ?subst ?output config res =
             EzFile.read_file file
         in
         let map = map_of_json res in
-        with_subst config (fun subst ->
+        with_subst ~config (fun subst ->
             subst content)
           ~brace:(fun s ->
               match StringMap.find s map with

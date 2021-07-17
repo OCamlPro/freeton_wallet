@@ -4,7 +4,7 @@
   (name freeton_wallet_lib)
   (public_name freeton_wallet_lib)
   (wrapped true)
-  (libraries lwt_ssl freeton_ocaml_sdk freeton_crawler_lib ezjsonm ez_subst ez_file ez_config ez_cmdliner calendar )
+  (libraries lwt_ssl freeton_solidity_lib freeton_ocaml_sdk freeton_crawler_lib ezjsonm ez_subst ez_file ez_config ez_cmdliner calendar )
   (preprocess (pps ppx_deriving_encoding))
   
   )
