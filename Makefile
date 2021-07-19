@@ -15,7 +15,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_db_updater freeton_crawler_db_versions
+	./scripts/copy-bin.sh freeton_wallet_lib ft freeton_crawler_lib freeton_crawler_db_updater freeton_crawler_db_versions freeton_solidity_lib
 	./scripts/after.sh build
 
 build-deps:

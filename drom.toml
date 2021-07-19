@@ -70,9 +70,11 @@ share-dirs = ["share"]
 
 # project-wide fields (depends on project skeleton)
 [fields]
-opam-repo = "git+https://github.com/OCamlPro/ocp-opam-repository"
+github-workflow-after-build = """
+      - name: check consistency of committed pre-processed files
+        run: git diff --exit-code src/freeton_crawler_lib
+"""
 github-worlflow-env = """
-
     env:
       PGHOST: localhost
       PGDATABASE: postgres_db
@@ -105,12 +107,7 @@ github-worlflow-env = """
           --health-timeout 5s
           --health-retries 5
 """
-
-github-workflow-after-build = """
-
-      - name: check consistency of committed pre-processed files
-        run: git diff --exit-code src/freeton_crawler_lib
-"""
+opam-repo = "git+https://github.com/OCamlPro/ocp-opam-repository"
 
 [[package]]
 dir = "src/freeton_wallet"
@@ -135,4 +132,8 @@ dir = "src/freeton_crawler_db_updater"
 [[package]]
 dir = "src/freeton_crawler_db_versions"
 # edit 'src/freeton_crawler_db_versions/package.toml' for package-specific options
+
+[[package]]
+dir = "src/freeton_solidity_lib"
+# edit 'src/freeton_solidity_lib/package.toml' for package-specific options
 

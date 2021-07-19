@@ -122,7 +122,7 @@ let action account args ~amount ~dst ~bounce ~src ~wait ~send =
     | Some account -> account
   in
 
-  Subst.with_substituted_list config args (fun args ->
+  Subst.with_substituted_list ~config args (fun args ->
       match dst with
       | Some dst ->
           send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ()

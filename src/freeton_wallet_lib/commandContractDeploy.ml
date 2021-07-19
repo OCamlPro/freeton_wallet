@@ -112,7 +112,7 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
     | None -> key
     | Some sign -> sign
   in
-  Subst.with_substituted config params (fun params ->
+  Subst.with_substituted ~config params (fun params ->
       Printf.eprintf "Deploying contract %S to %s\n%!" contract dst;
       Utils.deploy_contract config ~key ~sign ~contract ~params
         ?initial_data ~wc ())

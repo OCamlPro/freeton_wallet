@@ -93,6 +93,28 @@ let create_new_version contract num =
   EzFile.write_file version_file num;
   contract_dir // num
 
+
+let preprocess_solidity ~from_ ~to_ =
+  Subst.with_subst (fun preprocess ->
+      match FreetonSolidity.handle_exception (fun file ->
+          let ast = FreetonSolidity.parse_file ~preprocess file in
+          let tast = FreetonSolidity.typecheck_ast ast in
+          let s = FreetonSolidity.string_of_ast tast in
+          {|
+pragma ton-solidity >= 0.32.0;
+
+pragma AbiHeader expire;
+pragma AbiHeader pubkey;
+|} ^ s
+        ) from_
+      with
+      | Ok content ->
+          EzFile.write_file to_ content
+      | Error s ->
+          Printf.eprintf "Error: %s\n%!" s;
+          exit 2
+    )
+
 let action ~filename ~force ?contract () =
   (* TODO: check that no account is using this contract,
      otherwise, these accounts will become unreachable, i.e. we
@@ -101,8 +123,19 @@ let action ~filename ~force ?contract () =
   let dirname = Filename.dirname filename in
   let basename = Filename.basename filename in
   let contract, ext = EzString.cut_at basename '.' in
-  if ext <> "sol" then
-    Error.raise "File %s must end with .sol extension" basename;
+  let filename, contract_name =
+    match String.lowercase_ascii ext with
+    | "sol" -> filename, contract_name
+    | "spp" ->
+        let new_filename = dirname // contract ^ ".sol" in
+        preprocess_solidity ~from_:filename ~to_:new_filename;
+        new_filename,
+        ( match contract_name with
+          | None -> Some contract
+          | _ -> contract_name )
+    | _ ->
+        Error.raise "File %s must end with .sol extension" basename
+  in
   let known = known_contracts () in
   if not force && StringMap.mem contract known then
     Error.raise "Contract %s already exists (use -f to override)"

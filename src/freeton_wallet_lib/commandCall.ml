@@ -33,7 +33,7 @@ let action ~account ~meth ~params ~local ~sign ~subst ~wait =
             | None -> None
             | Some _ -> Some key
       in
-      Subst.with_substituted config params (fun params ->
+      Subst.with_substituted ~config params (fun params ->
           Utils.call_contract config ~wait
             ~address ~contract ~meth ~params ~local ?src ~subst () )
 
