@@ -11,3 +11,5 @@
 (**************************************************************************)
 
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
+
+val action_phase_errors : (int * string) list

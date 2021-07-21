@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-6d44506c7a219f961e258ade3109e22a:.
+7a99ca8331b737081cd04b7fe820e75c:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -97,7 +97,7 @@ d8e1f86010b70962928b4fd5cad260e8:drom.toml
 
 # begin context for dune-project
 # file dune-project
-9234065a3365978633eb53912cd632a2:dune-project
+41ea328ebe73bc91a5a7c44ce337b6f2:dune-project
 # end context for dune-project
 
 # begin context for freeton_crawler_db_updater.opam
@@ -117,7 +117,7 @@ d8e1f86010b70962928b4fd5cad260e8:drom.toml
 
 # begin context for freeton_solidity_lib.opam
 # file freeton_solidity_lib.opam
-bf1890d908cdafb15013c1420637e1c6:freeton_solidity_lib.opam
+8dc53db2893eb7a98219688ef0e20f7a:freeton_solidity_lib.opam
 # end context for freeton_solidity_lib.opam
 
 # begin context for freeton_wallet_lib.opam
@@ -244,11 +244,6 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 # file src/freeton_solidity_lib/index.mld
 a5031ea129fae9ca960536994189e4dd:src/freeton_solidity_lib/index.mld
 # end context for src/freeton_solidity_lib/index.mld
-
-# begin context for src/freeton_solidity_lib/main.ml
-# file src/freeton_solidity_lib/main.ml
-139a166abbebefcec3213e8d82bcf748:src/freeton_solidity_lib/main.ml
-# end context for src/freeton_solidity_lib/main.ml
 
 # begin context for src/freeton_solidity_lib/package.toml
 # file src/freeton_solidity_lib/package.toml
