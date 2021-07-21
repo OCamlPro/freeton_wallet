@@ -21,7 +21,7 @@ let create_contract name =
   CommandContractNewIntf.
     create_interface ("I" ^ name);
 
-  let filename = name ^ ".sol" in
+  let filename = name ^ ".spp" in
   if Sys.file_exists filename then
     Printf.eprintf "Skipping generation of %S: already exists\n%!" filename
   else
@@ -70,7 +70,7 @@ all: contracts
 INTERFACES=I*.sol
 
 clean:
-%crm -f *~ *.code *.tvm
+%crm -f *~ *.code
 |} tab
     in
     let content =
@@ -78,8 +78,8 @@ clean:
 
 contracts::%s.code
 
-%s.code: %s.sol $(INTERFACES)
-%cft contract --build %s.sol -f
+%s.code: %s.spp $(INTERFACES)
+%cft contract build %s.spp -f
 |} content
         name name name tab name
     in
@@ -90,10 +90,6 @@ contracts::%s.code
       EzFile.write_file ".gitignore"
         {|*~
 *.code
-
-# Remove these lines when you want to keep the tvm files
-*.tvm
-*.abi.json
 |};
       Printf.eprintf "File .gitignore created\n%!";
     end

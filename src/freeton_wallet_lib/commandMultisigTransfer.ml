@@ -85,9 +85,11 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     if send || allBalance then
       let meth = "sendTransaction" in
       let params = Printf.sprintf
-          {|{"dest":"%s","value":0,"bounce":%b,"flags":128,"payload":"%s"}|}
+          {|{"dest":"%s","value":%s,"bounce":%b,"flags":%d,"payload":"%s"}|}
           dst_addr
+          (if allBalance then "0" else Int64.to_string nanotokens)
           bounce
+          (if allBalance then 128 else 0)
           payload
       in
       Printf.eprintf "Warning: 'all' balance only works with one-custodian multisigs\n%!";

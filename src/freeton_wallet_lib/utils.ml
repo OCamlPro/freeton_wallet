@@ -304,7 +304,7 @@ let track_messages config queue =
     let msg_id = Queue.peek queue in
     begin
       match post config
-              Ton_sdk.REQUEST.( transactions
+              Ton_sdk.REQUEST.( transactions ~level:3
                                   ~filter:
                                     (aeq "in_msg" (astring msg_id))
                                   [] ) with
@@ -314,11 +314,30 @@ let track_messages config queue =
           ignore ( Queue.take queue );
           last_time := Unix.gettimeofday ();
           Printf.printf "Msg %s:\nIn trans. %s\n%!" msg_id tr.tr_id;
-          Printf.printf "  %s %s, delta: %s\n%!"
+          Printf.printf "  %s %s, delta: %s%s%s\n%!"
             (match tr.tr_aborted with
              | false -> ""
              | true -> "aborted,") tr.tr_status_name
-            (Misc.tons_of_z tr.tr_balance_delta );
+            (Misc.tons_of_z tr.tr_balance_delta )
+            (match tr.tr_action with
+             | Some { result_code = Some result_code ; _ } ->
+                 if result_code <> 0 then
+                   Printf.sprintf ", action.result_code = %d%s" result_code
+                     (try
+                        let msg = List.assoc result_code
+                            CommandPrintError.action_phase_errors in
+                        " " ^ msg
+                      with _ -> "" )
+                 else ""
+             | _ -> "" )
+            (match tr.tr_compute with
+             | Some { exit_code = Some exit_code ; _ } ->
+                 if exit_code <> 0 then
+                   Printf.sprintf ", compute.exit_code = %d" exit_code
+                 else ""
+             | _ -> "" )
+
+          ;
           List.iter (fun msg_id ->
               match post config
                       Ton_sdk.REQUEST.( messages ~level:3 ~id: msg_id [] ) with

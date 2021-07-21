@@ -100,12 +100,14 @@ let preprocess_solidity ~from_ ~to_ =
           let ast = FreetonSolidity.parse_file ~preprocess file in
           let tast = FreetonSolidity.typecheck_ast ast in
           let s = FreetonSolidity.string_of_ast tast in
-          {|
+          Printf.sprintf {|
+// This file was generated from file %S. DO NOT EDIT !
 pragma ton-solidity >= 0.32.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
-|} ^ s
+%s
+|} file s
         ) from_
       with
       | Ok content ->
@@ -126,7 +128,7 @@ let action ~filename ~force ?contract () =
   let filename, contract_name =
     match String.lowercase_ascii ext with
     | "sol" -> filename, contract_name
-    | "spp" ->
+    | "spp" | "solpp" ->
         let new_filename = dirname // contract ^ ".sol" in
         preprocess_solidity ~from_:filename ~to_:new_filename;
         new_filename,

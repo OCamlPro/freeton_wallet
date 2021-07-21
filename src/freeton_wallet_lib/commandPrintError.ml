@@ -13,6 +13,20 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
+let action_phase_errors = [
+  32, "Action list invalid" ;
+  33, "Too many actions" ;
+  34, "Unsupported action" ;
+  35, "Invalid source address" ;
+  36, "Invalid destination address" ;
+  37, "Too low balance to send outbound message (37) at action" ;
+  38, "Too low extra to send outbound message (38) at action" ;
+  39, "Message does not fit in buffer" ;
+  40, "Message too large" ;
+  41, "Library not found" ;
+  42, "Library delete error" ;
+]
+
 let errors = [
 
   "TVM Errors", [
@@ -33,19 +47,7 @@ let errors = [
     -14 ;
   ] ;
 
-  "Action Phase Errors", [
-    "Action list invalid", 32 ;
-    "Too many actions", 33 ;
-    "Unsupported action", 34 ;
-    "Invalid source address", 35 ;
-    "Invalid destination address", 36 ;
-    "Too low balance to send outbound message (37) at action", 37 ;
-    "Too low extra to send outbound message (38) at action", 38 ;
-    "Message does not fit in buffer", 39 ;
-    "Message too large", 40 ;
-    "Library not found", 41 ;
-    "Library delete error", 42 ;
-  ] ;
+  "Action Phase Errors", List.map (fun (x,y) -> (y,x)) action_phase_errors ;
 
   "Solidity Runtime Errors", [
 
