@@ -808,6 +808,8 @@ Where options are:
 
 * :code:`FILENAME`   Import contract from FILENAME
 
+* :code:`--force` or :code:`-f`   Override existing contracts
+
 
 ft contract list
 ~~~~~~~~~~~~~~~~~~
