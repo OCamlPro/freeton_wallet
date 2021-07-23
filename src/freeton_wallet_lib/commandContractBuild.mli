@@ -13,6 +13,7 @@
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
 
 val list_contracts : unit -> unit
+val known_contracts : unit -> string EzCompat.StringMap.t
 
 val create_new_version : string -> int -> string
 val get_current_version : string -> int option

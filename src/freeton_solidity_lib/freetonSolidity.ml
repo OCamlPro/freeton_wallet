@@ -10,19 +10,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (c) 2021 OCamlPro & Origin Labs                             *)
-(*                                                                        *)
-(*  All rights reserved.                                                  *)
-(*  This file is distributed under the terms of the GNU Lesser General    *)
-(*  Public License version 2.1, with the special exception on linking     *)
-(*  described in the LICENSE.md file in the root directory.               *)
-(*                                                                        *)
-(*                                                                        *)
-(**************************************************************************)
-
 open Solidity_common
 open Solidity_ast
 open Solidity_checker_TYPES
@@ -536,7 +523,7 @@ let register_primitives () =
        match t_opt with
        | Some (TAddress _) when !for_freeton ->
            make_surcharged_fun ~nreq:1 pos
-             [ "value", TUint 256, false ;
+             [ "value", TUint 128, false ;
                "bounce", TBool, true ;
                "flag", TUint 16, true ;
                "body", TAbstract TvmCell, true ;
@@ -1105,3 +1092,102 @@ let parse_file = Solidity_parser.parse_file ~freeton:true
 let typecheck_ast =
   Solidity_typechecker.type_program ~init:register_primitives
 let string_of_ast = Solidity_printer.string_of_program ~freeton:true
+
+open Solidity_typechecker
+
+(* TODO: use the 'fields' set of fo to detect re-use *)
+
+let type_options_fun opt env pos is_payable fo opts =
+  List.fold_left (fun fo (id, e) ->
+      let id = strip id in
+      let fo, already_set =
+        match Ident.to_string id, fo.kind with
+        | "value", KExtContractFun when
+            not !for_freeton && not is_payable ->
+            error pos "Cannot set option \"value\" \
+                       on a non-payable function type"
+        | "value", KNewContract when
+            not !for_freeton && not is_payable ->
+            error pos "Cannot set option \"value\", since the \
+                       constructor of contract is non-payable"
+        | "value", ( KExtContractFun | KNewContract | KReturn ) ->
+            expect_expression_type opt env e (TUint 256);
+            { fo with value = true }, fo.value
+        | "gas", KExtContractFun ->
+            expect_expression_type opt env e (TUint 256);
+            { fo with gas = true }, fo.gas
+        | "salt", KNewContract ->
+            expect_expression_type opt env e (TFixBytes 32);
+            { fo with salt = true }, fo.salt
+        | "gas", KNewContract ->
+            error pos "Function call option \"%s\" cannot \
+                       be used with \"new\""
+              (Ident.to_string id);
+        | "salt", KExtContractFun ->
+            error pos "Function call option \"%s\" can \
+                       only be used with \"new\""
+              (Ident.to_string id);
+            (* FREETON *)
+            (* TODO: check that mandatory fields are provided *)
+        | "pubkey", ( KNewContract | KExtContractFun )
+           ->
+            expect_expression_type opt env e
+              ( TOptional (TUint 256));
+            fo, false (* TODO *)
+        | "code", KNewContract  ->
+            expect_expression_type opt env e (TAbstract TvmCell);
+            fo, false (* TODO *)
+        | "flag", ( KExtContractFun | KNewContract | KReturn )  ->
+            expect_expression_type opt env e (TUint 8);
+            fo, false (* TODO *)
+        | "varInit", KNewContract  ->
+            fo, false (* TODO *)
+        | "abiVer", KExtContractFun  ->
+            expect_expression_type opt env e (TUint 8);
+            fo, false (* TODO *)
+        | "extMsg", KExtContractFun  ->
+            expect_expression_type opt env e TBool ;
+            fo, false (* TODO *)
+        | "sign", KExtContractFun  ->
+            expect_expression_type opt env e TBool ;
+            fo, false (* TODO *)
+        | "bounce", ( KExtContractFun | KReturn )  ->
+            expect_expression_type opt env e TBool ;
+            fo, false (* TODO *)
+        | "stateInit", KNewContract  ->
+            expect_expression_type opt env e (TAbstract TvmCell) ;
+            fo, false (* TODO *)
+        | "wid", KNewContract  ->
+            expect_expression_type opt env e (TUint 8) ;
+            fo, false (* TODO *)
+        | "time", KExtContractFun  ->
+            expect_expression_type opt env e (TUint 64) ;
+            fo, false (* TODO *)
+        | "expire", KExtContractFun  ->
+            expect_expression_type opt env e (TUint 64) ;
+            fo, false (* TODO *)
+        | "callbackId", KExtContractFun  ->
+            expect_expression_type opt env e (TUint 64) ;
+            fo, false (* TODO *)
+        | "callback", KExtContractFun  ->
+            fo, false (* TODO *)
+        | "onErrorId", KExtContractFun  ->
+            expect_expression_type opt env e (TUint 64) ;
+            fo, false (* TODO *)
+        | _, KOther ->
+            error pos "Function call options can only be set on \
+                       external function calls or contract creations"
+              (Ident.to_string id);
+        | _ ->
+            error pos "Unknown option \"%s\". Valid options are \
+                       \"salt\", \"value\" and \"gas\""
+              (Ident.to_string id);
+      in
+      if already_set then
+        error pos "Option \"%s\" has already been set"
+          (Ident.to_string id);
+      fo
+    ) fo opts
+
+let () =
+  Solidity_typechecker.type_options_ref := type_options_fun
