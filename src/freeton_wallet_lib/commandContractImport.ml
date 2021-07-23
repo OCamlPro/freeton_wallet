@@ -10,12 +10,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
 open EzFile.OP
 
 
-let action ~filename () =
+let action ~force ~filename () =
   let dirname = Filename.dirname filename in
   let basename = Filename.basename filename in
   let contract, _ext = EzString.cut_at basename '.' in
@@ -60,6 +61,10 @@ let action ~filename () =
           match next_version with
           | None -> ()
           | Some next_version ->
+              let known = CommandContractBuild.known_contracts () in
+              if not force && StringMap.mem contract known then
+                Error.raise "Contract %s already exists (use -f to override)"
+                  contract;
               let contract_prefix =
                 CommandContractBuild.create_new_version contract next_version
               in
@@ -85,6 +90,7 @@ let action ~filename () =
   end
 
 let cmd =
+  let force = ref false in
   let filename = ref None in
   EZCMD.sub
     "contract import"
@@ -92,7 +98,7 @@ let cmd =
        match !filename with
        | None -> Error.raise "You must provide the filename of the contract"
        | Some filename ->
-           action ~filename
+           action ~force:!force ~filename
              ()
     )
     ~args:
@@ -100,6 +106,9 @@ let cmd =
 
         [], Arg.Anon (0, fun file -> filename := Some file),
         EZCMD.info ~docv:"FILENAME" "Import contract from FILENAME";
+
+        [ "force" ; "f" ], Arg.Set force,
+        EZCMD.info "Override existing contracts";
 
       ]
     ~doc: "Import a contract"
