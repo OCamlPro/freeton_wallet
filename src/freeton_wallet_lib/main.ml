@@ -83,6 +83,8 @@ let main () =
 
       [ "test" ], CommandTest.cmd;
       [ "init" ], CommandInit.cmd;
+      [ "doc" ], CommandDoc.cmd;
+      [ "doc" ; "list" ], CommandDocList.cmd;
 
       [ "node" ; "start" ], CommandNodeStart.cmd;
       [ "node" ; "stop" ], CommandNodeStop.cmd;

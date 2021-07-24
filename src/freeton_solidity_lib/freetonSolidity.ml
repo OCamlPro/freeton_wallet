@@ -110,7 +110,7 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
                 if optional then
                   iter args n
                 else
-                  assert false (* TODO: error non-optional argument missing *)
+                  error pos "Missing argument %S" name
       in
       let expected_args = iter expected_args nargs in
       Some ( primitive_fun_named expected_args result MNonPayable )

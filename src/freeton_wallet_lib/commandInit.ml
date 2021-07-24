@@ -72,6 +72,8 @@ let install_solc config ~distclean =
 
   bin_install "build/solc/solc" ;
   bin_install "lib/stdlib_sol.tvm" ;
+  EzFile.make_dir ~p:true Globals.doc_dir ;
+  Misc.call [ "cp"; "-f" ; "API.md"; Globals.doc_dir // "API.md" ];
   ()
 
 let install_tvm_linker config ~distclean =

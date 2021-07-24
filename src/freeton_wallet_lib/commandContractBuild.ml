@@ -95,9 +95,13 @@ let create_new_version contract num =
 
 
 let preprocess_solidity ~from_ ~to_ =
+  let files = ref [] in
   Subst.with_subst (fun preprocess ->
       match FreetonSolidity.handle_exception (fun file ->
+          Solidity_lexer.recursive_comments := true ;
           let ast = FreetonSolidity.parse_file ~preprocess file in
+          files := List.map (fun m ->
+              m.Solidity_ast.module_file) ast.program_modules;
           let tast = FreetonSolidity.typecheck_ast ast in
           let s = FreetonSolidity.string_of_ast tast in
           Printf.sprintf
@@ -115,7 +119,8 @@ pragma AbiHeader pubkey;
       | Error s ->
           Printf.eprintf "Error: %s\n%!" s;
           exit 2
-    )
+    );
+  !files
 
 let action ~filename ~force ?contract () =
   (* TODO: check that no account is using this contract,
@@ -129,8 +134,10 @@ let action ~filename ~force ?contract () =
     match String.lowercase_ascii ext with
     | "sol" -> filename, contract_name
     | "spp" | "solpp" ->
-        let new_filename = dirname // contract ^ ".sol" in
-        preprocess_solidity ~from_:filename ~to_:new_filename;
+        let new_filename = contract ^ ".sol" in
+        let _files: string list =
+          preprocess_solidity ~from_:filename ~to_:new_filename
+        in
         new_filename,
         ( match contract_name with
           | None -> Some contract
