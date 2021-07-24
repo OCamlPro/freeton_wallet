@@ -98,7 +98,7 @@ let preprocess_solidity ~from_ ~to_ =
   let files = ref [] in
   Subst.with_subst (fun preprocess ->
       match FreetonSolidity.handle_exception (fun file ->
-          Solidity_lexer.recursive_comments := true ;
+          (* Solidity_lexer.recursive_comments := true ; *)
           let ast = FreetonSolidity.parse_file ~preprocess file in
           files := List.map (fun m ->
               m.Solidity_ast.module_file) ast.program_modules;
