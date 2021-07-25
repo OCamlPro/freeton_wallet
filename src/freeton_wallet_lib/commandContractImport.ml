@@ -60,10 +60,10 @@ let import ~contract ~tvc ~abi ~force ~src =
   end
 
 
-let action ~force ~filename ~make () =
+let action ~force ~filename ~make ?contract () =
   let dirname = if make then "" else Filename.dirname filename in
   let basename = Filename.basename filename in
-  let contract, ext = EzString.cut_at basename '.' in
+  let contract_name, ext = EzString.cut_at basename '.' in
   let abi = ref [] in
   let tvc = ref [] in
   let src = ref [] in
@@ -78,10 +78,14 @@ let action ~force ~filename ~make () =
   ] in
 
   List.iter (fun (kind, ext) ->
-      let filename = Filename.concat dirname ( contract ^ "." ^ ext) in
+      let filename = Filename.concat dirname ( contract_name ^ "." ^ ext) in
       if Sys.file_exists filename then
         kind := filename :: !kind
     ) files;
+  let contract = match contract with
+    | None -> contract_name
+    | Some contract -> contract
+  in
   begin
     match !abi, !tvc with
     | [ abi ], [ tvc ] ->
@@ -115,10 +119,10 @@ let action ~force ~filename ~make () =
           | None ->
               import ~contract ~abi ~tvc ~src:!src ~force
           | Some filename ->
-              CommandContractBuild.action ~filename ~force ()
+              CommandContractBuild.action ~filename ~force ~contract ()
         end
     | [], [] when make ->
-        CommandContractBuild.action ~filename ~force ()
+        CommandContractBuild.action ~filename ~force ~contract ()
     | [], _ -> Error.raise "Missing abi file"
     | _, [] -> Error.raise "Missing tvc file"
     | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
@@ -130,6 +134,7 @@ let cmd =
   let force = ref false in
   let make = ref false in
   let filename = ref None in
+  let contract = ref None in
   EZCMD.sub
     "contract import"
     (fun () ->
@@ -140,6 +145,7 @@ let cmd =
              ~force:!force
              ~make:!make
              ~filename
+             ?contract:!contract
              ()
     )
     ~args:
@@ -153,6 +159,9 @@ let cmd =
 
         [ "make" ], Arg.Set make,
         EZCMD.info "Build contract if needed (only for .spp)";
+
+        [ "contract"], Arg.String (fun s -> contract := Some s),
+        EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
 
       ]
     ~doc: "Import a contract"
