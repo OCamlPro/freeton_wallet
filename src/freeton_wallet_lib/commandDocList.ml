@@ -10,16 +10,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val cmd : Ezcmd.V2.EZCMD.TYPES.sub
+open Ezcmd.V2
 
-val list_contracts : unit -> unit
-val known_contracts : unit -> string EzCompat.StringMap.t
-
-val create_new_version : string -> int -> string
-val get_current_version : string -> int option
-val same_file : string -> string -> bool
-
-val action :
-  filename:string -> force:bool -> ?contract:string -> unit -> unit
-
-val preprocess_solidity : from_:string -> to_:string -> string list
+let cmd =
+  EZCMD.sub
+    "doc list"
+    (fun () ->
+       let files = try Sys.readdir Globals.doc_dir with _ -> [||] in
+       Printf.printf "%d files in %s:\n%!"
+         ( Array.length files ) Globals.doc_dir;
+       Array.iter (fun file ->
+           Printf.printf "%s\n%!" file) files;
+    )
+    ~args:
+      [
+      ]
+    ~doc: "List useful documentation files stored in ~/.ft/doc/"
+    ~man:[]

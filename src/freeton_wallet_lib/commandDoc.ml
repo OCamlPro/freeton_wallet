@@ -10,16 +10,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val cmd : Ezcmd.V2.EZCMD.TYPES.sub
+open Ezcmd.V2
+open EZCMD.TYPES
+open EzFile.OP
 
-val list_contracts : unit -> unit
-val known_contracts : unit -> string EzCompat.StringMap.t
+let action ~file =
+  let file = match file with
+    | None -> "API.md"
+    | Some file -> file
+  in
+  let file = Globals.doc_dir // file in
+  if not ( Sys.file_exists file ) then
+    Error.raise "File %S does not exist" file;
+  let _retcode = Printf.kprintf Sys.command "less '%s'" file in
+  ()
 
-val create_new_version : string -> int -> string
-val get_current_version : string -> int option
-val same_file : string -> string -> bool
-
-val action :
-  filename:string -> force:bool -> ?contract:string -> unit -> unit
-
-val preprocess_solidity : from_:string -> to_:string -> string list
+let cmd =
+  let file = ref None in
+  EZCMD.sub
+    "doc"
+    (fun () -> action ~file:!file )
+    ~args:
+      [
+        [], Arg.Anon (0, fun s -> file := Some s),
+        EZCMD.info ~docv:"DOCFILE" "File to display" ;
+      ]
+    ~doc: "Display useful documentation files (stored in ~/.ft/doc/)"
+    ~man:[]

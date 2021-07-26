@@ -15,11 +15,55 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open EzFile.OP
 
+let import ~contract ~tvc ~abi ~force ~src =
+  let next_version =
+    match CommandContractBuild.get_current_version contract with
+    | None -> Some 1
+    | Some version ->
+        let contract = contract // string_of_int version in
+        let contract_prefix = Globals.contracts_dir // contract in
+        if
+          CommandContractBuild.same_file
+            (contract_prefix ^ ".tvc")  tvc &&
+          CommandContractBuild.same_file
+            (contract_prefix ^ ".abi.json") abi then begin
+          Printf.eprintf "Contract already known as %s\n%!"
+            contract ;
+          None
+        end else
+          Some ( version + 1 )
+  in
+  begin
+    match next_version with
+    | None -> ()
+    | Some next_version ->
+        let known = CommandContractBuild.known_contracts () in
+        if not force && StringMap.mem contract known then
+          Error.raise "Contract %s already exists (use -f to override)"
+            contract;
+        let contract_prefix =
+          CommandContractBuild.create_new_version contract next_version
+        in
+        Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
+        let tvc_file = contract_prefix ^ ".tvc" in
+        Misc.call [ "cp"; "-f"; tvc ; tvc_file ];
+        Misc.register_tvc_file ~tvc_file
+          ~contract: ( Misc.fully_qualified_contract contract ) ;
+        match src with
+        | [] -> ()
+        | list ->
+            EzFile.make_dir ~p:true contract_prefix;
+            List.iter (fun src ->
+                Misc.call [ "cp"; "-f"; src ;
+                            contract_prefix // Filename.basename src ];
+              ) list
+  end
 
-let action ~force ~filename () =
-  let dirname = Filename.dirname filename in
+
+let action ~force ~filename ~make ?contract () =
+  let dirname = if make then "" else Filename.dirname filename in
   let basename = Filename.basename filename in
-  let contract, _ext = EzString.cut_at basename '.' in
+  let contract_name, ext = EzString.cut_at basename '.' in
   let abi = ref [] in
   let tvc = ref [] in
   let src = ref [] in
@@ -32,56 +76,53 @@ let action ~force ~filename () =
     src, "cpp";
     src, "hpp";
   ] in
+
   List.iter (fun (kind, ext) ->
-      let filename = Filename.concat dirname ( contract ^ "." ^ ext) in
+      let filename = Filename.concat dirname ( contract_name ^ "." ^ ext) in
       if Sys.file_exists filename then
         kind := filename :: !kind
     ) files;
+  let contract = match contract with
+    | None -> contract_name
+    | Some contract -> contract
+  in
   begin
     match !abi, !tvc with
     | [ abi ], [ tvc ] ->
-        let next_version =
-          match CommandContractBuild.get_current_version contract with
-          | None -> Some 1
-          | Some version ->
-              let contract = contract // string_of_int version in
-              let contract_prefix = Globals.contracts_dir // contract in
-              if
-                CommandContractBuild.same_file
-                  (contract_prefix ^ ".tvc")  tvc &&
-                CommandContractBuild.same_file
-                  (contract_prefix ^ ".abi.json") abi then begin
-                Printf.eprintf "Contract already known as %s\n%!"
-                  contract ;
-                None
-              end else
-                Some ( version + 1 )
-        in
         begin
-          match next_version with
-          | None -> ()
-          | Some next_version ->
-              let known = CommandContractBuild.known_contracts () in
-              if not force && StringMap.mem contract known then
-                Error.raise "Contract %s already exists (use -f to override)"
-                  contract;
-              let contract_prefix =
-                CommandContractBuild.create_new_version contract next_version
+          let build_file =
+            if make && ext = "spp" then
+              let tmp_filename = Filename.temp_file contract ".sol" in
+              let files = CommandContractBuild.preprocess_solidity
+                  ~from_:filename ~to_: tmp_filename
               in
-              Misc.call [ "cp"; "-f"; abi ; contract_prefix ^ ".abi.json" ];
-              let tvc_file = contract_prefix ^ ".tvc" in
-              Misc.call [ "cp"; "-f"; tvc ; tvc_file ];
-              Misc.register_tvc_file ~tvc_file
-                ~contract: ( Misc.fully_qualified_contract contract ) ;
-              match !src with
-              | [] -> ()
-              | list ->
-                  EzFile.make_dir ~p:true contract_prefix;
-                  List.iter (fun src ->
-                      Misc.call [ "cp"; "-f"; src ;
-                                  contract_prefix // Filename.basename src ];
-                    ) list
+              let tvc_time = (Unix.lstat tvc).Unix.st_mtime in
+              let need_build = ref false in
+              List.iter (fun file ->
+                  let time = (Unix.lstat file).Unix.st_mtime in
+                  (* Printf.eprintf "Check %S\n%!" file; *)
+                  need_build := !need_build
+                                ||  ( time > tvc_time );
+                  (* Printf.eprintf "need_build: %b\n%!" !need_build; *)
+                ) files;
+              if !need_build then
+                let new_filename = contract ^ ".sol" in
+                Printf.eprintf "contract: %S\n%!" contract;
+                Sys.rename tmp_filename new_filename;
+                Some new_filename
+              else
+                None
+            else
+              None
+          in
+          match build_file with
+          | None ->
+              import ~contract ~abi ~tvc ~src:!src ~force
+          | Some filename ->
+              CommandContractBuild.action ~filename ~force ~contract ()
         end
+    | [], [] when make ->
+        CommandContractBuild.action ~filename ~force ~contract ()
     | [], _ -> Error.raise "Missing abi file"
     | _, [] -> Error.raise "Missing tvc file"
     | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
@@ -91,14 +132,20 @@ let action ~force ~filename () =
 
 let cmd =
   let force = ref false in
+  let make = ref false in
   let filename = ref None in
+  let contract = ref None in
   EZCMD.sub
     "contract import"
     (fun () ->
        match !filename with
        | None -> Error.raise "You must provide the filename of the contract"
        | Some filename ->
-           action ~force:!force ~filename
+           action
+             ~force:!force
+             ~make:!make
+             ~filename
+             ?contract:!contract
              ()
     )
     ~args:
@@ -109,6 +156,12 @@ let cmd =
 
         [ "force" ; "f" ], Arg.Set force,
         EZCMD.info "Override existing contracts";
+
+        [ "make" ], Arg.Set make,
+        EZCMD.info "Build contract if needed (only for .spp)";
+
+        [ "contract"], Arg.String (fun s -> contract := Some s),
+        EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
 
       ]
     ~doc: "Import a contract"
