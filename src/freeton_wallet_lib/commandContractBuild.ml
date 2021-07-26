@@ -132,7 +132,18 @@ let action ~filename ~force ?contract () =
   let contract, ext = EzString.cut_at basename '.' in
   let filename, contract_name =
     match String.lowercase_ascii ext with
-    | "sol" -> filename, contract_name
+    | "sol" ->
+        begin
+          match Sys.getenv "FT_SOL" with
+          | exception Not_found -> ()
+          | _ ->
+              let new_filename = Filename.temp_file "ft" ".sol" in
+              let _files: string list =
+                preprocess_solidity ~from_:filename ~to_:new_filename
+              in
+              Sys.remove new_filename
+        end;
+        filename, contract_name
     | "spp" | "solpp" ->
         let new_filename = contract ^ ".sol" in
         let _files: string list =

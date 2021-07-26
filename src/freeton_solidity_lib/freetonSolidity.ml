@@ -75,7 +75,10 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
   | Some (AList list) ->
       let len = List.length list in
       if len <= nreq then
-        None (* TODO *)
+        error pos "Not enough arguments"
+      else
+      if len > List.length expected_args then
+        error pos "Too many arguments"
       else
         Some
           ( make_fun (List.map (fun (_, type_, _optiona) ->
@@ -346,17 +349,18 @@ let register_primitives () =
            begin
              match opt.call_args with
              | Some ( AList list ) ->
-                 begin
-                   match list with
-                     [ TType type_ ] ->
-                       Some (make_fun list [ type_ ] MNonPayable)
-                   | _ ->
-                       Printf.eprintf "wrong args (1) %s\n%!"
-                         (String.concat " x "
-                            ( List.map
-                                Solidity_type_printer.string_of_type list ) );
-                       None
-                 end
+                 let res =
+                   List.mapi (fun i arg ->
+                       match arg with
+                       | TType type_ -> type_
+                       | _ ->
+                           error pos
+                             "wrong argument %d, should be a type" i
+                     )
+                     list
+                 in
+
+                 Some (make_fun list res MNonPayable)
              | _ ->
                  Printf.eprintf "wrong args (2) \n%!";
                  None
@@ -631,10 +635,49 @@ let register_primitives () =
            Some (make_var (TFixBytes (4)))
        | _ -> None);
 
+  let infer_int_type pos list =
+    let signed = List.exists (function | TInt _ -> true
+                                       | TRationalConst (q, _ ) ->
+                                           ExtQ.is_neg q
+                                       | _ -> false) list
+    in
+    let length = ref 0 in
+    let bad = ref false in
+    List.iter (function
+        | TUint n ->
+            length := max !length
+                ( if signed then n+1 else n)
+        | TInt n -> length := max n !length
+        | TRationalConst (q, _) ->
+            let nbits = Z.numbits (Q.num q) in
+            length := max !length
+                ( if signed then
+                    if ExtQ.is_neg q then
+                      nbits
+                    else
+                      1 + nbits
+                  else
+                    nbits)
+        | t ->
+            error pos "non integer type %s\n%!"
+              (Solidity_type_printer.string_of_type t);
+      ) list ;
+    if !bad then
+      None
+    else
+      let t =
+        if signed then
+          TInt !length
+        else
+          TUint !length
+      in
+      Some t
+  in
+
   register 46
     { prim_name = "min";
       prim_kind = PrimMemberVariable }
-    (fun _pos _opt t_opt ->
+    (fun pos opt t_opt ->
        match t_opt with
        | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
            Some (make_fun [ ]
@@ -642,43 +685,44 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | Some (TMagic (TMetaType (TInt (_) | TUint (_) as t))) ->
            Some (make_var (t))
-       | _ -> None);
-
-  register 47
-    { prim_name = "max";
-      prim_kind = PrimMemberVariable }
-    (fun _pos opt t_opt ->
-       match t_opt with
-       | Some (TMagic (TMetaType (TInt (_) | TUint (_) as t))) ->
-           Some (make_var (t))
-       | Some (TMagic TMath) ->
+       | Some (TMagic TMath) when !for_freeton ->
            begin
              match opt.call_args with
              | Some ( AList [] ) -> None
              | Some ( AList list ) ->
-                 let signed = List.exists (function | TInt _ -> true
-                                                    | _ -> false) list
-                 in
-                 let length = ref 0 in
-                 let bad = ref false in
-                 List.iter (function
-                     | TUint n ->
-                         length := max !length
-                             ( if signed then n+1 else n)
-                     | TInt n -> length := max n !length
-                     | _ -> bad := true
-                   ) list ;
-                 if !bad then
-                   None
-                 else
-                   let t =
-                     if signed then
-                       TInt !length
-                     else
-                       TUint !length
-                   in
-                   Some (make_fun
-                           ( List.map (fun _ -> t) list ) [ t ] MNonPayable )
+                 begin
+                   match infer_int_type pos list with
+                   | None -> None
+                   | Some t ->
+                       Some (make_fun
+                               ( List.map (fun _ -> t) list )
+                               [ t ] MNonPayable )
+                 end
+             | _ -> None
+           end
+       | _ -> None);
+
+
+  register 47
+    { prim_name = "max";
+      prim_kind = PrimMemberVariable }
+    (fun pos opt t_opt ->
+       match t_opt with
+       | Some (TMagic (TMetaType (TInt (_) | TUint (_) as t))) ->
+           Some (make_var (t))
+       | Some (TMagic TMath) when !for_freeton ->
+           begin
+             match opt.call_args with
+             | Some ( AList [] ) -> None
+             | Some ( AList list ) ->
+                 begin
+                   match infer_int_type pos list with
+                   | None -> None
+                   | Some t ->
+                       Some (make_fun
+                               ( List.map (fun _ -> t) list )
+                               [ t ] MNonPayable )
+                 end
              | _ -> None
            end
        | _ -> None);
@@ -1072,8 +1116,80 @@ let register_primitives () =
     (fun _pos _opt t_opt ->
        match t_opt with
        | Some (TAddress (_)) when !for_freeton ->
-           Some (make_var (TUint 8))
+           Some (make_var (TInt 8))
        | _ -> None);
+
+  register 86
+    { prim_name = "encodeBody";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMagic TTvm) when !for_freeton ->
+           Some (make_fun [ TDots ] [ TAbstract TvmCell ] MNonPayable)
+       | _ -> None);
+
+  register 87
+    { prim_name = "muldivmod";
+      prim_kind = PrimMemberVariable }
+    (fun pos opt t_opt ->
+       match t_opt with
+       | Some (TMagic TMath) ->
+           begin
+             match opt.call_args with
+             | Some ( AList [] ) -> None
+             | Some ( AList list ) ->
+                 begin
+                   match infer_int_type pos list with
+                   | None -> None
+                   | Some t ->
+
+                       Some (make_fun [ t; t; t] [ t ; t ] MNonPayable )
+                 end
+             | _ -> None
+           end
+       | _ -> None);
+
+  register 88
+    { prim_name = "deploy";
+      prim_kind = PrimMemberVariable }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMagic TTvm) ->
+           Some (make_fun [
+               TAbstract TvmCell; (* stateInit *)
+               TAbstract TvmCell; (* payload *)
+               TUint 128 ;
+               TInt 8
+             ]
+               [ TAddress true ] MNonPayable )
+       | _ -> None);
+
+  let muldiv_kind pos opt t_opt =
+    match t_opt with
+    | Some (TMagic TMath) ->
+        begin
+          match opt.call_args with
+          | Some ( AList [] ) -> None
+          | Some ( AList list ) ->
+              begin
+                match infer_int_type pos list with
+                | None -> None
+                | Some t ->
+                    Some (make_fun [ t; t; t] [ t ] MNonPayable )
+              end
+          | _ -> None
+        end
+    | _ -> None
+  in
+  register 89
+    { prim_name = "muldiv";
+      prim_kind = PrimMemberVariable } muldiv_kind ;
+  register 90
+    { prim_name = "muldivr";
+      prim_kind = PrimMemberVariable } muldiv_kind ;
+  register 91
+    { prim_name = "muldivc";
+      prim_kind = PrimMemberVariable } muldiv_kind ;
 
   ()
 
@@ -1151,14 +1267,14 @@ let type_options_fun opt env pos is_payable fo opts =
         | "sign", KExtContractFun  ->
             expect_expression_type opt env e TBool ;
             fo, false (* TODO *)
-        | "bounce", ( KExtContractFun | KReturn )  ->
+        | "bounce", ( KExtContractFun | KNewContract | KReturn )  ->
             expect_expression_type opt env e TBool ;
             fo, false (* TODO *)
         | "stateInit", KNewContract  ->
             expect_expression_type opt env e (TAbstract TvmCell) ;
             fo, false (* TODO *)
         | "wid", KNewContract  ->
-            expect_expression_type opt env e (TUint 8) ;
+            expect_expression_type opt env e (TInt 8) ;
             fo, false (* TODO *)
         | "time", KExtContractFun  ->
             expect_expression_type opt env e (TUint 64) ;
