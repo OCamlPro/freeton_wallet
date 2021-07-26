@@ -78,6 +78,12 @@ Overview of sub-commands::
   debot
     Manage debots
   
+  doc
+    Display useful documentation files (stored in ~/.ft/doc/)
+  
+  doc list
+    List useful documentation files stored in ~/.ft/doc/
+  
   exec
     Call command with substitution on arguments, use -- before the command.
   
@@ -808,7 +814,11 @@ Where options are:
 
 * :code:`FILENAME`   Import contract from FILENAME
 
+* :code:`--contract CONTRACT`   Name of contract to build
+
 * :code:`--force` or :code:`-f`   Override existing contracts
+
+* :code:`--make`   Build contract if needed (only for .spp)
 
 
 ft contract list
@@ -943,6 +953,38 @@ Where options are:
 
 
 * :code:`--new NAME`   Create template files for debot NAME
+
+
+ft doc
+~~~~~~~~
+
+Display useful documentation files (stored in ~/.ft/doc/)
+
+
+**USAGE**
+::
+  
+  ft doc DOCFILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`DOCFILE`   File to display
+
+
+ft doc list
+~~~~~~~~~~~~~
+
+List useful documentation files stored in ~/.ft/doc/
+
+
+**USAGE**
+::
+  
+  ft doc list [OPTIONS]
+
+Where options are:
+
 
 
 ft exec
