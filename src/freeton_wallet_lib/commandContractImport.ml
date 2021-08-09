@@ -91,28 +91,32 @@ let action ~force ~filename ~make ?contract () =
     | [ abi ], [ tvc ] ->
         begin
           let build_file =
-            if make && ext = "spp" then
-              let tmp_filename = Filename.temp_file contract ".sol" in
-              let files = CommandContractBuild.preprocess_solidity
-                  ~from_:filename ~to_: tmp_filename
-              in
-              let tvc_time = (Unix.lstat tvc).Unix.st_mtime in
-              let need_build = ref false in
-              List.iter (fun file ->
-                  let time = (Unix.lstat file).Unix.st_mtime in
-                  (* Printf.eprintf "Check %S\n%!" file; *)
-                  need_build := !need_build
-                                ||  ( time > tvc_time );
-                  (* Printf.eprintf "need_build: %b\n%!" !need_build; *)
-                ) files;
-              if !need_build then
-                let new_filename = contract ^ ".sol" in
-                Printf.eprintf "contract: %S\n%!" contract;
-                Sys.rename tmp_filename new_filename;
-                Some new_filename
-              else
+            if make then
+              if ext = "spp" then
+                let tmp_filename = Filename.temp_file contract ".sol" in
+                let files = CommandContractBuild.preprocess_solidity
+                    ~from_:filename ~to_: tmp_filename
+                in
+                let tvc_time = (Unix.lstat tvc).Unix.st_mtime in
+                let need_build = ref false in
+                List.iter (fun file ->
+                    let time = (Unix.lstat file).Unix.st_mtime in
+                    (* Printf.eprintf "Check %S\n%!" file; *)
+                    need_build := !need_build
+                                  ||  ( time > tvc_time );
+                    (* Printf.eprintf "need_build: %b\n%!" !need_build; *)
+                  ) (filename :: files);
+                if !need_build then
+                  let new_filename = contract ^ ".sol" in
+                  Printf.eprintf "contract: %S\n%!" contract;
+                  Sys.rename tmp_filename new_filename;
+                  Some new_filename
+                else
+                  None
+              else begin
+                Printf.eprintf "Warning: --make on .sol file does not rebuild. Use .spp instead\n%!";
                 None
-            else
+            end else
               None
           in
           match build_file with

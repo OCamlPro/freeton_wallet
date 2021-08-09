@@ -952,10 +952,12 @@ let register_primitives () =
        | Some ( TMagic TTvm ) when !for_freeton ->
            make_surcharged_fun ~nreq:1 pos
              [
-               "pubkey", TUint 256, false ;
                "code", TAbstract TvmCell, false ;
-               "contr", TDots, false ; (* TODO do better *)
-               "varInit", TDots, false ; (* TODO do better *)
+               "data", TAbstract TvmCell, true ;
+               "splitDepth", TUint 8, true ;
+               "pubkey", TUint 256, true ;
+               "contr", TDots, true ; (* TODO do better *)
+               "varInit", TDots, true ; (* TODO do better *)
              ] opt
              [ TAbstract TvmCell ]
        | _ -> None);
