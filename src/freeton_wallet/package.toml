@@ -63,3 +63,4 @@ ft = "version"
 #  gen-opam = "some" | "all" 
 [fields]
 # ...
+gen-opam = "some"

@@ -17,50 +17,7 @@ open Solidity_exceptions
 
 let error = type_error
 
-let register id p f_desc =
-  Solidity_common.add_primitive id p;
-  Solidity_tenv.add_primitive_desc id f_desc
-
-
-
-let primitive_fun_named ?(returns_lvalue=false)
-    arg_types ret_types function_mutability =
-  Function { function_abs_name = LongIdent.empty;
-             function_params = arg_types;
-             function_returns = List.map (fun t -> (t, None)) ret_types;
-             function_returns_lvalue = returns_lvalue;
-             function_visibility = VPublic;
-             function_mutability;
-             function_override = None;
-             function_selector = None;
-             function_is_method = false; (* can be true *)
-             function_is_primitive = true;
-             function_def = None; }
-
-let make_fun = Solidity_type_builder.primitive_fun
-
-let make_var = Solidity_type_builder.primitive_var
-
-let make_prim_args pos opt =
-  match opt.call_args with
-  | None -> None
-  | Some (AList atl) ->
-      Some (List.map (Solidity_type_conv.mobile_type pos) atl)
-  | Some (ANamed _) ->
-      error pos "Named arguments not allowed on primitive"
-
-let preprocess_arg_0 _pos atl_opt =
-  match atl_opt with
-  | None -> []
-  | Some (atl) -> atl
-
-let preprocess_arg_1 pos t atl_opt =
-  match atl_opt with
-  | None -> []
-  | Some (_ :: atl) -> t :: atl
-  | Some ([]) ->
-      error pos "Need at least 1 argument for function \
-                 call, but provided only 0"
+open Solidity_primitives.UTILS
 
 let rec list_sub n list =
   if n = 0 then [] else
@@ -995,10 +952,12 @@ let register_primitives () =
        | Some ( TMagic TTvm ) when !for_freeton ->
            make_surcharged_fun ~nreq:1 pos
              [
-               "pubkey", TUint 256, false ;
                "code", TAbstract TvmCell, false ;
-               "contr", TDots, false ; (* TODO do better *)
-               "varInit", TDots, false ; (* TODO do better *)
+               "data", TAbstract TvmCell, true ;
+               "splitDepth", TUint 8, true ;
+               "pubkey", TUint 256, true ;
+               "contr", TDots, true ; (* TODO do better *)
+               "varInit", TDots, true ; (* TODO do better *)
              ] opt
              [ TAbstract TvmCell ]
        | _ -> None);

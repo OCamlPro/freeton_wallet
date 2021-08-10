@@ -22,7 +22,10 @@ let verbose i = !Globals.verbosity >= i
 
 
 let temp_dir = Globals.ft_dir // "tmp"
-let tmpfile () = Filename.temp_file ~temp_dir "tmpfile" ".tmp"
+let tmpfile () =
+  if not ( Sys.file_exists temp_dir ) then
+    EzFile.make_dir ~p:true temp_dir;
+  Filename.temp_file ~temp_dir "tmpfile" ".tmp"
 
 let call ?(stdout = Unix.stdout) args =
   if verbose 1 then
