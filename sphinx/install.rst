@@ -53,6 +53,7 @@ you can for example create it with::
 
   $ opam switch create 4.10.0
   
+  
 Second, checkout the sources of :code:`freeton_wallet` in a directory::
 
   $ git clone git@github.com:OCamlPro/freeton_wallet.git
@@ -63,7 +64,7 @@ Then, you need to install all the dependencies::
   $ opam repo add ocp git+https://github.com/OCamlPro/ocp-opam-repository
   $ opam install --deps-only ./ft.opam
 
-Finally, you can build the package it::
+Finally, you can build the package ft::
 
   $ eval $(opam env)
   $ dune build
