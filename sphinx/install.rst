@@ -4,7 +4,7 @@ How to install
 Using Docker
 ~~~~~~~~~~~~
 
-Using :code:`ft: with Docker will work on Linux, Mac OS and Windows.
+Using :code:`ft` with Docker will work on Linux, Mac OS and Windows.
 
 The latest image of :code:`ft` is available on:
 
