@@ -7,7 +7,7 @@ Displaying Wallet Information
 The sub-command :code:`ft output` can be used to display wallet
 information, and save it into files.
 
-For example, to display the address associated with an address, you
+For example, to display the address associated with a wallet, you
 may use::
 
   $ ft output --addr user0

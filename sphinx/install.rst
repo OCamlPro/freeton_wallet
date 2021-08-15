@@ -4,7 +4,7 @@ How to install
 Using Docker
 ~~~~~~~~~~~~
 
-Using :code:`ft: with Docker will work on Linux, Mac OS and Windows.
+Using :code:`ft` with Docker will work on Linux, Mac OS and Windows.
 
 The latest image of :code:`ft` is available on:
 
@@ -63,7 +63,7 @@ Then, you need to install all the dependencies::
   $ opam repo add ocp git+https://github.com/OCamlPro/ocp-opam-repository
   $ opam install --deps-only ./ft.opam
 
-Finally, you can build the package it::
+Finally, you can build the package ft::
 
   $ eval $(opam env)
   $ dune build
