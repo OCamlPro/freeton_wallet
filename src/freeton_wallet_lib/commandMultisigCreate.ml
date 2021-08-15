@@ -33,6 +33,29 @@ let check_key_contract key =
   | _ ->
       "SafeMultisigWallet"
 
+let is_hexa name =
+  let rec iter name i len =
+    if i = len then true
+    else
+      match name.[i] with
+      | '0'..'9'
+      | 'a'..'f'
+      | 'A'..'F' -> iter name (i+1) len
+      | _ -> false
+  in
+  iter name 0 (String.length name)
+
+let is_pubkey name =
+  if String.length name = 64 && is_hexa name then
+    Some name
+  else
+  if String.length name = 66 &&
+     name.[0] = '0' && name.[1] = 'x' then
+    let name = String.sub name 2 64 in
+    if is_hexa name then Some name else None
+  else
+    None
+
 let create_multisig
     ?client
     ?(custodians=[])
@@ -54,7 +77,11 @@ let create_multisig
   let owners = List.map (fun name ->
       match Misc.find_key net name with
       | None ->
-          Error.raise "Key %S does not exist" name
+          begin match is_pubkey name with
+            | None ->
+                Error.raise "Key %S does not exist" name
+            | Some name -> name
+          end
       | Some key ->
           match key.key_pair with
           | None -> Error.raise "Key %S has no key pair" name
