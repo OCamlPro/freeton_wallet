@@ -26,18 +26,20 @@ let hardcoded_code_hashes = [
 
 ]
 
-let bin_install file =
+let bin_install ~toolchain file =
   let basename = Filename.basename file in
-  Misc.call [ "cp" ; "-f" ; file ; Globals.bin_dir // basename ]
+  Misc.call [ "cp" ; "-f" ; file ;
+              Globals.bin_dir ~toolchain // basename ]
 
-let install_tonos_cli config ~distclean =
-  Unix.chdir Globals.git_dir ;
-  let dir = Globals.git_dir // "tonos-cli" in
+let install_tonos_cli ~toolchain ~distclean =
+  let git_dir = Globals.git_dir ~toolchain in
+  Unix.chdir git_dir ;
+  let dir = git_dir // "tonos-cli" in
   if distclean then Misc.call [ "rm"; "-rf"; dir ];
 
   let exists = Sys.file_exists dir in
   if not exists then
-    Misc.call [ "git" ; "clone"; ( Config.repos config ).repo_tonos_cli ;
+    Misc.call [ "git" ; "clone"; toolchain.repo_tonos_cli ;
                 "tonos-cli" ];
   Unix.chdir dir;
   if exists then begin
@@ -45,18 +47,19 @@ let install_tonos_cli config ~distclean =
     Misc.call [ "cargo" ; "update" ];
   end;
   Misc.call [ "cargo"; "build" ];
-  bin_install "target/debug/tonos-cli" ;
+  bin_install ~toolchain "target/debug/tonos-cli" ;
   Misc.call [ "cargo"; "clean" ];
   ()
 
-let install_solc config ~distclean =
-  Unix.chdir Globals.git_dir ;
-  let dir = Globals.git_dir // "TON-Solidity-Compiler" in
+let install_solc ~toolchain ~distclean =
+  let git_dir = Globals.git_dir ~toolchain in
+  Unix.chdir git_dir ;
+  let dir = git_dir // "TON-Solidity-Compiler" in
   if distclean then Misc.call [ "rm"; "-rf"; dir ];
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone";
-                ( Config.repos config ).repo_solc ;  "TON-Solidity-Compiler" ];
+               toolchain.repo_solc ;  "TON-Solidity-Compiler" ];
   Unix.chdir dir;
   if exists then
     Misc.call [ "git" ; "pull" ];
@@ -70,21 +73,22 @@ let install_solc config ~distclean =
   Misc.call [ "cmake" ; "--build" ; "." ; "--" ; "-j8" ];
   Unix.chdir "..";
 
-  bin_install "build/solc/solc" ;
-  bin_install "lib/stdlib_sol.tvm" ;
+  bin_install ~toolchain "build/solc/solc" ;
+  bin_install ~toolchain "lib/stdlib_sol.tvm" ;
   EzFile.make_dir ~p:true Globals.doc_dir ;
   Misc.call [ "cp"; "-f" ; "API.md"; Globals.doc_dir // "API.md" ];
   ()
 
-let install_tvm_linker config ~distclean =
-  Unix.chdir Globals.git_dir ;
-  let dir = Globals.git_dir // "TVM-linker" in
+let install_tvm_linker ~toolchain ~distclean =
+  let git_dir = Globals.git_dir ~toolchain in
+  Unix.chdir git_dir ;
+  let dir = git_dir // "TVM-linker" in
   if distclean then Misc.call [ "rm"; "-rf"; dir ];
 
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone";
-                ( Config.repos config) .repo_tvm_linker ;  "TVM-linker" ];
+                toolchain.repo_tvm_linker ;  "TVM-linker" ];
   Unix.chdir dir;
   if exists then
     Misc.call [ "git" ; "pull" ];
@@ -92,8 +96,8 @@ let install_tvm_linker config ~distclean =
   if exists then
     Misc.call [ "cargo" ; "update" ];
   Misc.call [ "cargo"; "build" ];
-  bin_install "target/debug/tvm_linker" ;
-  Misc.call [ "Cargo"; "clean" ];
+  bin_install ~toolchain "target/debug/tvm_linker" ;
+  Misc.call [ "cargo"; "clean" ];
   ()
 
 let install_code_hashes () =
@@ -118,18 +122,21 @@ let action ~distclean ~client ~solc ~linker ~code_hashes =
 
   if Globals.is_alpine then begin
     Printf.eprintf
-      "Docker detected. Use 'docker pull ocamlpro/ft:latest' to upgrade\n%!";
+      "Docker detected. Using 'docker pull ocamlpro/ft:latest' to upgrade\n%!";
+    Misc.call [ "docker"; "pull"; "ocamlpro/ft:latest" ]
   end else begin
-    EzFile.make_dir ~p:true Globals.git_dir ;
-    EzFile.make_dir ~p:true Globals.bin_dir ;
+    let toolchain = Config.toolchain config in
+    let git_dir = Globals.git_dir ~toolchain in
+    EzFile.make_dir ~p:true git_dir ;
+    EzFile.make_dir ~p:true (Globals.bin_dir ~toolchain);
 
     if distclean && not (client || solc || linker ) then
-      Misc.call [ "rm"; "-rf"; Globals.git_dir ];
+      Misc.call [ "rm"; "-rf"; git_dir ];
 
     if client then
-      install_tonos_cli config ~distclean ;
-    if solc then install_solc config ~distclean ;
-    if linker then install_tvm_linker config ~distclean ;
+      install_tonos_cli ~toolchain ~distclean ;
+    if solc then install_solc ~toolchain ~distclean ;
+    if linker then install_tvm_linker ~toolchain ~distclean ;
   end;
   ()
 

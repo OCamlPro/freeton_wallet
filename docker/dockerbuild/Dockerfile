@@ -1,7 +1,7 @@
 ARG BASE_TAG
 FROM frolvlad/alpine-glibc:latest
 
-RUN apk add gmp-dev pkgconf libressl-dev docker
+RUN apk add gmp-dev pkgconf libressl-dev docker git
 RUN mkdir /user
 RUN chmod 777 /user
 

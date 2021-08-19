@@ -11,6 +11,7 @@
 (**************************************************************************)
 
 open EzFile.OP
+open Types
 
 let verbosity = ref 1
 let command = "ft"
@@ -46,14 +47,26 @@ let config_file = ft_dir // "config.json"
 let contracts_dir = ft_dir // "contracts"
 let code_hash_dir = ft_dir // "code_hash"
 
-let git_dir = ft_dir // "GIT"
+let git_dir ~toolchain =
+  let dir = ft_dir // "GIT" in
+  if toolchain.repo_toolchain = "" then
+    dir
+  else
+    dir // toolchain.repo_toolchain
+
 let doc_dir = ft_dir // "doc"
 
-let bin_dir =
-  if is_alpine then
-    "/bin"
+let bin_dir ~toolchain =
+  let dir =
+    if is_alpine then
+      "/bin"
+    else
+      ft_dir // "bin"
+  in
+  if toolchain.repo_toolchain = "" then
+    dir
   else
-    ft_dir // "bin"
+    dir // toolchain.repo_toolchain
 
 let () =
   if is_alpine then

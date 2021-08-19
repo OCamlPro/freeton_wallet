@@ -24,11 +24,14 @@ let action todo =
       if Sys.file_exists name then
         Error.raise "Directory %S already exists" name ;
       let dir = Sys.getcwd () in
-      EzFile.make_dir ~p:true Globals.git_dir ;
-      let srcdir = Globals.git_dir // "debots" in
+      let config = Config.config () in
+      let toolchain = Config.toolchain config in
+      let git_dir = Globals.git_dir ~toolchain in
+      EzFile.make_dir ~p:true git_dir ;
+      let srcdir = git_dir // "debots" in
       let exists = Sys.file_exists srcdir in
       if not exists then begin
-        Unix.chdir Globals.git_dir ;
+        Unix.chdir git_dir ;
         Misc.call [ "git" ; "clone"; "https://github.com/tonlabs/debots.git" ];
       end ;
       Unix.chdir srcdir;

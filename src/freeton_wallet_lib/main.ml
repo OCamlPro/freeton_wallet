@@ -32,8 +32,12 @@ let increase_verbosity ()=
     Printexc.record_backtrace true;
   incr Globals.verbosity
 
+let backtrace = match Sys.getenv "FT_BACKTRACE" with
+  | _ -> true
+  | exception _ -> false
+
 let main () =
-  Printexc.record_backtrace false;
+  Printexc.record_backtrace backtrace;
   let commands =
     [
       [ "switch" ; "list" ], CommandSwitchList.cmd;
@@ -228,7 +232,7 @@ let main () =
       if config.modified then
         Config.save config
   with
-  | Error.Error s ->
+  | Error.Error s when not backtrace ->
       Printf.eprintf "Error: %s\n%!" s;
       exit 2
   | exn ->

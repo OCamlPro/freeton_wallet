@@ -51,7 +51,9 @@ and date_now_delay now f rem =
 
 let get_code filename =
   if Globals.use_ton_sdk then
-    let tvm_linker = Misc.binary_file "tvm_linker" in
+    let config = Config.config () in
+    let toolchain = Config.toolchain config in
+    let tvm_linker = Misc.binary_file ~toolchain "tvm_linker" in
     let lines =
       Misc.call_stdout_lines [ tvm_linker ; "decode" ; "--tvc" ; filename ] in
     let code = ref None in
@@ -79,6 +81,10 @@ let subst_string ?brace config =
     | [ "env" ; var ] -> begin
         match Sys.getenv var with
         | exception Not_found ->
+            Printf.eprintf
+              "Error hint: if you are using the Docker version, you may need to define\n" ;
+            Printf.eprintf
+              "  FT_DOCKER='-e %s' for 'ft' to see this variable.\n%!" var;
             Error.raise "Env variable %S is not defined" var
         | s -> s
       end
@@ -285,7 +291,7 @@ let subst_string ?brace config =
       Error.raise "Cannot substitute %S: exception %s"
         s ( Printexc.to_string exn)
   in
-  (fun s -> EZ_SUBST.string ~sep:'%' ~brace ~ctxt:() s), files
+  (fun s -> EZ_SUBST.string ~sep:'%' ~brace ~bracket:brace ~ctxt:() s), files
 
 
 let help =

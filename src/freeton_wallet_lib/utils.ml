@@ -30,7 +30,8 @@ let tonoscli binary config args =
 
 let tonoscli config args =
   let config_file = tonoscli_config config in
-  let binary = Misc.binary_file "tonos-cli" in
+  let toolchain = Config.toolchain config in
+  let binary = Misc.binary_file ~toolchain "tonos-cli" in
   if not ( Sys.file_exists config_file ) then begin
     let node = Config.current_node config in
     Misc.call (tonoscli binary config ["config" ; "--url"; node.node_url ]);

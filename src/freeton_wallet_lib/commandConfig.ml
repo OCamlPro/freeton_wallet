@@ -16,11 +16,11 @@ open Types
 
 let action ?client_repo ?solc_repo ?linker_repo ?(add_multisigs=[]) () =
   let config = Config.config () in
-  let _net = Config.current_network config in
-  let repos = Config.repos config in
+  let net = Config.current_network config in
+  let repos = Config.toolchain config in
   match client_repo, solc_repo, linker_repo, add_multisigs with
   | None, None, None, [] ->
-      Printf.printf "Config:\n";
+      Printf.printf "Config: toolchain: %S\n" net.net_toolchain;
       Printf.printf "  client-repo: %s\n" repos.repo_tonos_cli ;
       Printf.printf "  solc-repo: %s\n" repos.repo_solc ;
       Printf.printf "  linker-repo: %s\n" repos.repo_tvm_linker ;
