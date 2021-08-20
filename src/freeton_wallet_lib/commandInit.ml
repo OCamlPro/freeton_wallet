@@ -115,7 +115,7 @@ let install_code_hashes () =
 
   ()
 
-let action ~distclean ~client ~solc ~linker ~code_hashes =
+let action ~distclean ~client ~solc ~linker ~code_hashes ?toolchain () =
   let config = Config.config () in
 
   if code_hashes then install_code_hashes ();
@@ -125,7 +125,10 @@ let action ~distclean ~client ~solc ~linker ~code_hashes =
       "Docker detected. Using 'docker pull ocamlpro/ft:latest' to upgrade\n%!";
     Misc.call [ "docker"; "pull"; "ocamlpro/ft:latest" ]
   end else begin
-    let toolchain = Config.toolchain config in
+    let toolchain = match toolchain with
+      | None -> Config.toolchain config
+      | Some toolchain -> Config.find_toolchain config toolchain
+    in
     let git_dir = Globals.git_dir ~toolchain in
     EzFile.make_dir ~p:true git_dir ;
     EzFile.make_dir ~p:true (Globals.bin_dir ~toolchain);
@@ -146,6 +149,7 @@ let cmd =
   let solc = ref false in
   let linker = ref false in
   let code_hashes = ref false in
+  let toolchain = ref None in
 
   EZCMD.sub
     "init"
@@ -157,6 +161,7 @@ let cmd =
              client, solc, linker, code_hashes
        in
        action ~distclean:!distclean ~client ~solc ~linker ~code_hashes
+         ?toolchain:!toolchain ()
     )
     ~args: [
       [ "distclean" ], Arg.Set distclean,
@@ -170,6 +175,9 @@ let cmd =
       EZCMD.info "Build and install 'tvm_linker' from sources";
       [ "code-hashes" ], Arg.Set code_hashes,
       EZCMD.info "Create a database of code hashes from predefined contracts";
+      [ "toolchain" ], Arg.String ( fun s -> toolchain := Some s ),
+      EZCMD.info ~docv:"TOOLCHAIN" "Toolchain to initialize" ;
+
     ]
     ~doc: "Initialize with TON Labs binary tools, compiled from sources."
     ~man:[
