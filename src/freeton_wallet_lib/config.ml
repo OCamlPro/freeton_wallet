@@ -201,6 +201,7 @@ let mainnet_network = {
   net_nodes = [ mainnet_node ] ;
   net_keys = [] ;
   net_deployer = "deployer" ;
+  net_toolchain = "";
 }
 
 let testnet_node = {
@@ -216,6 +217,7 @@ let testnet_network = {
   net_nodes = [ testnet_node ] ;
   net_keys = [ ];
   net_deployer = "deployer" ;
+  net_toolchain = "";
 }
 
 let rustnet_node = {
@@ -231,6 +233,7 @@ let rustnet_network = {
   net_nodes = [ rustnet_node ] ;
   net_keys = [ ];
   net_deployer = "deployer" ;
+  net_toolchain = "";
 }
 
 let fldnet_node = {
@@ -246,6 +249,7 @@ let fldnet_network = {
   net_nodes = [ fldnet_node ] ;
   net_keys = [ ];
   net_deployer = "deployer" ;
+  net_toolchain = "";
 }
 
 let nil_node = {
@@ -261,6 +265,7 @@ let nil_network = {
   net_nodes = [ nil_node ] ;
   net_keys = [ ];
   net_deployer = "deployer" ;
+  net_toolchain = "nil";
 }
 
 let known_networks = [
@@ -276,9 +281,17 @@ let repo_solc = "https://github.com/tonlabs/TON-Solidity-Compiler.git"
 let repo_tvm_linker = "https://github.com/tonlabs/TVM-linker.git"
 
 let default_repos = {
+  repo_toolchain = "";
   repo_tonos_cli ;
   repo_solc ;
   repo_tvm_linker ;
+}
+
+let nil_repos = {
+  repo_toolchain = "nil";
+  repo_tonos_cli = "https://github.com/NilFoundation/tonos-cli.git" ;
+  repo_solc = "https://github.com/NilFoundation/tvm-solidity.git" ;
+  repo_tvm_linker = "https://github.com/NilFoundation/tvm-lld.git" ;
 }
 
 let default_multisigs = [
@@ -296,17 +309,10 @@ let default_config = {
   networks = [ testnet_network ;
                mainnet_network ;
              ] ;
-  repos = Some default_repos ;
+  repos = None ;
+  toolchains = [ default_repos ; nil_repos ];
   multisigs = default_multisigs ;
 }
-
-let repos config =
-  match config.repos with
-  | None ->
-      config.repos <- Some default_repos ;
-      config.modified <- true ;
-      default_repos
-  | Some repos -> repos
 
 let save config =
   EzFile.make_dir ~p:true Globals.ft_dir;
@@ -329,9 +335,7 @@ let save config =
                        end ;
                        { net with net_keys = [] }
                      ) config.networks ;
-                   repos = ( match config.repos with
-                       | None -> Some default_repos
-                       | _ -> config.repos ) ;
+                   repos = None;
                  }
     in
     if !Globals.verbosity > 0 then
@@ -507,22 +511,17 @@ let load () =
 
   begin
     match config.repos with
-    | None ->
-        config.repos <- Some default_repos ;
-        config.modified <- true
-    | Some repos ->
-        if repos.repo_tvm_linker = "" then begin
-          repos.repo_tvm_linker <- repo_tvm_linker ;
-          config.modified <- true ;
-        end ;
-        if repos.repo_solc = "" then begin
-          repos.repo_solc <- repo_solc ;
-          config.modified <- true ;
-        end ;
-        if repos.repo_tonos_cli = "" then begin
-          repos.repo_tonos_cli <- repo_tonos_cli ;
-          config.modified <- true ;
-        end
+    | None -> ()
+    | Some _ ->
+        config.repos <- None ;
+        config.modified <- true ;
+  end;
+  begin
+    match config.toolchains with
+    | [] ->
+        config.toolchains <- [ default_repos ; nil_repos ];
+        config.modified <- true ;
+    | _ -> ()
   end;
   if config.multisigs = [] then begin
     config.multisigs <- default_multisigs ;
@@ -560,3 +559,17 @@ let print () =
           Printf.eprintf "    url: %s\n%!" node.node_url
         ) net.net_nodes
     ) config.networks
+
+let toolchain config =
+  let net = current_network config in
+  let rec iter toolchains =
+    match toolchains with
+    | [] ->
+        Error.raise "Broken config: no toolchain %S\n%!" net.net_toolchain
+    | repos :: toolchains ->
+        if repos.repo_toolchain = net.net_toolchain then
+          repos
+        else
+          iter toolchains
+  in
+  iter config.toolchains

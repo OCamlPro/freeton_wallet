@@ -41,9 +41,11 @@ type network = {
   mutable net_nodes : node list ;           [@key "nodes"]
   mutable net_keys : key list ;   [@dft []] [@key "keys"]
   mutable net_deployer : string ; [@dft "deployer"] [@key "deployer"]
+  mutable net_toolchain : string ; [@dft ""]
 } [@@deriving json_encoding]
 
 type repos = {
+  mutable repo_toolchain : string ; [@dft ""]
   mutable repo_tonos_cli : string ; [@dft ""]
   mutable repo_solc : string ; [@dft ""]
   mutable repo_tvm_linker : string ; [@dft ""]
@@ -55,6 +57,7 @@ type config = {
   mutable current_network : string ;  [@key "network"]
   mutable networks : network list ;
   mutable repos : repos option ;
+  mutable toolchains : repos list ;   [@dft []]
   mutable multisigs : string list ;   [@dft []]
 } [@@deriving json_encoding]
 

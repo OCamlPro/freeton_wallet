@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action ~switch ~url ~image =
+let action ~switch ~url ~image ?(toolchain="") () =
   match switch with
   | None ->
       Error.raise
@@ -32,6 +32,7 @@ let action ~switch ~url ~image =
           current_account = None ;
           net_keys ;
           net_deployer ;
+          net_toolchain = toolchain;
         } in
         config.networks <- config.networks @ [ net ];
         config.current_network <- net_name ;
@@ -84,6 +85,7 @@ let action ~switch ~url ~image =
 let cmd =
   let switch = ref None in
   let url = ref None in
+  let toolchain = ref None in
   let image = ref "tonlabs/local-node" in
   EZCMD.sub
     "switch create"
@@ -92,6 +94,8 @@ let cmd =
          ~switch:!switch
          ~url:!url
          ~image:!image
+         ?toolchain:!toolchain
+         ()
     )
     ~args: (
       [
@@ -104,7 +108,8 @@ let cmd =
         [ "image" ], Arg.String ( fun s -> image := s ),
         EZCMD.info ~docv:"DOCKER" "Docker image to use for sandboxes" ;
 
-
+        [ "toolchain" ], Arg.String ( fun s -> toolchain := Some s ),
+        EZCMD.info ~docv:"TOOLCHAIN" "Toolchain to use" ;
       ] )
     ~doc: "Create a new switch for an existing network, or create a sandbox local network"
     ~man:[

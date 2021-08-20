@@ -1150,6 +1150,17 @@ let register_primitives () =
     { prim_name = "muldivc";
       prim_kind = PrimMemberVariable } muldiv_kind ;
 
+  register 92
+    { prim_name = "empty";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( _from, _to, _loc )) when !for_freeton ->
+           Some (make_fun [] [ TBool ] MNonPayable)
+       | Some (TArray ( _, _, _ )) when !for_freeton ->
+           Some (make_fun [] [ TBool ] MNonPayable)
+       | _ -> None);
+
   ()
 
 let handle_exception f x =

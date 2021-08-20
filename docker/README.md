@@ -32,7 +32,7 @@ make dev
 
 Inside the prompt, we will need to install all dependencies:
 ```
-apk add --upgrade --no-cache make patch gcc curl coreutils musl-dev opam git  gmp-dev pkgconf libressl-dev emacs cmake 
+apk add --upgrade --no-cache make patch gcc curl coreutils musl-dev opam git  gmp-dev pkgconf libressl-dev emacs cmake  g++ boost boost-dev boost-static
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # choose 1
 opam init -a -y --comp 4.10.0 --disable-sandboxing
@@ -71,7 +71,7 @@ cp -f ft /bin/ft
 
 Finally, we can build all utilities:
 ```
-apk add g++ boost boost-dev boost-static
+source $HOME/.cargo/env
 FT_HOME=/root/ft ft init
 ```
 

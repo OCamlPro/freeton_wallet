@@ -160,10 +160,12 @@ let action ~filename ~force ?contract () =
   if not force && StringMap.mem contract known then
     Error.raise "Contract %s already exists (use -f to override)"
       contract;
-  let solc = Misc.binary_file "solc" in
+  let config = Config.config () in
+  let toolchain = Config.toolchain config in
+  let solc = Misc.binary_file ~toolchain "solc" in
   (* maybe use argument --tvm-optimize *)
-  let tvm_linker = Misc.binary_file "tvm_linker" in
-  let stdlib = Misc.binary_file "stdlib_sol.tvm" in
+  let tvm_linker = Misc.binary_file ~toolchain "tvm_linker" in
+  let stdlib = Misc.binary_file ~toolchain "stdlib_sol.tvm" in
 
   let abi_file = contract ^ ".abi.json" in
   let code_file = contract ^ ".code" in
