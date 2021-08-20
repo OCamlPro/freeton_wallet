@@ -30,3 +30,5 @@ val toolchain : Types.config -> Types.repos
 val default_repos : Types.repos
 
 val known_networks : Types.network list
+
+val find_toolchain : Types.config -> string -> Types.repos

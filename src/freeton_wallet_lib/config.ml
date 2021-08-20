@@ -560,16 +560,19 @@ let print () =
         ) net.net_nodes
     ) config.networks
 
-let toolchain config =
-  let net = current_network config in
+let find_toolchain config toolchain =
   let rec iter toolchains =
     match toolchains with
     | [] ->
-        Error.raise "Broken config: no toolchain %S\n%!" net.net_toolchain
+        Error.raise "Broken config: no toolchain %S\n%!" toolchain
     | repos :: toolchains ->
-        if repos.repo_toolchain = net.net_toolchain then
+        if repos.repo_toolchain = toolchain then
           repos
         else
           iter toolchains
   in
   iter config.toolchains
+
+let toolchain config =
+  let net = current_network config in
+  find_toolchain config net.net_toolchain
