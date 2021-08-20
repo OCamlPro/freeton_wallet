@@ -1655,6 +1655,8 @@ Where options are:
 
 * :code:`--deployer ACCOUNT`   Set deployer to account ACCOUNT. The deployer is the account used to credit the initial balance of an address before deploying a contract on it.
 
+* :code:`--toolchain TOOLCHAIN`   Name of toolchain to use in this switch
+
 * :code:`--url URL`   Node Url of this network (without /graphql)
 
 
@@ -1741,6 +1743,8 @@ Where options are:
 * :code:`NETWORK`   Name of network switch to create
 
 * :code:`--image DOCKER`   Docker image to use for sandboxes
+
+* :code:`--toolchain TOOLCHAIN`   Toolchain to use
 
 * :code:`--url URL`   URL of the default node in this network
 
