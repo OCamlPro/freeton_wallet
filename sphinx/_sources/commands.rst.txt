@@ -1067,6 +1067,8 @@ Where options are:
 
 * :code:`--solc`   Build and install 'solc' from sources
 
+* :code:`--toolchain TOOLCHAIN`   Toolchain to initialize
+
 
 ft inspect
 ~~~~~~~~~~~~
