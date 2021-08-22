@@ -14,6 +14,7 @@ open EzCompat
 open Ez_subst.V1
 open Ezcmd.V2
 open EZCMD.TYPES
+open EzFile.OP
 
 let date_of_int date =
   let date = CalendarLib.Calendar.from_unixfloat (float_of_int date) in
@@ -73,10 +74,16 @@ let get_code_hash filename =
   let state = Ton_sdk.TVC.read filename in
   Ton_sdk.TVC.code_hash state
 
-let subst_string ?brace config =
+let subst_string ?dir ?brace:brace_arg config =
   let net = Config.current_network config in
   let files = ref [] in
-
+  let read_file file =
+    EzFile.read_file (
+      match dir with
+      | None -> file
+      | Some dir -> dir // file
+    )
+  in
   let rec iter = function
     | [ "env" ; var ] -> begin
         match Sys.getenv var with
@@ -195,8 +202,7 @@ let subst_string ?brace config =
 
     | [ "ton" ; n ] ->
         Int64.to_string ( Misc.nanotokens_of_string n )
-    | [ "file" ; file ] ->
-        String.trim ( EzFile.read_file file )
+    | [ "file" ; file ] -> String.trim ( read_file file )
 
     | "string" :: rem -> String.concat ":" rem
 
@@ -209,7 +215,8 @@ let subst_string ?brace config =
 
 
     (* encoders *)
-    | "read" :: rem -> EzFile.read_file ( iter rem )
+    | "read" :: rem -> read_file ( iter rem )
+    | "subst" :: rem -> subst ( iter rem )
     | "hex" :: rem ->
         let `Hex s = Hex.of_string ( iter rem ) in s
     | "of-hex" :: rem ->
@@ -281,10 +288,10 @@ let subst_string ?brace config =
           ( String.concat ":" rem )
 
     | _ -> raise Not_found
-  in
-  let brace () s =
+
+  and brace () s =
     try
-      match brace with
+      match brace_arg with
       | None ->
           iter ( EzString.split s ':' )
       | Some brace ->
@@ -295,8 +302,10 @@ let subst_string ?brace config =
     with exn ->
       Error.raise "Cannot substitute %S: exception %s"
         s ( Printexc.to_string exn)
+  and subst s =
+    EZ_SUBST.string ~sep:'%' ~brace ~bracket:brace ~ctxt:() s
   in
-  (fun s -> EZ_SUBST.string ~sep:'%' ~brace ~bracket:brace ~ctxt:() s), files
+  subst, files
 
 
 let help =
@@ -348,12 +357,12 @@ Escaping of '}' is done using '\}'.
 |}
 
 
-let with_subst ?brace ?config f =
+let with_subst ?brace ?config ?dir f =
   let config = match config with
     | None -> Config.config ()
     | Some config -> config
   in
-  let (subst, files) = subst_string ?brace config in
+  let (subst, files) = subst_string ?dir ?brace config in
   let clean () = List.iter Sys.remove !files in
   match
     f subst
