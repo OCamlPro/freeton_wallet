@@ -274,6 +274,11 @@ let subst_string ?brace config =
 
     | [ n ; "ton" ] -> Int64.to_string ( Misc.nanotokens_of_string n )
 
+    | [ "sol" ; "fwd" ] -> "{ value: 0, flag: 64, bounce: true }"
+    | [ "sol" ; "stp" ] -> {|msg.sender.transfer(0 , false, 64 );|}
+    | "sol" :: "gas" :: rem ->
+        Printf.sprintf  {|{value: %s, flag: 0, bounce: true}|}
+          ( String.concat ":" rem )
 
     | _ -> raise Not_found
   in
