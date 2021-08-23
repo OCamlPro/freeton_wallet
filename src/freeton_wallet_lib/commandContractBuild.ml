@@ -96,7 +96,8 @@ let create_new_version contract num =
 
 let preprocess_solidity ~from_ ~to_ =
   let files = ref [] in
-  Subst.with_subst (fun preprocess ->
+  let dir = Filename.dirname from_ in
+  Subst.with_subst ~dir (fun preprocess ->
       match FreetonSolidity.handle_exception (fun file ->
           (* Solidity_lexer.recursive_comments := true ; *)
           let ast = FreetonSolidity.parse_file ~preprocess file in
