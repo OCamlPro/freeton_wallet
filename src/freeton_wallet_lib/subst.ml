@@ -287,6 +287,34 @@ let subst_string ?dir ?brace:brace_arg config =
         Printf.sprintf  {|{value: %s, flag: 0, bounce: true}|}
           ( String.concat ":" rem )
 
+    | [ "sol" ; "msg" ; okCallback ; errorCallback ] ->
+        Printf.sprintf {|
+        {
+          abiVer: 2,
+          extMsg: true,
+          sign: false,
+          pubkey: nopubkey,
+          time: uint64(now),
+          expire: 0,
+          callbackId: tvm.functionId(%s),
+          onErrorId: tvm.functionId(%s),
+          }
+        |} okCallback errorCallback
+
+    | [ "sol" ; "msg" ; pubkey ; okCallback ; errorCallback ] ->
+        Printf.sprintf {|
+        {
+          abiVer: 2,
+          extMsg: true,
+          sign: true,
+          pubkey: %s,
+          time: uint64(now),
+          expire: 0,
+          callbackId: tvm.functionId(%s),
+          onErrorId: tvm.functionId(%s),
+          }
+        |} pubkey okCallback errorCallback
+
     | _ -> raise Not_found
 
   and brace () s =
