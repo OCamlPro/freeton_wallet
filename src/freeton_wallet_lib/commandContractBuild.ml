@@ -94,10 +94,22 @@ let create_new_version contract num =
   contract_dir // num
 
 
-let preprocess_solidity ~from_ ~to_ =
+let preprocess_solidity ?old_file ~from_ ~to_ () =
   let files = ref [] in
+  let need_build = ref false in
   let dir = Filename.dirname from_ in
   Subst.with_subst ~dir (fun preprocess ->
+      let preprocess =
+        match Sys.getenv "FT_DEBUG_SPP" with
+        | exception _ -> preprocess
+        | _ ->
+            let counter = ref 0 in
+            fun s ->
+              let s = preprocess s in
+              incr counter;
+              EzFile.write_file (Printf.sprintf "%s-pp%d.sol" to_ !counter) s;
+              s
+      in
       match FreetonSolidity.handle_exception (fun file ->
           (* Solidity_lexer.recursive_comments := true ; *)
           let ast = FreetonSolidity.parse_file ~preprocess file in
@@ -116,12 +128,22 @@ pragma AbiHeader pubkey;
         ) from_
       with
       | Ok content ->
+          begin
+            match old_file with
+            | None -> ()
+            | Some old_file ->
+                try
+                  let old_content = EzFile.read_file old_file in
+                  need_build := old_content <> content
+                with _ ->
+                  need_build := true
+          end;
           EzFile.write_file to_ content
       | Error s ->
           Printf.eprintf "Error: %s\n%!" s;
           exit 2
     );
-  !files
+  !files, !need_build
 
 let action ~filename ~force ?contract () =
   (* TODO: check that no account is using this contract,
@@ -139,16 +161,16 @@ let action ~filename ~force ?contract () =
           | exception Not_found -> ()
           | _ ->
               let new_filename = Filename.temp_file "ft" ".sol" in
-              let _files: string list =
-                preprocess_solidity ~from_:filename ~to_:new_filename
+              let _: string list * bool =
+                preprocess_solidity ~from_:filename ~to_:new_filename ()
               in
               Sys.remove new_filename
         end;
         filename, contract_name
     | "spp" | "solpp" ->
         let new_filename = contract ^ ".sol" in
-        let _files: string list =
-          preprocess_solidity ~from_:filename ~to_:new_filename
+        let _: string list * bool =
+          preprocess_solidity ~from_:filename ~to_:new_filename ()
         in
         new_filename,
         ( match contract_name with

@@ -22,6 +22,11 @@ type create =
 let action ~contract ~force ~params ~wc ?create ?sign ~deployer
     ?initial_data ~credit () =
   let config = Config.config () in
+
+  let subst, _ = Subst.subst_string config in
+  let initial_data = Option.map subst initial_data in
+
+
   let net = Config.current_network config in
   let create =
     match create, sign with

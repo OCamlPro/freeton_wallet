@@ -185,8 +185,7 @@ let add_account config ~initial_data
 
   let contract = Option.map Misc.fully_qualified_contract contract in
 
-  let subst, _ = Subst.subst_string config in
-  let key_passphrase = Option.map subst passphrase in
+  let key_passphrase = passphrase in
 
   let key_pair =
     match keyfile, key_passphrase with
@@ -566,6 +565,11 @@ let genkey ?name ?contract ?initial_data config ~force =
 let action accounts ~passphrase ~address ~contract ~keyfile ~wc
     ~force ~initial_data =
   let config = Config.config () in
+
+  let subst, _ = Subst.subst_string config in
+  let passphrase = Option.map subst passphrase in
+  let initial_data = Option.map subst initial_data in
+
   match passphrase, address, contract, keyfile, wc with
   | None, None, _, None, None when
       ( contract = None ) ->

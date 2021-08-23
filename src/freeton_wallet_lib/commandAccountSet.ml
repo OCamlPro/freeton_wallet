@@ -15,6 +15,11 @@ open EZCMD.TYPES
 
 let action ~account ~passphrase ~address ~contract ~keyfile ~wc ~initial_data =
   let config = Config.config () in
+
+  let subst, _ = Subst.subst_string config in
+  let passphrase = Option.map subst passphrase in
+  let initial_data = Option.map subst initial_data in
+
   match account with
   | None -> Error.raise "An account name must be provided"
   | Some name ->
