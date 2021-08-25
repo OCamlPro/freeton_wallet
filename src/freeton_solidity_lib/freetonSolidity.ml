@@ -1161,6 +1161,27 @@ let register_primitives () =
            Some (make_fun [] [ TBool ] MNonPayable)
        | _ -> None);
 
+  register 93
+    { prim_name = "stoi";
+      prim_kind = PrimFunction }
+    (fun _pos _opt _t_opt ->
+       Some (make_fun [ TString LMemory ]
+               [ TUint 256; TBool ] MNonPayable)
+    );
+
+  register 94
+    { prim_name = "makeAddrNone";
+      prim_kind = PrimMemberFunction }
+    (fun pos _opt t_opt ->
+       match t_opt with
+       | Some ( TType (TAddress _) ) ->
+           Some (make_fun [] [TAddress true] MNonPayable)
+       | Some t ->
+            error pos "address has type %s\n%!"
+              (Solidity_type_printer.string_of_type t);
+       | None -> None
+    );
+
   ()
 
 let handle_exception f x =

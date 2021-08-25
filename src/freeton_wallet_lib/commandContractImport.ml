@@ -118,9 +118,10 @@ let action ~force ~filename ~make ?contract () =
                   Printf.eprintf "contract: %S\n%!" contract;
                   Sys.rename tmp_filename new_filename;
                   Some new_filename
-                end else
+                end else begin
+                  Sys.remove tmp_filename ;
                   None
-              else begin
+                end else begin
                 Printf.eprintf "Warning: --make on .sol file does not rebuild. Use .spp instead\n%!";
                 None
               end else

@@ -3,7 +3,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.6.2)
+(version 0.6.3)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -115,7 +115,7 @@
  (depends
    (ocaml (>= 4.08.0))
    solidity-typechecker
-   (solidity-parser (and (>= 0.3.3) (< 1.0.0)))
+   (solidity-parser (and (>= 0.3.5) (< 1.0.0)))
    ocplib_stuff
    ez_file
    ppx_inline_test
