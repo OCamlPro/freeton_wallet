@@ -173,7 +173,7 @@ let cmd =
         [ "send" ], Arg.Set send,
         EZCMD.info "Force sendTransaction() instead of submitTransaction()";
 
-        [ "sponsor" ], Arg.Clear bounce,
+        [ "parrain"; "sponsor" ], Arg.Clear bounce,
         EZCMD.info " Transfer to inactive account";
 
         [ "bounce" ], Arg.Bool (fun b -> bounce := b),
