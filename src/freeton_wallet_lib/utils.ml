@@ -34,7 +34,7 @@ let tonoscli config args =
   let binary = Misc.binary_file ~toolchain "tonos-cli" in
   if not ( Sys.file_exists config_file ) then begin
     let node = Config.current_node config in
-    Misc.call (tonoscli binary config ["config" ; "--url"; node.node_url ]);
+    Misc.call (tonoscli binary config ["--url"; node.node_url ; "config" ]);
 
     let src_file = "tonlabs-cli.conf.json" in
     if Sys.file_exists src_file then begin
