@@ -107,15 +107,21 @@ let preprocess_solidity ?old_file ~from_ ~to_ () =
             fun s ->
               let s = preprocess s in
               incr counter;
-              EzFile.write_file (Printf.sprintf "%s-pp%d.sol" to_ !counter) s;
+              let tmp_file = Printf.sprintf "%s-pp%d.sol" to_ !counter in
+              EzFile.write_file tmp_file s;
+              Solidity_parser.add_temporary_file tmp_file ;
               s
       in
       match FreetonSolidity.handle_exception (fun file ->
           (* Solidity_lexer.recursive_comments := true ; *)
-          let ast = FreetonSolidity.parse_file ~preprocess file in
+          let ast = FreetonSolidity.parse_file ~preprocess ~cpp:true file in
           files := List.map (fun m ->
               m.Solidity_ast.module_file) ast.program_modules;
-          let tast = FreetonSolidity.typecheck_ast ast in
+          let tast =
+            match Sys.getenv "FT_SKIP_TYPECHECK" with
+            | exception _ -> FreetonSolidity.typecheck_ast ast
+            | _ -> { ast with program_modules = List.rev ast.program_modules }
+          in
           let s = FreetonSolidity.string_of_ast tast in
           Printf.sprintf
             {|// This file was generated from file %S. DO NOT EDIT !

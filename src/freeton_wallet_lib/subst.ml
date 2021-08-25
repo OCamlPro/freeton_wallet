@@ -287,6 +287,7 @@ let subst_string ?dir ?brace:brace_arg config =
         Printf.sprintf  {|{value: %s, flag: 0, bounce: true}|}
           ( String.concat ":" rem )
 
+(*
     | [ "sol" ; "msg" ; okCallback ; errorCallback ] ->
         Printf.sprintf {|
         {
@@ -314,6 +315,7 @@ let subst_string ?dir ?brace:brace_arg config =
           onErrorId: tvm.functionId(%s),
           }
         |} pubkey okCallback errorCallback
+        *)
 
     | _ -> raise Not_found
 

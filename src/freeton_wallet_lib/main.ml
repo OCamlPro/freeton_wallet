@@ -233,9 +233,11 @@ let main () =
         Config.save config
   with
   | Error.Error s when not backtrace ->
+      Solidity_parser.keep_temporary_files () ;
       Printf.eprintf "Error: %s\n%!" s;
       exit 2
   | exn ->
+      Solidity_parser.keep_temporary_files () ;
       let bt = Printexc.get_backtrace () in
       let error = Printexc.to_string exn in
       Printf.eprintf "fatal exception %s\n%s\n%!" error bt;
