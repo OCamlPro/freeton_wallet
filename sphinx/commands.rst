@@ -1318,7 +1318,7 @@ Should be like that:
 If the target is not an active account:
 ::
 
-  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain
+  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --sponsor
 
 
 To send all the balance:
@@ -1351,7 +1351,7 @@ Where options are:
 
 * :code:`--from ACCOUNT`   The source of the transfer
 
-* :code:`--parrain`    Transfer to inactive account
+* :code:`--sponsor`    Transfer to inactive account
 
 * :code:`--src ACCOUNT`   The custodian signing the multisig transfer
 

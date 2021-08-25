@@ -17,7 +17,7 @@ sleep 10
 ft node --give user1 || exit 2
 
 ft account --create customBank --contract 9_PiggyBank || exit 2
-ft multisig -a user1 --transfer 10 --to customBank --parrain || exit 2
+ft multisig -a user1 --transfer 10 --to customBank --sponsor || exit 2
 
 ft contract --deploy 9_PiggyBank_Owner || exit 2
 ft contract --deploy 9_PiggyBank_Stranger || exit 2

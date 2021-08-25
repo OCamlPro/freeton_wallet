@@ -139,7 +139,7 @@ Should be like that:
 If the target is not an active account:
 ::
   
-  # ft multisig transfer 100.000 --from my-account --to other-account --parrain
+  # ft multisig transfer 100.000 --from my-account --to other-account --sponsor
 
 To send all the balance:
 ::
