@@ -62,7 +62,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     | None -> false
   in
   if bounce && not dst_exists then
-    Error.raise "Destination does not exist. Use --parrain option";
+    Error.raise "Destination does not exist. Use --sponsor option";
 
   let args = match args with
     | [ meth ; params ] -> Some ( meth, params )
@@ -173,7 +173,7 @@ let cmd =
         [ "send" ], Arg.Set send,
         EZCMD.info "Force sendTransaction() instead of submitTransaction()";
 
-        [ "parrain" ], Arg.Clear bounce,
+        [ "sponsor" ], Arg.Clear bounce,
         EZCMD.info " Transfer to inactive account";
 
         [ "bounce" ], Arg.Bool (fun b -> bounce := b),
@@ -194,7 +194,7 @@ let cmd =
       `P "Should be like that:";
       `Pre {|# ft multisig transfer 100.000 -from MY-ACCOUNT --to OTHER-ACCOUNT|};
       `P "If the target is not an active account:";
-      `Pre {|# ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain|};
+      `Pre {|# ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --sponsor|};
       `P "To send all the balance:";
       `Pre {|# ft multisig transfer all --from MY-ACCOUNT --to OTHER-ACCOUNT|};
 
