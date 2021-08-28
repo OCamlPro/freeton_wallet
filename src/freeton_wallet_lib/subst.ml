@@ -16,6 +16,48 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open EzFile.OP
 
+let int_of_string n = try int_of_string n with
+  | _exn ->
+      Printf.kprintf failwith "int_of_string(%S)" n
+
+let date_of_string date =
+  try
+    let date, hour = EzString.cut_at date 'T' in
+    let tm_year, tm_mon, tm_mday = match EzString.split date '-' with
+      | [ year ] -> int_of_string year - 1900, 0, 1
+      | [ year ; mon ] -> int_of_string year - 1900, int_of_string mon - 1, 1
+      | [ year ; mon ; mday ] ->
+          int_of_string year - 1900, int_of_string mon - 1, int_of_string mday
+      | _ -> raise Not_found
+    in
+    let tm_hour, tm_min, tm_sec = match EzString.split hour ':' with
+      | [] -> 0,0,0
+      | [ hour ] -> int_of_string hour, 0,0
+      | [ hour ; min ] -> int_of_string hour, int_of_string min,0
+      | [ hour ; min ; sec ] ->
+          int_of_string hour, int_of_string min, int_of_string sec
+      | _ -> raise Not_found
+    in
+    let time, _ =
+      Unix.mktime {
+        Unix.tm_year ;
+        tm_mon ;
+        tm_mday ;
+        tm_hour ;
+        tm_min ;
+        tm_sec ;
+
+        tm_wday = 0 ;
+        tm_yday = 0 ;
+        tm_isdst = false ;
+
+      }
+    in
+    int_of_float time |> string_of_int
+  with
+  | Not_found ->
+    failwith "Bad date format"
+
 let date_of_int date =
   let date = CalendarLib.Calendar.from_unixfloat (float_of_int date) in
   CalendarLib.Printer.Calendar.sprint "%Y-%m-%dT%H:%M:%SZ" date
@@ -28,6 +70,7 @@ let rec date_now now rem =
   | "minus" :: rem ->
       date_now_delay now (fun now delay -> now - delay) rem
   | _ ->
+
       Error.raise "Bad substitution 'now:%s'"
         (String.concat ":" rem)
 
@@ -212,7 +255,8 @@ let subst_string ?dir ?brace:brace_arg config =
     | "date" :: rem ->
         date_of_int (
           date_now (int_of_float (Unix.gettimeofday ())) rem )
-
+    | "time" :: rem ->
+        date_of_string ( String.concat ":" rem )
 
     (* encoders *)
     | "read" :: rem -> read_file ( iter rem )
