@@ -31,38 +31,43 @@ let bin_install ~toolchain file =
   Misc.call [ "cp" ; "-f" ; file ;
               Globals.bin_dir ~toolchain // basename ]
 
-let install_tonos_cli ~toolchain ~distclean =
+(* Use #branch or !commit *)
+let git_clone ~toolchain ~distclean repo subdir =
+  let repo, branch = EzString.cut_at repo '#' in
+  let repo, commit = EzString.cut_at repo '!' in
   let git_dir = Globals.git_dir ~toolchain in
-  Unix.chdir git_dir ;
-  let dir = git_dir // "tonos-cli" in
+  let dir = git_dir // subdir in
   if distclean then Misc.call [ "rm"; "-rf"; dir ];
 
   let exists = Sys.file_exists dir in
   if not exists then
-    Misc.call [ "git" ; "clone"; toolchain.repo_tonos_cli ;
-                "tonos-cli" ];
+    Misc.call [ "git" ; "clone"; repo ; subdir ];
   Unix.chdir dir;
-  if exists then begin
+  if branch <> "" then
+    Misc.call [ "git" ; "checkout"; branch ];
+  if commit <> "" then
+    Misc.call [ "git" ; "checkout"; commit ];
+  if exists && commit <> "" then
     Misc.call [ "git" ; "pull" ];
+  ( dir, exists )
+
+let install_tonos_cli ~toolchain ~distclean =
+  let ( _dir, exists ) =
+    git_clone ~toolchain ~distclean
+      toolchain.repo_tonos_cli "tonos-cli"
+  in
+  if exists then
     Misc.call [ "cargo" ; "update" ];
-  end;
   Misc.call [ "cargo"; "build" ];
   bin_install ~toolchain "target/debug/tonos-cli" ;
   Misc.call [ "cargo"; "clean" ];
   ()
 
 let install_solc ~toolchain ~distclean =
-  let git_dir = Globals.git_dir ~toolchain in
-  Unix.chdir git_dir ;
-  let dir = git_dir // "TON-Solidity-Compiler" in
-  if distclean then Misc.call [ "rm"; "-rf"; dir ];
-  let exists = Sys.file_exists dir in
-  if not exists then
-    Misc.call [ "git" ; "clone";
-               toolchain.repo_solc ;  "TON-Solidity-Compiler" ];
-  Unix.chdir dir;
-  if exists then
-    Misc.call [ "git" ; "pull" ];
+  let ( dir, _exists ) =
+    git_clone ~toolchain ~distclean
+      toolchain.repo_solc "TON-Solidity-Compiler"
+  in
   Printf.eprintf "If deps are missing, use:\n";
   Printf.eprintf "  cd %s\n" dir;
   Printf.eprintf "  sh ./compiler/scripts/install_deps.sh\n%!";
@@ -80,18 +85,10 @@ let install_solc ~toolchain ~distclean =
   ()
 
 let install_tvm_linker ~toolchain ~distclean =
-  let git_dir = Globals.git_dir ~toolchain in
-  Unix.chdir git_dir ;
-  let dir = git_dir // "TVM-linker" in
-  if distclean then Misc.call [ "rm"; "-rf"; dir ];
-
-  let exists = Sys.file_exists dir in
-  if not exists then
-    Misc.call [ "git" ; "clone";
-                toolchain.repo_tvm_linker ;  "TVM-linker" ];
-  Unix.chdir dir;
-  if exists then
-    Misc.call [ "git" ; "pull" ];
+  let ( _dir, exists ) =
+    git_clone ~toolchain ~distclean
+      toolchain.repo_tvm_linker "TVM-linker"
+  in
   Unix.chdir "tvm_linker";
   if exists then
     Misc.call [ "cargo" ; "update" ];

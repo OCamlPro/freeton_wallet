@@ -1020,10 +1020,26 @@ let register_primitives () =
   register 79
     { prim_name = "format";
       prim_kind = PrimFunction }
-    (fun _pos _opt t_opt ->
+    (fun _pos opt t_opt ->
        match t_opt with
        | None when !for_freeton ->
-           Some (make_fun [ TString LMemory ; TDots ] [TString LMemory ] MNonPayable)
+           begin
+             match opt.call_args with
+             | Some ( AList list ) ->
+                 Some (make_fun
+                         ( List.mapi (fun i _arg ->
+                               if i = 0 then
+                                 TString LMemory
+                               else
+                                 TAny
+                             ) list
+                         )
+                         [TString LMemory ] MNonPayable)
+
+             | _ ->
+                 Some (make_fun [ TString LMemory ; TDots ]
+                         [TString LMemory ] MNonPayable)
+           end
        | _ -> None);
 
   register 80
@@ -1181,6 +1197,24 @@ let register_primitives () =
               (Solidity_type_printer.string_of_type t);
        | None -> None
     );
+
+  register 95
+    { prim_name = "storeTons";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmBuilder) when !for_freeton ->
+           Some (make_fun [ TUint 128 ] [] MNonPayable)
+       | _ -> None);
+
+  register 96
+    { prim_name = "storeUnsigned";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmBuilder) when !for_freeton ->
+           Some (make_fun [ TUint 256 ; TUint 16 ] [] MNonPayable)
+       | _ -> None);
 
   ()
 
