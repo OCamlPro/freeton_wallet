@@ -480,7 +480,7 @@ let call_contract
     )
 
 let deploy_contract config ~key ?sign ~contract ~params
-     ~wc ?initial_data ?client () =
+     ~wc ?initial_data ?initial_pubkey ?client () =
   let sign = match sign with
     | None -> key
     | Some sign -> sign
@@ -507,6 +507,7 @@ let deploy_contract config ~key ?sign ~contract ~params
                    ~params
                    ~keypair
                    ?initial_data
+                   ?initial_pubkey
                    ()
                in
                Printf.eprintf "Contract deployed at %s\n%!" addr;

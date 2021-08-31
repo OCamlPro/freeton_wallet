@@ -35,9 +35,9 @@ val deploy_contract :
   ?sign:Types.key ->
   contract:string -> params:string -> wc:int option ->
   ?initial_data: string ->
+  ?initial_pubkey: string ->
   ?client:Ton_sdk.TYPES.client ->
   unit -> unit
-
 
 val tonoscli : Types.config -> string list -> string list
 

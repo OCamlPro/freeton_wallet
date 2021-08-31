@@ -14,11 +14,17 @@ val cmd : Ezcmd.V2.EZCMD.TYPES.sub
 
 val genkey :
   ?name:string -> ?contract:string ->
-  ?initial_data:string -> Types.config -> force:bool -> unit
+  ?initial_data:string ->
+  ?initial_pubkey:string ->
+  Types.config -> force:bool -> unit
 
 val gen_address :
   Types.config -> Freeton_types.keypair ->
-  string -> initial_data:string option -> wc:int option -> string
+  string ->
+  initial_data:string option ->
+  initial_pubkey:string option ->
+  wc:int option ->
+  string
 
 val change_account :
   Types.config ->
@@ -27,4 +33,5 @@ val change_account :
   ?address:string ->
   ?contract:string ->
   initial_data:string option ->
+  initial_pubkey:string option ->
   ?keyfile:string -> ?wc:int -> unit -> unit

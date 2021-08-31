@@ -61,7 +61,7 @@ ez_file = "0.2.0"
 ez_subst = ">=0.1"
 ezjsonm = ""
 freeton_crawler_lib = "version"
-freeton_ocaml_sdk = "0.4.0"
+# freeton_ocaml_sdk = "0.4.2"
 lwt_ssl = ">=1.1"
 freeton_solidity_lib = "version"
 

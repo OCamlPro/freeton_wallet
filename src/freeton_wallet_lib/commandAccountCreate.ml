@@ -141,7 +141,8 @@ let gen_keypair config passphrase =
     Sys.remove tmpfile;
     keypair
 
-let gen_address config keypair contract ~initial_data ~wc =
+let gen_address config keypair contract
+    ~initial_data ~initial_pubkey ~wc =
   Misc.with_contract contract
     (fun ~contract_tvc ~contract_abi ->
 
@@ -149,12 +150,11 @@ let gen_address config keypair contract ~initial_data ~wc =
          let abi = EzFile.read_file contract_abi in
          Ton_sdk.CRYPTO.generate_address
            ~tvc_file:contract_tvc
-           ~abi ~keypair ?initial_data
+           ~abi ~keypair ?initial_data ?initial_pubkey
            ()
        else
-         match initial_data with
-         | Some _ -> Error.raise "Cannot use FT_USE_TONOS with initial data"
-         | None ->
+         match initial_data, initial_pubkey with
+         | None, None ->
              Misc.with_keypair keypair (fun ~keypair_file ->
 
                  let stdout = Misc.call_stdout_lines @@
@@ -167,9 +167,11 @@ let gen_address config keypair contract ~initial_data ~wc =
                  Misc.find_line_ok (function
                      | [ "Raw" ; "address:" ; s ] -> Some s
                      | _ -> None) stdout
-               ))
+               )
+         | _ -> Error.raise "Cannot use FT_USE_TONOS with initial data/pubkey"
+    )
 
-let add_account config ~initial_data
+let add_account config ~initial_data ~initial_pubkey
     ~name ~passphrase ~address ~contract ~wc ~keyfile ~force =
   let net = Config.current_network config in
   let key_name = name in
@@ -208,7 +210,7 @@ let add_account config ~initial_data
              }
     | None, Some contract, Some keypair ->
         let acc_address = gen_address config keypair contract
-            ~initial_data ~wc in
+            ~initial_data ~initial_pubkey ~wc in
         Some { acc_address ;
                acc_contract = Some contract ;
                acc_workchain = wc ;
@@ -227,7 +229,8 @@ let add_account config ~initial_data
   ()
 
 let change_account config
-    ~name ?passphrase ?address ?contract ~initial_data ?keyfile ?wc () =
+    ~name ?passphrase ?address ?contract
+    ~initial_data ~initial_pubkey ?keyfile ?wc () =
   let net = Config.current_network config in
   let key = match Misc.find_key net name with
     | None -> Error.raise "Unknown account %S cannot be modified\n%!" name
@@ -255,7 +258,26 @@ let change_account config
             config.modified <- true;
           end;
           None
-      | _ -> keyfile
+      | Some file ->
+          Some ( Misc.read_json_file Encoding.keypair file )
+      | None -> None
+    in
+
+    let keyfile = match initial_pubkey with
+      | None -> keyfile
+      | Some public ->
+          begin
+            match keyfile with
+            | None -> ()
+            | Some keyfile ->
+                if keyfile.Ton_sdk.TYPES.public <> public then
+                  Error.raise "Keyfile and initial_pubkey differ";
+                match passphrase with
+                | None -> ()
+                | Some _ ->
+                    Error.raise "passphrase and initial_pubkey are incompatible"
+          end;
+          Some { public ; secret = None }
     in
 
     let contract = match contract with
@@ -349,7 +371,7 @@ let change_account config
           | None -> None
           | Some contract ->
               let acc_address = gen_address config key_pair contract
-                  ~initial_data ~wc in
+                  ~initial_data ~initial_pubkey  ~wc in
               Some { acc_address ;
                      acc_contract = Some contract ;
                      acc_workchain = wc ;
@@ -376,9 +398,7 @@ let change_account config
         key.key_account <- key_account;
         config.modified <- true;
 
-    | None, Some keyfile ->
-
-        let key_pair = Misc.read_json_file Encoding.keypair keyfile in
+    | None, Some key_pair ->
 
         if key.key_pair <> None then
           Error.raise
@@ -411,7 +431,7 @@ let change_account config
           | None -> None
           | Some contract ->
               let acc_address = gen_address config key_pair contract
-                  ~initial_data ~wc in
+                  ~initial_data ~initial_pubkey ~wc in
               Some { acc_address ;
                      acc_contract = Some contract ;
                      acc_workchain = wc ;
@@ -489,7 +509,7 @@ let change_account config
               Error.raise "You must clear address before changing contract";
 
             let acc_address = gen_address config key_pair contract
-                ~initial_data ~wc in
+                ~initial_data ~initial_pubkey ~wc in
             key.key_account <-
               Some { acc_address ;
                      acc_contract = Some contract ;
@@ -506,7 +526,7 @@ let change_account config
   end
 
 
-let genkey ?name ?contract ?initial_data config ~force =
+let genkey ?name ?contract ?initial_data ?initial_pubkey config ~force =
   let net = Config.current_network config in
   begin
     match name with
@@ -521,7 +541,10 @@ let genkey ?name ?contract ?initial_data config ~force =
           else
             raise exn
   end;
-  let seed_phrase = gen_passphrase config in
+  let seed_phrase, keypair =
+    match initial_pubkey with
+    | None ->
+        let seed_phrase = gen_passphrase config in
 
   (*
   let stdout = Misc.call_stdout_lines
@@ -539,11 +562,15 @@ let genkey ?name ?contract ?initial_data config ~force =
              (String.concat "|" stdout)
   in
 *)
-  let keypair = gen_keypair config seed_phrase in
-  Printf.eprintf "Passphrase: %S\n%!" seed_phrase;
-  Printf.eprintf "{ \"public\": \"%s\",\n%!" keypair.public;
-  Printf.eprintf "  \"secret\": \"%s\" }\n%!"
-    (match keypair.secret with None -> assert false | Some s -> s);
+        let keypair = gen_keypair config seed_phrase in
+        Printf.eprintf "Passphrase: %S\n%!" seed_phrase;
+        Printf.eprintf "{ \"public\": \"%s\",\n%!" keypair.public;
+        Printf.eprintf "  \"secret\": \"%s\" }\n%!"
+          (match keypair.secret with None -> assert false | Some s -> s);
+        Some seed_phrase, keypair
+    | Some public ->
+        None, { public ; secret = None }
+  in
   match name with
   | None -> ()
   | Some name ->
@@ -551,7 +578,7 @@ let genkey ?name ?contract ?initial_data config ~force =
       net.net_keys <- {
         key_name = name ;
         key_pair = Some keypair;
-        key_passphrase = Some seed_phrase;
+        key_passphrase = seed_phrase;
         key_account = None ;
       } :: net.net_keys;
       config.modified <- true;
@@ -560,7 +587,8 @@ let genkey ?name ?contract ?initial_data config ~force =
       match contract with
       | None -> ()
       | Some contract ->
-          change_account config ~name ~contract ~initial_data ()
+          change_account config ~name ~contract
+            ~initial_data ~initial_pubkey ()
 
 let action accounts ~passphrase ~address ~contract ~keyfile ~wc
     ~force ~initial_data =
@@ -591,7 +619,7 @@ let action accounts ~passphrase ~address ~contract ~keyfile ~wc
       | [ name ] ->
           add_account config
             ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
-            ~initial_data
+            ~initial_data ~initial_pubkey:None
 
 let cmd =
   let accounts = ref [] in
