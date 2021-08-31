@@ -665,6 +665,10 @@ let register_primitives () =
       prim_kind = PrimMemberVariable }
     (fun pos opt t_opt ->
        match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun [ ]
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
        | Some (TMagic (TMetaType (TInt (_) | TUint (_) as t))) ->
            Some (make_var (t))
        | Some (TMagic TMath) when !for_freeton ->
@@ -1215,6 +1219,162 @@ let register_primitives () =
        | Some (TAbstract TvmBuilder) when !for_freeton ->
            Some (make_fun [ TUint 256 ; TUint 16 ] [] MNonPayable)
        | _ -> None);
+
+  register 97
+    { prim_name = "add";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun [ from_  ; to_ ] [] MNonPayable)
+       | _ -> None);
+
+  register 98
+    { prim_name = "at";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           (* raise an exception is missing *)
+           Some (make_fun [ from_ ] [ to_ ] MNonPayable)
+       | _ -> None);
+
+  register 99
+    { prim_name = "prev";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun [ from_ ]
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
+       | _ -> None);
+
+  register 100
+    { prim_name = "nextOrEq";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun [ from_ ]
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
+       | _ -> None);
+
+  register 101
+    { prim_name = "prevOrEq";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun [ from_ ]
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
+       | _ -> None);
+
+  register 102
+    { prim_name = "delMin";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun []
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
+       | _ -> None);
+
+  register 103
+    { prim_name = "delMax";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some (make_fun []
+                   [ TOptional (TTuple [ Some from_ ;
+                                         Some to_ ] ) ] MNonPayable)
+       | _ -> None);
+
+  register 104
+    { prim_name = "replace";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some ( make_fun [ from_ ; to_ ] [ TBool ] MNonPayable )
+       | _ -> None);
+
+  register 105
+    { prim_name = "getSet";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
+       | _ -> None);
+
+  register 106
+    { prim_name = "getAdd";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
+       | _ -> None);
+
+  register 107
+    { prim_name = "getReplace";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+           Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
+       | _ -> None);
+
+  register 108
+    { prim_name = "getType";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAddress _) ->
+           Some ( make_fun [] [ TUint 8] MNonPayable )
+       | _ -> None);
+
+  register 109
+    { prim_name = "isStdZero";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAddress _) ->
+           Some ( make_fun [] [ TBool] MNonPayable )
+       | _ -> None);
+
+  register 110
+    { prim_name = "isExternZero";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAddress _) ->
+           Some ( make_fun [] [ TBool] MNonPayable )
+       | _ -> None);
+
+  register 111
+    { prim_name = "isNone";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAddress _) ->
+           Some ( make_fun [] [ TBool] MNonPayable )
+       | _ -> None);
+
+  register 112
+    { prim_name = "unpack";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAddress _) ->
+           Some ( make_fun [] [ TInt 8 ; TUint 256] MNonPayable )
+       | _ -> None);
+
 
   ()
 
