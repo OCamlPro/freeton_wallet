@@ -45,6 +45,7 @@ let cmd =
         ~keyfile:!keyfile
         ~wc:!wc
         ~initial_data:!static_vars
+        ~initial_pubkey:None
     )
     ~args:
       [ [],

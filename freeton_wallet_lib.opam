@@ -47,7 +47,6 @@ depends: [
   "dune" {>= "2.6.0"}
   "lwt_ssl" {>= "1.1"}
   "freeton_solidity_lib" {= version}
-  "freeton_ocaml_sdk" {>= "0.4.0" & < "1.0.0"}
   "freeton_crawler_lib" {= version}
   "ezjsonm" {}
   "ez_subst" {>= "0.1"}

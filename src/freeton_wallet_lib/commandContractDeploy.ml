@@ -20,7 +20,7 @@ type create =
 
 
 let action ~contract ~force ~params ~wc ?create ?sign ~deployer
-    ?initial_data ~credit () =
+    ?initial_data ?initial_pubkey ~credit () =
   let config = Config.config () in
 
   let subst, _ = Subst.subst_string config in
@@ -64,7 +64,7 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
               in
               let acc_address =
                 CommandAccountCreate.gen_address config key_pair contract
-                  ~initial_data ~wc:None
+                  ~initial_data ~initial_pubkey ~wc:None
               in
               let key_account = Some {
                   acc_address ;
@@ -120,7 +120,9 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
   Subst.with_substituted ~config params (fun params ->
       Printf.eprintf "Deploying contract %S to %s\n%!" contract dst;
       Utils.deploy_contract config ~key ~sign ~contract ~params
-        ?initial_data ~wc ())
+        ?initial_data
+        ?initial_pubkey
+        ~wc ())
 
 
 let cmd =
@@ -133,6 +135,7 @@ let cmd =
   let sign = ref None in
   let contract = ref None in
   let credit = ref 1 in
+  let initial_pubkey = ref None in
   EZCMD.sub
     "contract deploy"
     (fun () ->
@@ -149,6 +152,7 @@ let cmd =
                ?sign:!sign
                ~deployer:!deployer
                ?initial_data:!static_vars
+               ?initial_pubkey:!initial_pubkey
                ~credit:!credit
                ()
     )
@@ -194,8 +198,12 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT"
           "Replace ACCOUNT when deploying contract (with --deploy)";
 
-        [ "credit" ], Arg.Int (fun s -> credit := s),
+        [ "credit" ], Arg.Int (fun i -> credit := i),
         EZCMD.info ~docv:"TONS" "Initial credit of the account by the deployer";
+
+        [ "pubkey" ], Arg.String (fun s -> initial_pubkey := Some s),
+        EZCMD.info ~docv:"PUBKEY"
+          "Set initial pubkey of tvm image (hexa without 0x)";
 
       ]
     ~doc: "Deploy contracts"
