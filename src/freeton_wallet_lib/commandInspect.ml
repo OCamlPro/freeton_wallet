@@ -60,7 +60,8 @@ let query_message config ~level ?limit msg_id =
             else
               "dst", msg_id
           in
-          let address = Utils.address_of_account config address in
+          let net = Config.current_network config in
+          let address = Utils.address_of_account net address in
           let addr = Misc.raw_address address in
           let filter =
             REQUEST.(aeq field (astring addr))
@@ -230,7 +231,8 @@ let inspect_account ~level ?limit ~subst account =
     | "all" ->
         REQUEST.accounts ~level ?limit []
     | _ ->
-        let address = Utils.address_of_account config account in
+        let net = Config.current_network config in
+        let address = Utils.address_of_account net account in
         let addr = Misc.raw_address address in
         REQUEST.account ~level addr
   in
@@ -243,7 +245,8 @@ let inspect_account ~level ?limit ~subst account =
 let inspect_account_past ~level ?limit ~abis queue account =
   let config = Config.config () in
   let abis = AbiCache.create config ~abis in
-  let address = Utils.address_of_account config account in
+  let net = Config.current_network config in
+  let address = Utils.address_of_account net account in
   let address = Misc.raw_address address in
   let node = Config.current_node config in
   let client = CLIENT.create node.node_url in
@@ -298,7 +301,8 @@ let filter_of_shard config shard =
               | Shard _ -> assert false
               | Blockid blockid -> blockid
               | Account account ->
-                  let address = Utils.address_of_account config account in
+                  let net = Config.current_network config in
+                  let address = Utils.address_of_account net account in
                   let address = Misc.raw_address address in
                   let node = Config.current_node config in
                   let client = CLIENT.create node.node_url in

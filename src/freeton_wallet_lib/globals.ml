@@ -45,6 +45,7 @@ let ft_dir =
 let config_file = ft_dir // "config.json"
 
 let contracts_dir = ft_dir // "contracts"
+let debots_dir = ft_dir // "debots"
 let code_hash_dir = ft_dir // "code_hash"
 
 let git_dir ~toolchain =

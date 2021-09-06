@@ -34,7 +34,8 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
           CommandMultisigCreate.check_key_contract account_key in
         ( account_addr, account_contract )
   in
-  let dst_addr = Utils.address_of_account config dst in
+  let net = Config.current_network config in
+  let dst_addr = Utils.address_of_account net dst in
   let dst_addr = Misc.raw_address dst_addr in
 
   let nanotokens, allBalance =

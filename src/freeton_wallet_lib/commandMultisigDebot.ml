@@ -19,7 +19,8 @@ let action account =
   let account = match account with
     | None -> "debot-multisig"
     | Some account -> account in
-  let address = Utils.address_of_account config account in
+  let net = Config.current_network config in
+  let address = Utils.address_of_account net account in
   let address = Misc.raw_address address in
   CommandClient.action ~exec:false [ "debot" ; "fetch" ; address ] ;
   ()

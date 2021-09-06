@@ -199,7 +199,8 @@ let action ~account ?block_id ?timeout ~level ~on_event ?output () =
         | Some file -> open_out file
       in
       let config = Config.config () in
-      let address = Utils.address_of_account config account in
+      let net = Config.current_network config in
+      let address = Utils.address_of_account net account in
       let address = Misc.raw_address address in
       Printf.fprintf oc "Watching account %s\n%!" address;
       let abi = Utils.abi_of_account config account in

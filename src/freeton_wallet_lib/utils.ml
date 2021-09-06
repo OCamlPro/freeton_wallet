@@ -555,11 +555,10 @@ let post_lwt config req =
   | Ok r -> Lwt.return r
   | Error exn -> raise exn
 
-let address_of_account config account =
+let address_of_account net account =
   match Misc.is_address account with
   | Some address -> RawAddress address
   | None ->
-      let net = Config.current_network config in
       let key = Misc.find_key_exn net account in
       Account ( Misc.get_key_account_exn key )
 

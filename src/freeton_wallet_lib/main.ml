@@ -107,7 +107,9 @@ let main () =
       [ "watch" ], CommandWatch.cmd;
       [ "inspect" ], CommandInspect.cmd;
       [ "crawler" ], CommandCrawler.cmd;
-      [ "debot" ], CommandDebot.cmd;
+      (*      [ "debot" ], CommandDebot.cmd; *)
+      [ "debot" ; "new" ], CommandDebotNew.cmd;
+      [ "debot" ; "fetch" ], CommandDebotFetch.cmd;
     ]
   in
 

@@ -41,7 +41,7 @@ val deploy_contract :
 
 val tonoscli : Types.config -> string list -> string list
 
-val address_of_account : Types.config -> string -> Types.address
+val address_of_account : Types.network -> string -> Types.address
 val abi_of_account : Types.config -> string -> string option (* content *)
 
 (* returns Some (exists, balance) if exists, None otherwise *)
