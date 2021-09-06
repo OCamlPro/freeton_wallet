@@ -16,6 +16,8 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open EzFile.OP
 
+let dyn_substs = ref StringMap.empty
+
 let int_of_string n = try int_of_string n with
   | _exn ->
       Printf.kprintf failwith "int_of_string(%S)" n
@@ -259,6 +261,15 @@ let subst_string ?dir ?brace:brace_arg config =
         date_of_string ( String.concat ":" rem )
 
     (* encoders *)
+
+    | "apply" :: dyn_subst :: rem ->
+        begin
+          match StringMap.find dyn_subst !dyn_substs with
+          | exception Not_found ->
+              Error.raise "No dynamic substitution %S" dyn_subst
+          | f ->
+              f iter rem
+        end
     | "read" :: rem -> read_file ( iter rem )
     | "subst" :: rem -> subst ( iter rem )
     | "hex" :: rem ->
@@ -361,7 +372,10 @@ let subst_string ?dir ?brace:brace_arg config =
         |} pubkey okCallback errorCallback
         *)
 
-    | _ -> raise Not_found
+    | rem ->
+        Printf.eprintf "Warning: No substitution found for %S"
+          ( String.concat ":" rem );
+        raise Not_found
 
   and brace () s =
     try
@@ -492,21 +506,28 @@ let subst_or_output ~msg ?subst ?output config res =
     match subst with
     | None -> res
     | Some file ->
-        let content =
-          let len = String.length file in
-          if len > 0 && file.[0] = '@' then
-            String.sub file 1 (len-1)
-          else
-            EzFile.read_file file
-        in
         let map = map_of_json res in
-        with_subst ~config (fun subst ->
-            subst content)
-          ~brace:(fun s ->
-              match StringMap.find s map with
-              | exception Not_found -> None
-              | s -> Some s
-            )
+        if file = "@" then
+          let b = Buffer.create 1000 in
+          StringMap.iter (fun k v ->
+              Printf.bprintf b "%%{%s}=%s\n" k v
+            ) map;
+          Buffer.contents b
+        else
+          let content =
+            let len = String.length file in
+            if len > 0 && file.[0] = '@' then
+              String.sub file 1 (len-1)
+            else
+              EzFile.read_file file
+          in
+          with_subst ~config (fun subst ->
+              subst content)
+            ~brace:(fun s ->
+                match StringMap.find s map with
+                | exception Not_found -> None
+                | s -> Some s
+              )
   in
   match output with
   | Some "-"
@@ -534,3 +555,7 @@ let make_args () =
     subst_or_output ~msg config res ?subst:!subst ?output:!output
   in
   add_args, subst_or_output
+
+let add_dyn_subst name
+    ( f : ( string list -> string ) -> string list -> string ) =
+  dyn_substs := StringMap.add name f !dyn_substs

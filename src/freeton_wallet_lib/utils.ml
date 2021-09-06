@@ -283,7 +283,7 @@ let check_abi ~contract ~abifile ~meth ~params =
   match !found with
   | Some params -> params
   | None ->
-      Error.raise "The ABI of %S does not contain method %S.\nHINT:Use the following command to show the full ABI:\nft contract --show-abi %s\n"
+      Error.raise "The ABI of %S does not contain method %S.\nHINT:Use the following command to show the full ABI:\nft contract abi %s\n"
         contract meth contract
 
 

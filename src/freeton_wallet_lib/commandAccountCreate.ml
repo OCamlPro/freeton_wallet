@@ -597,6 +597,7 @@ let action accounts ~passphrase ~address ~contract ~keyfile ~wc
   let subst, _ = Subst.subst_string config in
   let passphrase = Option.map subst passphrase in
   let initial_data = Option.map subst initial_data in
+  let keyfile = Option.map subst keyfile in
 
   match passphrase, address, contract, keyfile, wc with
   | None, None, _, None, None when
@@ -701,3 +702,44 @@ let cmd =
 
     ]
     ~doc: "Create new accounts in the wallet"
+
+let () =
+  Subst.add_dyn_subst "create-account"
+    (fun _iter rem ->
+       let config = Config.config () in
+       match rem with
+       | name :: rem ->
+           let address = String.concat ":" rem in
+           add_account config
+             ~name ~address:(Some address)
+             ~passphrase:None
+             ~contract:None
+             ~keyfile:None
+             ~wc:None
+             ~force:false
+             ~initial_data:None
+             ~initial_pubkey:None;
+           address
+       | _ -> Error.raise "Wrong arity for create-account:NAME:ADDRESS"
+    ) ;
+  Subst.add_dyn_subst "create-contract"
+    (fun _iter rem ->
+       let config = Config.config () in
+       match rem with
+       | name :: contract :: rem ->
+           let address = String.concat ":" rem in
+           add_account config
+             ~name
+             ~address:(Some address)
+             ~contract:(Some contract)
+             ~passphrase:None
+             ~keyfile:None
+             ~wc:None
+             ~force:false
+             ~initial_data:None
+             ~initial_pubkey:None;
+           address
+       | _ -> Error.raise "Wrong arity for create-contract:NAME:CONTRACT:ADDRESS"
+    ) ;
+
+  ()

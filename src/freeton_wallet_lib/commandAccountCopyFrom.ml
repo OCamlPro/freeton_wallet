@@ -32,7 +32,7 @@ let action ~switch ~accounts ~rename ~prefix =
   List.iter (fun net ->
       if net.net_name = switch then begin
         found := true ;
-        Config.load_wallet net ;
+        Config.load_wallet config net ;
         let keys =
           match accounts with
           | [] ->

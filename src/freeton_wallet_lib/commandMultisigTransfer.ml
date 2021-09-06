@@ -124,9 +124,14 @@ let action account args ~amount ~dst ~bounce ~src ~wait ~send =
     | Some account -> account
   in
 
-  Subst.with_substituted_list ~config args (fun args ->
+  Subst.with_subst ~config (fun subst ->
+      let account = subst account in
+      let args = List.map subst args in
       match dst with
       | Some dst ->
+          let dst = subst dst in
+          let amount = subst amount in
+          let src = Option.map subst src in
           send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ()
       | _ ->
           Error.raise "The argument --to ACCOUNT is mandatory"

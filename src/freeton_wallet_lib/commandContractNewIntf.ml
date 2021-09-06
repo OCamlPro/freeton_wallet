@@ -39,8 +39,7 @@ let cmd =
   EZCMD.sub
     "contract new interface"
     (fun () ->
-       Printf.eprintf "Error: You must provide a contrat name\n%!";
-       exit 2
+       Error.raise "Error: You must provide a contrat name\n%!"
     )
     ~args:[
       [], Arg.Anons (List.iter create_interface),

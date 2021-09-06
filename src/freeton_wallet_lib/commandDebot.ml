@@ -58,16 +58,21 @@ let action todo =
           let content = match Files.read ( "debot" // file ) with
             | None -> assert false
             | Some s -> s in
-          let content =
-            Ez_subst.V1.EZ_SUBST.string ~sep:'!' ~brace ~ctxt:() content
-          in
           let file = name // dest in
+          EzFile.write_file (file ^ ".tmp") content ;
+          let content =
+            Ez_subst.V1.EZ_SUBST.string
+              ~escape:(ref false) ~sep:'!' ~brace ~ctxt:() content
+          in
           EzFile.write_file file content ;
           Printf.eprintf "File %S generated\n%!" file ;
         )
         [
           "Makefile", "Makefile" ;
-          "Template.sol", name ^ ".sol" ;
+          "Template.sol", name ^ ".spp" ;
+          "StdMethods.sol", "lib/StdMethods.sol" ;
+          "Utility.sol", "lib/Utility.sol" ;
+          "cpp.sol", "lib/cpp.sol" ;
         ] ;
 
       ()
