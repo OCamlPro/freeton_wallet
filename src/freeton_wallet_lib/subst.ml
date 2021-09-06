@@ -119,47 +119,22 @@ let get_code_hash filename =
   let state = Ton_sdk.TVC.read filename in
   Ton_sdk.TVC.code_hash state
 
-let subst_string ?dir ?brace:brace_arg config =
-  let net = Config.current_network config in
-  let files = ref [] in
-  let read_file file =
-    EzFile.read_file (
-      match dir with
-      | None -> file
-      | Some dir -> dir // file
-    )
-  in
-  let rec iter = function
-    | [ "env" ; var ] -> begin
-        match Sys.getenv var with
-        | exception Not_found ->
-            Printf.eprintf
-              "Error hint: if you are using the Docker version, you may need to define\n" ;
-            Printf.eprintf
-              "  FT_DOCKER='-e %s' for 'ft' to see this variable.\n%!" var;
-            Error.raise "Env variable %S is not defined" var
-        | s -> s
-      end
-
-    (* Accounts substitutions: *)
-    | [ "addr" ; "zero" ] ->
-        "0:0000000000000000000000000000000000000000000000000000000000000000"
-
-    (* Account substitutions *)
-    | [ "account" ; "addr" ; account ]
-    | [ "account" ; "address" ; account ]
+let account_substs net files rem =
+  match rem with
+    | [  "addr" ; account ]
+    | [  "address" ; account ]
       ->
         let key = Misc.find_key_exn net account in
         Misc.get_key_address_exn key
-    | [ "account" ; "wc" ; account ] ->
+    | [  "wc" ; account ] ->
         let key = Misc.find_key_exn net account in
         let acc = Misc.get_key_account_exn key in
         Misc.string_of_workchain acc.acc_workchain
-    | [ "account" ; "pubkey" ; account ] ->
+    | [  "pubkey" ; account ] ->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
         key_pair.public
-    | [ "account" ; "seckey" ; account ] ->
+    | [  "seckey" ; account ] ->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
         begin
@@ -167,28 +142,28 @@ let subst_string ?dir ?brace:brace_arg config =
           | None -> Error.raise "No private key for %s" account
           | Some seckey -> seckey
         end
-    | [ "account" ; "passphrase" ; account ] ->
+    | [  "passphrase" ; account ] ->
         let key = Misc.find_key_exn net account in
         Misc.get_key_passphrase_exn key
-    | [ "account" ; "keyfile" ; account ] ->
+    | [  "keyfile" ; account ] ->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
         let file = Misc.gen_keyfile key_pair in
         files := file :: !files;
         file
-    | [ "account" ; "contract" ; account ] ->
+    | [  "contract" ; account ] ->
         let key = Misc.find_key_exn net account in
         let contract = Misc.get_key_contract_exn key in
         contract
-    | [ "account" ; "contract" ; "tvc" ; account ] ->
+    | [  "contract" ; "tvc" ; account ] ->
         let key = Misc.find_key_exn net account in
         let contract = Misc.get_key_contract_exn key in
         Misc.get_contract_tvcfile contract
-    | [ "account" ; "contract" ; "abi" ; account ] ->
+    | [  "contract" ; "abi" ; account ] ->
         let key = Misc.find_key_exn net account in
         let contract = Misc.get_key_contract_exn key in
         Misc.get_contract_abifile contract
-    | "account" :: "payload" :: account :: meth :: rem ->
+    | "payload" :: account :: meth :: rem ->
         let key = Misc.find_key_exn net account in
         let contract = Misc.get_key_contract_exn key in
         let params = match rem with
@@ -197,21 +172,7 @@ let subst_string ?dir ?brace:brace_arg config =
         let abi_file = Misc.get_contract_abifile contract in
         let abi = EzFile.read_file abi_file in
         Ton_sdk.ABI.encode_body ~abi ~meth ~params
-    (* Contracts substitutions *)
-    | [ "contract" ; "tvc" ; contract ] ->
-        Misc.get_contract_tvcfile contract
-    | [ "contract" ; "abi" ; contract ] ->
-        Misc.get_contract_abifile contract
-    | "contract" :: "payload" :: contract :: meth :: rem ->
-        let params = match rem with
-          | [] -> "{}"
-          | _ -> String.concat ":" rem in
-        let abi_file = Misc.get_contract_abifile contract in
-        let abi = EzFile.read_file abi_file in
-        Base64.encode_string (
-          Ton_sdk.ABI.encode_body ~abi ~meth ~params
-        )
-    | "account" :: "in-message" :: account :: value :: meth :: rem ->
+    | "in-message" :: account :: value :: meth :: rem ->
         let key = Misc.find_key_exn net account in
         let address = Misc.get_key_address_exn key in
         let contract = Misc.get_key_contract_exn key in
@@ -239,6 +200,64 @@ let subst_string ?dir ?brace:brace_arg config =
         Printf.eprintf "message:\n  id: %s\n  msg: %s\n  address: %s\n%!"
           msg.id msg.serialized_message msg.address;
         msg.serialized_message
+    | rem ->
+        Printf.eprintf "Warning: No substitution found for %S"
+          ( String.concat ":" ( "account" :: rem ) );
+        raise Not_found
+
+let subst_string ?dir ?brace:brace_arg config =
+  let net = Config.current_network config in
+  let files = ref [] in
+  let read_file file =
+    EzFile.read_file (
+      match dir with
+      | None -> file
+      | Some dir -> dir // file
+    )
+  in
+  let rec iter = function
+    | [ "env" ; var ] -> begin
+        match Sys.getenv var with
+        | exception Not_found ->
+            Printf.eprintf
+              "Error hint: if you are using the Docker version, you may need to define\n" ;
+            Printf.eprintf
+              "  FT_DOCKER='-e %s' for 'ft' to see this variable.\n%!" var;
+            Error.raise "Env variable %S is not defined" var
+        | s -> s
+      end
+
+    (* Accounts substitutions: *)
+    | [ "addr" ; "zero" ] ->
+        "0:0000000000000000000000000000000000000000000000000000000000000000"
+
+    (* Account substitutions *)
+    | "account" :: rem -> account_substs net files rem
+    | "net-account" :: switch :: rem ->
+        begin
+          match Misc.find_network config switch with
+          | Some net ->
+              Config.load_wallet config net ;
+              account_substs net files rem
+          | None ->
+              Error.raise "Cannot find network %S for substitution net-account"
+                switch
+      end
+
+    (* Contracts substitutions *)
+    | [ "contract" ; "tvc" ; contract ] ->
+        Misc.get_contract_tvcfile contract
+    | [ "contract" ; "abi" ; contract ] ->
+        Misc.get_contract_abifile contract
+    | "contract" :: "payload" :: contract :: meth :: rem ->
+        let params = match rem with
+          | [] -> "{}"
+          | _ -> String.concat ":" rem in
+        let abi_file = Misc.get_contract_abifile contract in
+        let abi = EzFile.read_file abi_file in
+        Base64.encode_string (
+          Ton_sdk.ABI.encode_body ~abi ~meth ~params
+        )
 
     (* Node substitutions *)
     | [ "node" ; "url" ] ->
