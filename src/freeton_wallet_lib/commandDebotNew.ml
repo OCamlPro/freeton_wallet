@@ -17,9 +17,10 @@ open EzFile.OP
 type todo =
   | New of string
 
-let action todo =
-  match todo with
-  | New name ->
+let action name =
+  match name with
+  | None -> Error.raise "Missing debot name"
+  | Some name ->
       let basename = Filename.chop_suffix name "Debot" in
       if Sys.file_exists name then
         Error.raise "Directory %S already exists" name ;
@@ -78,25 +79,25 @@ let action todo =
       ()
 
 let cmd =
-  let set_todo, with_todo = Misc.todo_arg () in
+  let debot_name = ref None in
   EZCMD.sub
-    "debot"
+    "debot new"
     (fun () ->
-       with_todo (fun todo -> action todo)
+       action !debot_name
     )
     ~args:
       [
-        [ "new" ] , Arg.String (fun name ->
+        [] , Arg.Anon (0, fun name ->
             match Filename.check_suffix name "Debot" with
             | true ->
-                set_todo "--new" (New name)
+                debot_name := Some name
             | false ->
-                Error.raise "Argument of --new should end with 'Debot'"
+                Error.raise "Debot name should end with 'Debot'"
           ),
         EZCMD.info ~docv:"NAME" "Create template files for debot NAME";
 
       ]
-    ~doc: "Manage debots"
+    ~doc: "Create a debot"
     ~man:[
       `S "DESCRIPTION";
       `Blocks [

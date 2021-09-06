@@ -145,9 +145,7 @@ pragma AbiHeader pubkey;
                   need_build := true
           end;
           EzFile.write_file to_ content
-      | Error s ->
-          Printf.eprintf "Error: %s\n%!" s;
-          exit 2
+      | Error s -> Error.raise "%s" s
     );
   !files, !need_build
 

@@ -16,7 +16,7 @@ open EZCMD.TYPES
 let send_confirm ~account ?src ~tx_id () =
   let config = Config.config () in
   let net = Config.current_network config in
-  let address = Utils.address_of_account config account in
+  let address = Utils.address_of_account net account in
   let address = Misc.raw_address address in
   let src = match src with
       None -> account

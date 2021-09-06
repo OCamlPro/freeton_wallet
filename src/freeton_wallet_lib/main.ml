@@ -27,17 +27,21 @@ let echo () =
         ( List.filter (fun s -> s <> "--echo")
             ( Array.to_list Sys.argv )))
 
-let increase_verbosity ()=
-  if !Globals.verbosity = 1 then
-    Printexc.record_backtrace true;
-  incr Globals.verbosity
-
 let backtrace = match Sys.getenv "FT_BACKTRACE" with
   | _ -> true
   | exception _ -> false
 
+let backtrace = ref backtrace
+
+let increase_verbosity ()=
+  if !Globals.verbosity = 1 then begin
+    Printexc.record_backtrace true;
+    backtrace := true;
+  end;
+  incr Globals.verbosity
+
 let main () =
-  Printexc.record_backtrace backtrace;
+  Printexc.record_backtrace !backtrace;
   let commands =
     [
       [ "switch" ; "list" ], CommandSwitchList.cmd;
@@ -103,7 +107,9 @@ let main () =
       [ "watch" ], CommandWatch.cmd;
       [ "inspect" ], CommandInspect.cmd;
       [ "crawler" ], CommandCrawler.cmd;
-      [ "debot" ], CommandDebot.cmd;
+      (*      [ "debot" ], CommandDebot.cmd; *)
+      [ "debot" ; "new" ], CommandDebotNew.cmd;
+      [ "debot" ; "fetch" ], CommandDebotFetch.cmd;
     ]
   in
 
@@ -232,7 +238,7 @@ let main () =
       if config.modified then
         Config.save config
   with
-  | Error.Error s when not backtrace ->
+  | Error.Error s when not !backtrace ->
       Solidity_parser.keep_temporary_files () ;
       Printf.eprintf "Error: %s\n%!" s;
       exit 2

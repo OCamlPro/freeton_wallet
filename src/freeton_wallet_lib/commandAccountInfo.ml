@@ -126,7 +126,7 @@ let get_account_info accounts ~info =
           ) net.net_keys
     | _ ->
         List.iter (fun account ->
-            let address = Utils.address_of_account config account in
+            let address = Utils.address_of_account net account in
             get_account_info config ~address ~name:account
           ) accounts
 
@@ -139,7 +139,7 @@ let get_live accounts =
     | _ -> assert false
   in
   List.iter (fun account ->
-      let address = Utils.address_of_account config account in
+      let address = Utils.address_of_account net account in
       let addr = Misc.raw_address address in
       let url = Printf.sprintf
           "https://%s/accounts/accountDetails?id=%s" host addr in

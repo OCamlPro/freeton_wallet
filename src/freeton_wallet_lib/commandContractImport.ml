@@ -133,7 +133,9 @@ let action ~force ~filename ~make ?contract () =
           | Some filename ->
               CommandContractBuild.action ~filename ~force ~contract ()
         end
-    | [], [] when make ->
+    | _, []
+    | [], _
+ when make ->
         CommandContractBuild.action ~filename ~force ~contract ()
     | [], _ -> Error.raise "Missing abi file"
     | _, [] -> Error.raise "Missing tvc file"

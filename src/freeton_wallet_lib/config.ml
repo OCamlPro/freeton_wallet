@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 open EzFile.OP
 
 open Types
@@ -49,6 +50,13 @@ let surf_account acc_address =
           acc_workchain = None ;
           acc_static_vars = None ;
         }
+
+let testnet_keys = [
+  remote_account "giver"
+    "0:653b9a6452c7a982c6dc92b2da9eba832ade1c467699ebb3b43dca6d77b780dd"
+    ~contract:"TestnetGiver" ;
+]
+
 let sandbox_keys = [
   remote_account "giver"
     "0:841288ed3b55d9cdafa806807f02a0ae0c169aa5edfe88a789a6482429756a94"
@@ -345,14 +353,35 @@ let save config =
   config.modified <- false ;
   ()
 
-let load_wallet net =
+let maybe_add_keys config net keys =
+  let set = ref StringSet.empty in
+  List.iter (fun k ->
+      set := StringSet.add k.key_name !set
+    ) net.net_keys;
+  let set = !set in
+  net.net_keys <-
+    net.net_keys @
+    List.filter (fun key ->
+        let new_key = not (StringSet.mem key.key_name set) in
+        if new_key then config.modified <- true;
+        new_key
+      ) keys
+
+let load_wallet config net =
   match net.net_keys with
   | [] ->
       let wallet_file = Globals.ft_dir // net.net_name // "wallet.json" in
       if Sys.file_exists wallet_file then begin
         if !Globals.verbosity > 0 then
           Printf.eprintf "Loading wallet file %s\n%!" wallet_file ;
-        net.net_keys <- Misc.read_json_file Encoding.wallet wallet_file
+        net.net_keys <- Misc.read_json_file Encoding.wallet wallet_file ;
+
+        if net.net_name = "mainnet" then
+          maybe_add_keys config net mainnet_keys
+        else
+        if net.net_name = "testnet" then
+          maybe_add_keys config net testnet_keys
+
       end
   | _ -> ()
 
@@ -492,13 +521,13 @@ let load () =
   let net = current_network config in
   if !Globals.verbosity > 0 then
     Printf.eprintf "Network: %s\n%!" net.net_name;
-  load_wallet net ;
+  load_wallet config net ;
 
   if config.version < 1 then begin
     config.version <- 1 ;
     config.modified <- true ;
     List.iter (fun net ->
-        load_wallet net ;
+        load_wallet config net ;
         if net.net_name = "mainnet" then
           net.net_keys <-
             net.net_keys @

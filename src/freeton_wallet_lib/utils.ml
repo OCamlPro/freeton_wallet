@@ -268,7 +268,9 @@ let check_abi ~contract ~abifile ~meth ~params =
         | exception exn ->
             for i = 0 to String.length params - 1 do
               match params.[i] with
-              | ' ' | ':' | '"' | '\'' | '{' | '}' -> raise exn
+              | ' ' | ':' | '"' | '\'' | '{' | '}' ->
+                  Error.raise "Invalid JSON param %S (%s)"
+                    params (Printexc.to_string exn)
               | _ -> ()
             done;
             maybe_single_param f (`String params)
@@ -276,14 +278,14 @@ let check_abi ~contract ~abifile ~meth ~params =
         | `Bool _
         | `Null
         | `A _ ->
-            Error.raise "Invalid JSON params"
+            Error.raise "Invalid JSON param kind %S" params
         | ( `String _ | `Float _ ) as p ->
             maybe_single_param f p
       end) abi.functions;
   match !found with
   | Some params -> params
   | None ->
-      Error.raise "The ABI of %S does not contain method %S.\nHINT:Use the following command to show the full ABI:\nft contract --show-abi %s\n"
+      Error.raise "The ABI of %S does not contain method %S.\nHINT:Use the following command to show the full ABI:\nft contract abi %s\n"
         contract meth contract
 
 
@@ -553,11 +555,10 @@ let post_lwt config req =
   | Ok r -> Lwt.return r
   | Error exn -> raise exn
 
-let address_of_account config account =
+let address_of_account net account =
   match Misc.is_address account with
   | Some address -> RawAddress address
   | None ->
-      let net = Config.current_network config in
       let key = Misc.find_key_exn net account in
       Account ( Misc.get_key_account_exn key )
 

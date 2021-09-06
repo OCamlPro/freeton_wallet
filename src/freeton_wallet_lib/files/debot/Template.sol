@@ -14,6 +14,10 @@ import "lib/Menu.sol";
 import "lib/Upgradable.sol";
 import "lib/Transferable.sol";
 
+import "lib/Utility.sol";
+
+#include "lib/cpp.sol"
+
 // Interface of the contract with which to interact
 
 interface IContract {
@@ -21,27 +25,10 @@ interface IContract {
   function getter () external returns ( uint256 y ) ;
 }
 
-abstract contract Utility {
-
-  function tonsToStr(uint128 nanotons) internal pure returns (string) {
-    (uint64 dec, uint64 float) = _tokens(nanotons);
-    string floatStr = format("{}", float);
-    while (floatStr.byteLength() < 9) {
-      floatStr = "0" + floatStr;
-    }
-    return format("{}.{}", dec, floatStr);
-  }
-
-  function _tokens(uint128 nanotokens) internal pure
-    returns (uint64, uint64) {
-    uint64 decimal = uint64(nanotokens / 1e9);
-    uint64 float = uint64(nanotokens - (decimal * 1e9));
-    return (decimal, float);
-  }
-}
-
 contract !{name}Debot is Debot, Upgradable, Transferable, Utility {
 
+#include "lib/StdMethods.sol"
+  
   string constant debot_name = "!{name}Debot" ;
   string constant debot_publisher = "My Software Company" ;
   string constant debot_caption = "Debot of !{name} contracts" ;
@@ -60,7 +47,6 @@ contract !{name}Debot is Debot, Upgradable, Transferable, Utility {
   address g_contract ;
   uint128 g_balance ;
   uint32 g_retryId ;
-  bytes m_icon;
 
   function askContractAddress() public {
     AddressInput.get(tvm.functionId(startChecks),
@@ -78,23 +64,6 @@ contract !{name}Debot is Debot, Upgradable, Transferable, Utility {
     } else {
       Sdk.getAccountCodeHash(tvm.functionId(checkContractHash), g_contract);
     }
-  }
-
-  function _checkActiveStatus(int8 acc_type, string obj)
-    private returns (bool) {
-    if (acc_type == -1)  {
-      Terminal.print(0, obj + " is inactive");
-      return false;
-    }
-    if (acc_type == 0) {
-      Terminal.print(0, obj + " is uninitialized");
-      return false;
-    }
-    if (acc_type == 2) {
-      Terminal.print(0, obj + " is frozen");
-      return false;
-    }
-    return true;
   }
 
   function checkContractHash(uint256 code_hash) public {
@@ -158,56 +127,8 @@ contract !{name}Debot is Debot, Upgradable, Transferable, Utility {
     y = x ;
   }
   
-
-  //
-  // Standard functions
-  //
-  
-  function onCodeUpgrade() internal override {
-    tvm.resetStorage();
-  }
-  
-  function setIcon(bytes icon) public {
-    require(msg.pubkey() == tvm.pubkey(), 100);
-      tvm.accept();
-      m_icon = icon;
-  }
   
   function start() public override {
     askContractAddress ();
   }
-  
-  /// @notice Returns Metadata about DeBot.
-  function getDebotInfo() public functionID(0xDEB)
-    override view
-    returns(
-            string name, string version, string publisher, string caption,
-            string author, address support, string hello, string language,
-            string dabi, bytes icon
-            ) {
-    name = debot_name;
-    version = format("{}.{}.{}",
-                     debot_version_major,
-                     debot_version_minor,
-                     debot_version_fix);
-    publisher = debot_publisher ;
-    caption = debot_caption ;
-    author = debot_author ;
-    support = address.makeAddrStd(0, debot_support);
-    hello = debot_hello ;
-    language = debot_language ;
-    dabi = m_debotAbi.get();
-    icon = m_icon;
-  }
-  
-  function getRequiredInterfaces() public view override
-    returns (uint256[] interfaces) {
-    return [
-            Terminal.ID,
-            AmountInput.ID,
-            ConfirmInput.ID,
-              AddressInput.ID,
-            Menu.ID ];
-  }
-  
 }

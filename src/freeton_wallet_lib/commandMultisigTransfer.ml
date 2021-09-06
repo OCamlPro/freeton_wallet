@@ -34,7 +34,8 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
           CommandMultisigCreate.check_key_contract account_key in
         ( account_addr, account_contract )
   in
-  let dst_addr = Utils.address_of_account config dst in
+  let net = Config.current_network config in
+  let dst_addr = Utils.address_of_account net dst in
   let dst_addr = Misc.raw_address dst_addr in
 
   let nanotokens, allBalance =
@@ -124,9 +125,14 @@ let action account args ~amount ~dst ~bounce ~src ~wait ~send =
     | Some account -> account
   in
 
-  Subst.with_substituted_list ~config args (fun args ->
+  Subst.with_subst ~config (fun subst ->
+      let account = subst account in
+      let args = List.map subst args in
       match dst with
       | Some dst ->
+          let dst = subst dst in
+          let amount = subst amount in
+          let src = Option.map subst src in
           send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ()
       | _ ->
           Error.raise "The argument --to ACCOUNT is mandatory"

@@ -391,8 +391,17 @@ let is_address account =
       if len > 2 &&
          wc.[0] = '0' && wc.[1] = '-' then String.sub wc 1 (len-1)
       else wc in
-    Some ( Printf.sprintf "%s:%s%s"
-             wc addr ( String.make (64 - len) '0' ) )
+    let len = String.length wc in
+    let is_num = ref true in
+    for i = 0 to len-1 do
+      match wc.[i] with
+      | '-' | '0'..'9' -> ()
+      | _ -> is_num := false
+    done;
+    if !is_num then
+      Some ( Printf.sprintf "%s:%s%s"
+               wc addr ( String.make (64 - len) '0' ) )
+    else None
   else None
 
 let raw_address = function
