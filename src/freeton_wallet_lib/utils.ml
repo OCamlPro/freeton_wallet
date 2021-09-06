@@ -268,7 +268,9 @@ let check_abi ~contract ~abifile ~meth ~params =
         | exception exn ->
             for i = 0 to String.length params - 1 do
               match params.[i] with
-              | ' ' | ':' | '"' | '\'' | '{' | '}' -> raise exn
+              | ' ' | ':' | '"' | '\'' | '{' | '}' ->
+                  Error.raise "Invalid JSON param %S (%s)"
+                    params (Printexc.to_string exn)
               | _ -> ()
             done;
             maybe_single_param f (`String params)
@@ -276,7 +278,7 @@ let check_abi ~contract ~abifile ~meth ~params =
         | `Bool _
         | `Null
         | `A _ ->
-            Error.raise "Invalid JSON params"
+            Error.raise "Invalid JSON param kind %S" params
         | ( `String _ | `Float _ ) as p ->
             maybe_single_param f p
       end) abi.functions;
