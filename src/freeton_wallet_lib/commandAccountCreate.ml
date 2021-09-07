@@ -187,7 +187,11 @@ let add_account config ~initial_data ~initial_pubkey
 
   let contract = Option.map Misc.fully_qualified_contract contract in
 
-  let key_passphrase = passphrase in
+  let key_passphrase =
+    match passphrase, keyfile, address with
+    | None, None, None -> Some ( gen_passphrase config )
+    | _ -> passphrase
+  in
 
   let key_pair =
     match keyfile, key_passphrase with

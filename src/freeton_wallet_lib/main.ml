@@ -60,6 +60,7 @@ let main () =
       [ "account" ; "create" ], CommandAccountCreate.cmd;
       [ "account" ; "whois" ], CommandAccountWhois.cmd;
       [ "account" ; "info" ], CommandAccountInfo.cmd;
+      [ "account" ; "state" ], CommandAccountState.cmd;
       [ "account" ; "list" ], CommandAccountList.cmd;
       [ "account" ; "set" ], CommandAccountSet.cmd;
       [ "account" ; "remove" ], CommandAccountRemove.cmd;
