@@ -77,7 +77,6 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
 
 
 let register_primitives () =
-
   (* Error handling *)
 
   register 1
@@ -1197,8 +1196,8 @@ let register_primitives () =
        | Some ( TType (TAddress _) ) ->
            Some (make_fun [] [TAddress true] MNonPayable)
        | Some t ->
-            error pos "address has type %s\n%!"
-              (Solidity_type_printer.string_of_type t);
+           error pos "address has type %s\n%!"
+             (Solidity_type_printer.string_of_type t);
        | None -> None
     );
 
@@ -1375,6 +1374,58 @@ let register_primitives () =
            Some ( make_fun [] [ TInt 8 ; TUint 256] MNonPayable )
        | _ -> None);
 
+  let tvm_prim num prim_name from_ to_ =
+    register num
+      { prim_name ;
+        prim_kind = PrimMemberVariable }
+      (fun _pos _opt t_opt ->
+         match t_opt with
+         | Some (TMagic TTvm) ->
+             Some (make_fun from_ to_ MNonPayable )
+         | _ -> None);
+  in
+  tvm_prim 113 "codeSalt"
+    [ TAbstract TvmCell ]
+    [ TOptional ( TAbstract TvmCell ) ];
+  tvm_prim 114 "rawCommit" [] [];
+  tvm_prim 115 "setData" [ TAbstract TvmCell ] [];
+  tvm_prim 116 "log" [ TString LMemory ] []; (* also "logtvm" *)
+  tvm_prim 117 "hexdump" [ TAny ] [];
+  tvm_prim 118 "bindump" [ TAny ] [];
+  tvm_prim 119 "configParam" [ TUint 8 ] [ TDots ];
+  tvm_prim 120 "rawConfigParam" [ TUint 8 ] [ TAbstract TvmCell ; TBool ];
+
+  register 121
+    { prim_name = "checkSign";
+      prim_kind = PrimFunction }
+    (fun _pos opt t_opt ->
+       match t_opt with
+       | Some ( TMagic TTvm ) ->
+           begin
+             match opt.call_args with
+             | Some (AList
+                       ((
+                         [ TUint 256 ; TUint 256 ; TUint 256 ; TUint 256 ]
+                       | [ TUint 256 ; TAbstract TvmSlice ; TUint 256 ]
+                       | [ TAbstract TvmSlice ; TAbstract TvmSlice ; TUint 256 ]
+                       ) as from_ ) ) ->
+                 Some (make_fun from_ [TBool] MPure)
+             | _ -> None
+           end
+       | _ -> None);
+
+  tvm_prim 122 "insertPubkey" [ TAbstract TvmCell ; TUint 256 ]
+    [ TAbstract TvmCell ];
+  tvm_prim 123 "buildEmptyData" [ TUint 256 ] [ TAbstract TvmCell ];
+  tvm_prim 124 "code" [] [ TAbstract TvmCell ];
+  tvm_prim 125 "setCodeSalt" [ TAbstract TvmCell; TAbstract TvmCell ] [ TAbstract TvmCell ];
+  tvm_prim 126 "setPubkey" [ TUint 256 ] [ ];
+  tvm_prim 127 "exit" [ ] [ ];
+  tvm_prim 128 "exit1" [ ] [ ];
+  (* missing TVM instructions:
+      * [tvm.buildExtMsg()](#tvmbuildextmsg)
+      * [tvm.buildIntMsg()](#tvmbuildintmsg)
+  *)
 
   ()
 
