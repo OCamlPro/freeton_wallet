@@ -39,6 +39,7 @@ let git_clone ~toolchain ~distclean repo subdir =
   let dir = git_dir // subdir in
   if distclean then Misc.call [ "rm"; "-rf"; dir ];
 
+  Unix.chdir git_dir;
   let exists = Sys.file_exists dir in
   if not exists then
     Misc.call [ "git" ; "clone"; repo ; subdir ];
