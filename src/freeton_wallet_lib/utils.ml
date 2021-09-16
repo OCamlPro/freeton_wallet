@@ -581,7 +581,7 @@ let get_account_info config address =
   | [ acc ] ->
       let balance =
         match acc.acc_balance with
-        | None -> assert false
+        | None -> Z.zero
         | Some z -> z
       in
       let exists =
