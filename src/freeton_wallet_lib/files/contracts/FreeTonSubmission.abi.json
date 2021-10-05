@@ -1,0 +1,71 @@
+{
+	"ABI version": 2,
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"participant","type":"address"},
+				{"name":"juryKeys","type":"uint256[]"},
+				{"name":"link","type":"bytes"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "vote",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "assess",
+			"inputs": [
+				{"name":"rating","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getVotes",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"votes","type":"uint32"}
+			]
+		},
+		{
+			"name": "getTotalRating",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"rating","type":"uint64"}
+			]
+		},
+		{
+			"name": "getAvgRating",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"rating","type":"uint64"}
+			]
+		},
+		{
+			"name": "getInfo",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"contestAddr","type":"address"},
+				{"name":"participantAddr","type":"address"},
+				{"name":"link","type":"bytes"},
+				{"components":[{"name":"key","type":"uint256"},{"name":"isVoted","type":"bool"}],"name":"jury","type":"tuple[]"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"m_contest","type":"address"}
+	],
+	"events": [
+	]
+}
