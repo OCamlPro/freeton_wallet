@@ -6,7 +6,7 @@ version: "0.6.5"
 license: "LGPL-2.1-only with OCaml-LGPL-linking-exception"
 synopsis:
   "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)"
-description: """
+description: """\
 The 'ft' tool is a multi-account terminal wallet for Free TON users and developers. It implements account creation/queries, contract deployments and calls, and inspection of blockchain state. It is the swissknife of Free TON.
 
 The FreeTON blockchain is the open-source version of the Telegram Open

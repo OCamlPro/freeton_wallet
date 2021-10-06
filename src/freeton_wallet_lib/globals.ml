@@ -12,10 +12,23 @@
 
 open EzFile.OP
 open Types
+open Ezcmd.V2
 
 let verbosity = ref 1
-let command = "ft"
-let about = "ft COMMAND COMMAND-OPTIONS"
+
+module PROGRAM = struct
+  let command = "ft"
+  let about = "ft COMMAND COMMAND-OPTIONS"
+  let set_verbosity n = verbosity := n
+  let get_verbosity () = !verbosity
+  let backtrace_var = Some "FT_BACKTRACE"
+  let usage = "Create and manage a FreeTON accounts"
+  let version = Version.version
+  exception Error = Error.Error
+end
+module MAIN = EZCMD.MAKE( PROGRAM )
+include PROGRAM
+
 
 let ft_home = match Sys.getenv "FT_HOME" with
   | exception _ -> None
