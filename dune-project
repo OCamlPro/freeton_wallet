@@ -33,7 +33,7 @@
    (ez_subst ( >= 0.1 ))
    (ez_file (and (>= 0.2.0) (< 1.0.0)))
    (ez_config (and (>= 0.1.0) (< 1.0.0)))
-   (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (ez_cmdliner (and (>= 0.4.2) (< 1.0.0)))
    (calendar ( >= 2 ))
    ppx_deriving_encoding
    crunch
@@ -66,10 +66,10 @@
  (depends
    (ocaml (>= 4.08.0))
    (lwt (and (>= 5.0.0) (< 6.0.0)))
-   (freeton_ocaml_sdk (and (>= 0.4.2) (< 1.0.0)))
+   (freeton_ocaml_sdk (and (>= 0.4.3) (< 1.0.0)))
    (freeton_crawler_db_versions (= version))
    ez_pgocaml
-   (ez_cmdliner (and (>= 0.2.0) (< 1.0.0)))
+   (ez_cmdliner (and (>= 0.4.0) (< 1.0.0)))
    pgocaml_ppx
    (freeton_crawler_db_updater (= version))
    ppx_inline_test

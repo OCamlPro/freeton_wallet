@@ -46,10 +46,10 @@ pack-modules = false
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ez_cmdliner = "0.2.0"
+ez_cmdliner = "0.4.0"
 ez_pgocaml = ""
 freeton_crawler_db_versions = "version"
-freeton_ocaml_sdk = "0.4.2"
+freeton_ocaml_sdk = "0.4.3"
 lwt = "5.0.0"
 
 # package tools dependencies

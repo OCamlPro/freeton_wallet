@@ -1,0 +1,25 @@
+1. Start a prompt in the docker image:
+
+$ make dev-start
+$ make dev
+
+2. Update
+
+$ opam update ocp
+$ cd freeton_wallet
+$ git pull
+$ drom build
+
+3. Install
+
+$ cp -f ft /bin/ft
+
+4. Install utilities
+
+$ source $HOME/.cargo/env
+$ FT_HOME=/root/ft ft init
+
+5. Exit and build
+
+$ make
+

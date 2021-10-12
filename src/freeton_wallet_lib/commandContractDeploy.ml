@@ -212,15 +212,15 @@ let cmd =
       `Blocks [
         `P "This command deploys a known contract to the blockchain";
         `P "Examples:";
-        `Pre {|ft contract deploy Forbar|};
-        `P "Create an account 'Foorbar', deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract deploy Forbar --create foo|};
+        `Pre {|ft contract deploy Foobar|};
+        `P "Create an account 'Foobar', deploy a contract 'Foobar' to it.";
+        `Pre {|ft contract deploy Foobar --create foo|};
         `P "Create an account 'foo', deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract deploy Forbar --replace foo|};
+        `Pre {|ft contract deploy Foobar --replace foo|};
         `P "Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.";
-        `Pre {|ft contract deploy Forbar --create foo --sign admin|};
+        `Pre {|ft contract deploy Foobar --create foo --sign admin|};
         `P "Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.";
-        `Pre {|ft contract deploy Forbar --dst foo|};
+        `Pre {|ft contract deploy Foobar --dst foo|};
         `P "Deploy a contract 'Foobar' an existing account 'foo' using its keypair.";
         `P "";
         `P "With --create and --replace, 1 TON is transferred to the initial account using a 'deployer' multisig account. The deployer account can either be set switch wide (ft config --deployer 'account') or in the deploy command (using the --deployer 'account' argument)";
