@@ -1427,6 +1427,30 @@ let register_primitives () =
       * [tvm.buildIntMsg()](#tvmbuildintmsg)
   *)
 
+  let div_kind pos opt t_opt =
+    match t_opt with
+    | Some (TMagic TMath) ->
+        begin
+          match opt.call_args with
+          | Some ( AList [] ) -> None
+          | Some ( AList list ) ->
+              begin
+                match infer_int_type pos list with
+                | None -> None
+                | Some t ->
+                    Some (make_fun [ t; t] [ t ] MNonPayable )
+              end
+          | _ -> None
+        end
+    | _ -> None
+  in
+  register 129
+    { prim_name = "divr";
+      prim_kind = PrimMemberVariable } div_kind ;
+  register 130
+    { prim_name = "divc";
+      prim_kind = PrimMemberVariable } div_kind ;
+
   ()
 
 let handle_exception f x =
