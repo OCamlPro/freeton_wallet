@@ -33,6 +33,9 @@ Overview of sub-commands::
   account set
     Modify the information associated with accounts in the wallet
   
+  account state
+    Get account info (local or from blockchain).
+  
   account whois
     Find accounts matching a string
   
@@ -75,8 +78,11 @@ Overview of sub-commands::
   crawler
     Crawl all transactions to an address and fill a psql database
   
-  debot
-    Manage debots
+  debot fetch
+    Call tonos-cli fetch DEBOT
+  
+  debot new
+    Create a debot
   
   doc
     Display useful documentation files (stored in ~/.ft/doc/)
@@ -271,10 +277,6 @@ Examples:
 
   ft account info MY-ACCOUNT
 
-::
-
-  ft account info MY-ACCOUNT --all
-
 
 **USAGE**
 ::
@@ -286,9 +288,9 @@ Where options are:
 
 * :code:`ARGUMENTS`   Name of account
 
-* :code:`--all`   Display all account parameters
+* :code:`-S` or :code:`--secrets`   Print passphrase and secret key (default with --json)
 
-* :code:`--live`   Open block explorer on address
+* :code:`--json`   Print in json format
 
 
 ft account list
@@ -433,6 +435,41 @@ Where options are:
 * :code:`--surf`   Contract should be TON Surf contract
 
 * :code:`--wc WORKCHAIN`   The workchain (default is 0)
+
+
+ft account state
+~~~~~~~~~~~~~~~~~~
+
+Get account info (local or from blockchain).
+
+
+
+**DESCRIPTION**
+
+
+This command displays the current states of the given accounts from the blockchain
+
+Examples:
+::
+
+  ft account state MY-ACCOUNT
+
+::
+
+  ft account state MY-ACCOUNT -v
+
+
+**USAGE**
+::
+  
+  ft account state ARGUMENTS [OPTIONS]
+
+Where options are:
+
+
+* :code:`ARGUMENTS`   Name of account
+
+* :code:`--live`   Open block explorer on address
 
 
 ft account whois
@@ -720,31 +757,31 @@ This command deploys a known contract to the blockchain
 Examples:
 ::
 
-  ft contract deploy Forbar
+  ft contract deploy Foobar
 
 
-Create an account 'Foorbar', deploy a contract 'Foobar' to it.
+Create an account 'Foobar', deploy a contract 'Foobar' to it.
 ::
 
-  ft contract deploy Forbar --create foo
+  ft contract deploy Foobar --create foo
 
 
 Create an account 'foo', deploy a contract 'Foobar' to it.
 ::
 
-  ft contract deploy Forbar --replace foo
+  ft contract deploy Foobar --replace foo
 
 
 Delete account 'foo', recreate it and deploy a contract 'Foobar' to it.
 ::
 
-  ft contract deploy Forbar --create foo --sign admin
+  ft contract deploy Foobar --create foo --sign admin
 
 
 Create an empty account 'foo', deploy a contract 'Foobar' to it, using the keypair from 'admin'.
 ::
 
-  ft contract deploy Forbar --dst foo
+  ft contract deploy Foobar --dst foo
 
 
 Deploy a contract 'Foobar' an existing account 'foo' using its keypair.
@@ -776,6 +813,8 @@ Where options are:
 * :code:`--force` or :code:`-f`   Override existing contracts
 
 * :code:`--params PARAMS`   Constructor/call Arguments ({} by default)
+
+* :code:`--pubkey PUBKEY`   Set initial pubkey of tvm image (hexa without 0x)
 
 * :code:`--replace ACCOUNT`   Replace ACCOUNT when deploying contract (with --deploy)
 
@@ -934,10 +973,37 @@ Where options are:
 * :code:`--stop`   Stop the manager process and the crawler
 
 
-ft debot
-~~~~~~~~~~
+ft debot fetch
+~~~~~~~~~~~~~~~~
 
-Manage debots
+Call tonos-cli fetch DEBOT
+
+
+
+**DESCRIPTION**
+
+
+
+
+**USAGE**
+::
+  
+  ft debot fetch DEBOT [OPTIONS]
+
+Where options are:
+
+
+* :code:`DEBOT`   Address of debot
+
+* :code:`--boc-from NETWORK`   Download debot from NETWORK (patched tonos-cli)
+
+* :code:`--cached`   Use cached version of boc (patched tonos-cli)
+
+
+ft debot new
+~~~~~~~~~~~~~~
+
+Create a debot
 
 
 
@@ -947,12 +1013,12 @@ Manage debots
 **USAGE**
 ::
   
-  ft debot [OPTIONS]
+  ft debot new NAME [OPTIONS]
 
 Where options are:
 
 
-* :code:`--new NAME`   Create template files for debot NAME
+* :code:`NAME`   Create template files for debot NAME
 
 
 ft doc
@@ -1375,7 +1441,7 @@ Should be like that:
 If the target is not an active account:
 ::
 
-  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --parrain
+  # ft multisig transfer 100.000 --from MY-ACCOUNT --to OTHER-ACCOUNT --sponsor
 
 
 To send all the balance:
@@ -1408,7 +1474,7 @@ Where options are:
 
 * :code:`--from ACCOUNT`   The source of the transfer
 
-* :code:`--parrain`    Transfer to inactive account
+* :code:`--parrain` or :code:`--sponsor`    Transfer to inactive account
 
 * :code:`--send`   Force sendTransaction() instead of submitTransaction()
 
