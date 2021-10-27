@@ -119,6 +119,22 @@ let get_code_hash filename =
   let state = Ton_sdk.TVC.read filename in
   Ton_sdk.TVC.code_hash state
 
+let get_code_depth filename =
+  let state = Ton_sdk.TVC.read filename in
+  Ton_sdk.TVC.code_depth state
+
+let get_data filename =
+  let state = Ton_sdk.TVC.read filename in
+  Ton_sdk.TVC.data state
+
+let get_data_hash filename =
+  let state = Ton_sdk.TVC.read filename in
+  Ton_sdk.TVC.data_hash state
+
+let get_data_depth filename =
+  let state = Ton_sdk.TVC.read filename in
+  Ton_sdk.TVC.data_depth state
+
 let account_substs net files rem =
   match rem with
     | [  "addr" ; account ]
@@ -306,6 +322,10 @@ let subst_string ?dir ?brace:brace_arg config =
         end
     | "get-code" :: rem -> get_code ( iter rem )
     | "get-code-hash" :: rem -> get_code_hash ( iter rem )
+    | "get-code-depth" :: rem -> get_code_depth ( iter rem ) |> Int64.to_string
+    | "get-data" :: rem -> get_data ( iter rem )
+    | "get-data-hash" :: rem -> get_data_hash ( iter rem )
+    | "get-data-depth" :: rem -> get_data_depth ( iter rem ) |> Int64.to_string
 
 
     (* deprecated *)
@@ -456,8 +476,14 @@ Encoders, working on the rest of the substitution:
 * base64:SUBST     Do SUBST, then convert to base64
 * of-hex:SUBST        Do SUBST, then convert from hex
 * of-base64:SUBST     Do SUBST, then convert from base64
-* get-code:SUBST   Do SUBST to generate a TVC filename, extract code from it to send as a TvmCell JSON argument
-* get-code-hash:SUBST   Do SUBST to generate a TVC filename, compute code hash
+
+Do SUBST to generate a TVC filename, then:
+* get-code:SUBST   extract code from it to send as a TvmCell JSON argument
+* get-code-hash:SUBST    compute code hash
+* get-code-depth:SUBST   compute code depth
+* get-data:SUBST   extract data from it to send as a TvmCell JSON argument
+* get-data-hash:SUBST    compute data hash
+* get-data-depth:SUBST   compute data depth
 
 Escaping of '}' is done using '\}'.
 
