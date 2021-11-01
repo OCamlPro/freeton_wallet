@@ -48,7 +48,7 @@ let git_clone ~toolchain ~distclean repo subdir =
     Misc.call [ "git" ; "checkout"; branch ];
   if commit <> "" then
     Misc.call [ "git" ; "checkout"; commit ];
-  if exists && commit <> "" then
+  if exists && commit = "" then
     Misc.call [ "git" ; "pull" ];
   ( dir, exists )
 
