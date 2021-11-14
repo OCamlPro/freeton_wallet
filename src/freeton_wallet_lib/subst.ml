@@ -198,7 +198,7 @@ let account_substs net files rem =
         let abi_file = Misc.get_contract_abifile contract in
         let abi = EzFile.read_file abi_file in
 
-        let call = Ton_sdk.SDK.EncodeFunctionCall.{
+        let call = Ton_sdk.ENCODE.EncodeFunctionCall.{
             abi ;
             meth ;
             header = None ;
@@ -207,7 +207,7 @@ let account_substs net files rem =
             key_pair = None ;
           } in
 
-        let msg = Ton_sdk.SDK.encode_internal_message
+        let msg = Ton_sdk.ENCODE.encode_internal_message
             ~address
             ~value: (Misc.nanotokens_of_string value )
             ~call
@@ -309,6 +309,21 @@ let subst_string ?dir ?brace:brace_arg config =
     | "subst" :: rem -> subst ( iter rem )
     | "hex" :: rem ->
         let `Hex s = Hex.of_string ( iter rem ) in s
+    | "escape" :: rem ->
+        let s = iter rem in
+        let len = String.length s in
+        let b = Buffer.create len in
+        for i = 0 to len-1 do
+          let c = s.[i] in
+          match c with
+          | '"' -> Buffer.add_char b '\\'; Buffer.add_char b '"'
+          | '\n' -> Buffer.add_char b '\\'; Buffer.add_char b 'n'
+          | '\\' -> Buffer.add_char b '\\'; Buffer.add_char b '\\'
+          | '\r' -> Buffer.add_char b '\\'; Buffer.add_char b 'r'
+          | '\t' -> Buffer.add_char b '\\'; Buffer.add_char b 't'
+          | _ -> Buffer.add_char b c
+        done;
+        Buffer.contents b
     | "of-hex" :: rem ->
         let s = Hex.to_string ( `Hex (iter rem) ) in s
     | "base64" :: rem ->

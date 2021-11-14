@@ -24,10 +24,10 @@ val call_contract :
   unit -> unit
 
 val post :
-  Types.config -> 'a Ton_request.t -> 'a
+  Types.config -> 'a Ton_sdk.REQUEST.t -> 'a
 
 val post_lwt :
-  Types.config -> 'a Ton_request.t -> 'a Lwt.t
+  Types.config -> 'a Ton_sdk.REQUEST.t -> 'a Lwt.t
 
 val deploy_contract :
   Types.config ->

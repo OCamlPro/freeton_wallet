@@ -55,7 +55,7 @@ let string_of_ppf f =
   Buffer.contents b
 
 let printf_params ppf params =
-  let open Ton_client.ABI.AbiContract in
+  let open Ton_sdk.TYPES.AbiContract in
   match params with
   | [] -> Format.fprintf ppf "{}"
   | _ ->
@@ -67,7 +67,7 @@ let printf_params ppf params =
       Format.fprintf ppf "@ @]}'"
 
 let printf_function ppf f =
-  let open Ton_client.ABI.AbiContract in
+  let open Ton_sdk.TYPES.AbiContract in
   Format.fprintf ppf "  * @[<1>%s@ "
     f.fun_name;
   printf_params ppf f.fun_inputs ;
@@ -89,7 +89,7 @@ let show_abi ~contract =
       Format.fprintf ppf "ABI of contract %S@." contract ;
       Format.fprintf ppf "  File: %s@." contract_abi ;
 
-      let open Ton_client.ABI.AbiContract in
+      let open Ton_sdk.TYPES.AbiContract in
 
       begin
         match abi.header with
@@ -138,12 +138,13 @@ let show_abi ~contract =
 type param_kind =
   | Address
   | Numerical
+  | Bytes
   | String
   | Cell
   | Unknown
 
 let check_abi ~contract ~abifile ~meth ~params =
-  let open Ton_client.ABI.AbiContract in
+  let open Ton_sdk.TYPES.AbiContract in
   let abi = Ton_sdk.ABI.read abifile in
   let found = ref None in
   let error f s =
@@ -193,7 +194,8 @@ let check_abi ~contract ~abifile ~meth ~params =
               | "int64"
               | "int128"
               | "int256" -> Numerical
-              | "string" | "bytes" -> String
+              | "string" -> String
+              | "bytes" -> Bytes
               | "cell" -> Cell
               | _ -> Unknown
             in
@@ -237,7 +239,7 @@ let check_abi ~contract ~abifile ~meth ~params =
                           (Printf.sprintf "Param %S of type %S should be numerical instead of %s\nHINT: maybe you forgot 0x in front."
                              p.param_name p.param_type s)
                   end
-              | String ->
+              | Bytes ->
                   let is_hexa = ref true in
                   for i = 0 to len -1 do
                     match s.[i] with
@@ -248,6 +250,7 @@ let check_abi ~contract ~abifile ~meth ~params =
                     error f
                       (Printf.sprintf "Param %S of type %S should be in hexadecimal instead of %s\nHINT: you can use %%{hex:string:%s} instead."
                          p.param_name p.param_type s s)
+              | String -> ()
               | Cell -> ()
               | Unknown -> ()
             end
@@ -410,7 +413,7 @@ let call_run config ?client ~wait
     track_messages config queue ;
     result
   else
-    Ton_sdk.ACTION.call_run ?client ~server_url
+    Ton_sdk.CALL.call ?client ~server_url
       ~address
       ~abi
       ~meth ~params

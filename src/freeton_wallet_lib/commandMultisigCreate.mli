@@ -13,7 +13,7 @@
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
 
 val create_multisig :
-  ?client:Freeton_types.client -> ?custodians:string list ->
+  ?client:Ton_sdk.TYPES.client -> ?custodians:string list ->
   ?not_owner:bool -> ?req:int -> ?wc:int -> ?contract:string -> string -> unit
 
 val check_key_contract : Types.key -> string

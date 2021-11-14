@@ -20,5 +20,5 @@ val create : Types.config -> abis:string list -> t
 val parse_message_body :
   client:Ton_sdk.TYPES.client ->
   abis:t ->
-  Ton_encoding.message ->
+  Ton_sdk.ENCODING.message ->
   string option

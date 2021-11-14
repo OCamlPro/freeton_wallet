@@ -34,7 +34,7 @@ let sol_abi contract =
 
   Format.fprintf ppf "pragma ton-solidity >= 0.32.0;@.";
 
-  let open Ton_client.ABI.AbiContract in
+  let open Ton_sdk.TYPES.AbiContract in
 
   begin
     match abi.header with

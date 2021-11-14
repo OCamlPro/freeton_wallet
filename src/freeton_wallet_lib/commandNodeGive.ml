@@ -92,7 +92,7 @@ let action ~amount ~accounts =
               | Some { acc_address ; _ } -> acc_address
             in
             let res =
-              Ton_sdk.ACTION.call_run
+              Ton_sdk.CALL.call
                 ~client
                 ~server_url:node.node_url
                 ~address:giver ~abi
