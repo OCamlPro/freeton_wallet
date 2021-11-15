@@ -19,7 +19,7 @@ val genkey :
   Types.config -> force:bool -> unit
 
 val gen_address :
-  Types.config -> Freeton_types.keypair ->
+  Types.config -> Ton_sdk.TYPES.keypair ->
   string ->
   initial_data:string option ->
   initial_pubkey:string option ->

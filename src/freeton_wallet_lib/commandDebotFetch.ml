@@ -63,7 +63,7 @@ let action ?debot ?boc ?(use_cached=false) () =
                   debot
                 else
                   match post net
-                          (Ton_request.account ~level:2 debot) with
+                          (Ton_sdk.REQUEST.account ~level:2 debot) with
                   | [ acc ] ->
                       begin
                         match acc.acc_boc with
