@@ -54,7 +54,6 @@ let list_contracts () =
       Printf.printf "* %s %s\n" name s) set;
   Printf.printf "%!"
 
-
 let remove_files dirname files =
   List.iter (fun file ->
       if Sys.file_exists file then
@@ -70,8 +69,6 @@ let check_exists dirname file =
       file
     else
       Error.raise "File %s was not generated" file
-
-
 
 let same_file f1 f2 =
   EzFile.read_file f1 = EzFile.read_file f2
@@ -92,7 +89,6 @@ let create_new_version contract num =
   EzFile.make_dir ~p:true contract_dir ;
   EzFile.write_file version_file num;
   contract_dir // num
-
 
 let preprocess_solidity ?old_file ~from_ ~to_ () =
   let files = ref [] in
@@ -149,7 +145,7 @@ pragma AbiHeader pubkey;
     );
   !files, !need_build
 
-let action ~filename ~force ?contract () =
+let action ~filename ~force ?contract ?solidity_version () =
   (* TODO: check that no account is using this contract,
      otherwise, these accounts will become unreachable, i.e. we
      lose the tvc file and so how to regen their address. *)
@@ -189,10 +185,12 @@ let action ~filename ~force ?contract () =
       contract;
   let config = Config.config () in
   let toolchain = Config.toolchain config in
-  let solc = Misc.binary_file ~toolchain "solc" in
+  let solc = Misc.binary_file
+      ~toolchain ?version:solidity_version "solc" in
   (* maybe use argument --tvm-optimize *)
   let tvm_linker = Misc.binary_file ~toolchain "tvm_linker" in
-  let stdlib = Misc.binary_file ~toolchain "stdlib_sol.tvm" in
+  let stdlib = Misc.binary_file ~toolchain
+      ?version:solidity_version "stdlib_sol.tvm" in
 
   let abi_file = contract ^ ".abi.json" in
   let code_file = contract ^ ".code" in
@@ -246,6 +244,7 @@ let cmd =
   let force = ref false in
   let contract = ref None in
   let filename = ref None in
+  let solidity_version = ref "master" in
   EZCMD.sub
     "contract build"
     (fun () ->
@@ -257,8 +256,8 @@ let cmd =
                ~filename
                ~force:!force
                ?contract:!contract
+               ~solidity_version:!solidity_version
                ()
-
     )
     ~args:
       [
@@ -271,6 +270,9 @@ let cmd =
 
         [ "contract"], Arg.String (fun s -> contract := Some s),
         EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
+
+        [ "solidity-version"], Arg.String (fun v -> solidity_version := v),
+        EZCMD.info ~docv:"VERSION" "Version of Solidity (e.g. 47)";
 
       ]
     ~doc: "Build a contract"
