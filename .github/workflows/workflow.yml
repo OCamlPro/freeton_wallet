@@ -84,10 +84,11 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions-bot@users.noreply.github.com
 
-      - run: |
-         opam repo add extra git+https://github.com/OCamlPro/ocp-opam-repository
-         sudo apt-get update
+      - name: add ocp-opam-repository
+        run: opam repo add ocp git+https://github.com/OCamlPro/ocp-opam-repository
+#        if: steps.cache-opam.outputs.cache-hit != 'true'
 
+      - run: sudo apt-get update
 
       - run: opam pin add . -y --no-action
 
