@@ -741,6 +741,8 @@ Where options are:
 
 * :code:`--force` or :code:`-f`   Override existing contracts
 
+* :code:`--solidity-version VERSION`   Version of Solidity (e.g. 47)
+
 
 ft contract deploy
 ~~~~~~~~~~~~~~~~~~~~
@@ -858,6 +860,8 @@ Where options are:
 * :code:`--force` or :code:`-f`   Override existing contracts
 
 * :code:`--make`   Build contract if needed (only for .spp)
+
+* :code:`--solidity-version VERSION`   Version of Solidity to use
 
 
 ft contract list
@@ -1132,6 +1136,8 @@ Where options are:
 * :code:`--linker`   Build and install 'tvm_linker' from sources
 
 * :code:`--solc`   Build and install 'solc' from sources
+
+* :code:`--solidity-version VERSION`   Version of solc to use
 
 * :code:`--toolchain TOOLCHAIN`   Toolchain to initialize
 
