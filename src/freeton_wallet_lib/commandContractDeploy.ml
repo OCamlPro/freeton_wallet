@@ -53,7 +53,7 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
           match sign with
           | None ->
               CommandAccountCreate.genkey ~name:dst
-                ~contract ?initial_data config ~force:false;
+                ~contract ?initial_data ?initial_pubkey config ~force:false;
               None
           | Some sign ->
               let sign = Misc.find_key_exn net sign in
@@ -64,7 +64,7 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
               in
               let acc_address =
                 CommandAccountCreate.gen_address config key_pair contract
-                  ~initial_data ~initial_pubkey ~wc:None
+                  ?initial_data ?initial_pubkey ?wc:None ()
               in
               let key_account = Some {
                   acc_address ;
