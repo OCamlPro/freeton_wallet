@@ -13,7 +13,8 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-let action ~account ~passphrase ~address ~contract ~keyfile ~wc ~initial_data =
+let action ~account ~passphrase ~address ~contract ~keyfile
+    ~wc ~initial_data ~initial_pubkey =
   let config = Config.config () in
 
   let subst, _ = Subst.subst_string config in
@@ -25,7 +26,7 @@ let action ~account ~passphrase ~address ~contract ~keyfile ~wc ~initial_data =
   | Some name ->
       CommandAccountCreate.change_account config
         ~name ?passphrase ?address ?contract ?keyfile ?wc
-        ~initial_data ()
+        ?initial_data ?initial_pubkey ()
 
 let cmd =
   let account = ref None in
@@ -46,6 +47,7 @@ let cmd =
         ~wc:!wc
         ~initial_data:!static_vars
         ~initial_pubkey:None
+
     )
     ~args:
       [ [],

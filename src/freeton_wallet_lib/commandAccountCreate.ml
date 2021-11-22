@@ -142,7 +142,7 @@ let gen_keypair config passphrase =
     keypair
 
 let gen_address config keypair contract
-    ~initial_data ~initial_pubkey ~wc =
+    ?initial_data ?initial_pubkey ?wc () =
   Misc.with_contract contract
     (fun ~contract_tvc ~contract_abi ->
 
@@ -214,7 +214,7 @@ let add_account config ~initial_data ~initial_pubkey
              }
     | None, Some contract, Some keypair ->
         let acc_address = gen_address config keypair contract
-            ~initial_data ~initial_pubkey ~wc in
+            ?initial_data ?initial_pubkey ?wc () in
         Some { acc_address ;
                acc_contract = Some contract ;
                acc_workchain = wc ;
@@ -234,7 +234,7 @@ let add_account config ~initial_data ~initial_pubkey
 
 let change_account config
     ~name ?passphrase ?address ?contract
-    ~initial_data ~initial_pubkey ?keyfile ?wc () =
+    ?initial_data ?initial_pubkey ?keyfile ?wc () =
   let net = Config.current_network config in
   let key = match Misc.find_key net name with
     | None -> Error.raise "Unknown account %S cannot be modified\n%!" name
@@ -375,7 +375,7 @@ let change_account config
           | None -> None
           | Some contract ->
               let acc_address = gen_address config key_pair contract
-                  ~initial_data ~initial_pubkey  ~wc in
+                  ?initial_data ?initial_pubkey  ?wc () in
               Some { acc_address ;
                      acc_contract = Some contract ;
                      acc_workchain = wc ;
@@ -435,7 +435,7 @@ let change_account config
           | None -> None
           | Some contract ->
               let acc_address = gen_address config key_pair contract
-                  ~initial_data ~initial_pubkey ~wc in
+                  ?initial_data ?initial_pubkey ?wc () in
               Some { acc_address ;
                      acc_contract = Some contract ;
                      acc_workchain = wc ;
@@ -513,7 +513,7 @@ let change_account config
               Error.raise "You must clear address before changing contract";
 
             let acc_address = gen_address config key_pair contract
-                ~initial_data ~initial_pubkey ~wc in
+                ?initial_data ?initial_pubkey ?wc () in
             key.key_account <-
               Some { acc_address ;
                      acc_contract = Some contract ;
@@ -592,7 +592,7 @@ let genkey ?name ?contract ?initial_data ?initial_pubkey config ~force =
       | None -> ()
       | Some contract ->
           change_account config ~name ~contract
-            ~initial_data ~initial_pubkey ()
+            ?initial_data ?initial_pubkey ()
 
 let action accounts ~passphrase ~address ~contract ~keyfile ~wc
     ~force ~initial_data =
