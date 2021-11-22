@@ -20,7 +20,8 @@ val get_current_version : string -> int option
 val same_file : string -> string -> bool
 
 val action :
-  filename:string -> force:bool -> ?contract:string -> unit -> unit
+  filename:string -> force:bool -> ?contract:string ->
+  ?solidity_version:string -> unit -> unit
 
 val preprocess_solidity :
   ?old_file:string -> from_:string -> to_:string -> unit ->

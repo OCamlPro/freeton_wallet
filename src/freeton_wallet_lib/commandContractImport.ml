@@ -60,7 +60,7 @@ let import ~contract ~tvc ~abi ~force ~src =
   end
 
 
-let action ~force ~filename ~make ?contract () =
+let action ~force ~filename ~make ?contract ?solidity_version () =
   let dirname = if make then "" else Filename.dirname filename in
   let basename = Filename.basename filename in
   let contract_name, ext = EzString.cut_at basename '.' in
@@ -131,12 +131,14 @@ let action ~force ~filename ~make ?contract () =
           | None ->
               import ~contract ~abi ~tvc ~src:!src ~force
           | Some filename ->
-              CommandContractBuild.action ~filename ~force ~contract ()
+              CommandContractBuild.action ~filename ~force ~contract
+                ?solidity_version ()
         end
     | _, []
     | [], _
  when make ->
-        CommandContractBuild.action ~filename ~force ~contract ()
+   CommandContractBuild.action ~filename ~force ~contract
+     ?solidity_version ()
     | [], _ -> Error.raise "Missing abi file"
     | _, [] -> Error.raise "Missing tvc file"
     | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
@@ -149,6 +151,7 @@ let cmd =
   let make = ref false in
   let filename = ref None in
   let contract = ref None in
+  let solidity_version = ref "master" in
   EZCMD.sub
     "contract import"
     (fun () ->
@@ -160,6 +163,7 @@ let cmd =
              ~make:!make
              ~filename
              ?contract:!contract
+             ~solidity_version:!solidity_version
              ()
     )
     ~args:
@@ -176,6 +180,9 @@ let cmd =
 
         [ "contract"], Arg.String (fun s -> contract := Some s),
         EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
+
+        [ "solidity-version" ], Arg.String ( fun s -> solidity_version := s ),
+        EZCMD.info ~docv:"VERSION" "Version of Solidity to use" ;
 
       ]
     ~doc: "Import a contract"

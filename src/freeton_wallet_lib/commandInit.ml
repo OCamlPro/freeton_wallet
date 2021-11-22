@@ -26,10 +26,16 @@ let hardcoded_code_hashes = [
 
 ]
 
-let bin_install ~toolchain file =
+let bin_install ~toolchain ?version file =
   let basename = Filename.basename file in
-  Misc.call [ "cp" ; "-f" ; file ;
-              Globals.bin_dir ~toolchain // basename ]
+  let target = match version with
+    | None -> Globals.bin_dir ~toolchain // basename
+    | Some version ->
+        let dir = Globals.bin_dir ~toolchain // version in
+        EzFile.make_dir ~p:true dir ;
+        dir // basename
+  in
+  Misc.call [ "cp" ; "-f" ; file ; target ]
 
 (* Use #branch or !commit *)
 let git_clone ~toolchain ~distclean repo subdir =
@@ -45,9 +51,13 @@ let git_clone ~toolchain ~distclean repo subdir =
     Misc.call [ "git" ; "clone"; repo ; subdir ];
   Unix.chdir dir;
   if branch <> "" then
-    Misc.call [ "git" ; "checkout"; branch ];
+    Misc.call [ "git" ; "checkout"; branch ]
+  else
   if commit <> "" then
-    Misc.call [ "git" ; "checkout"; commit ];
+    Misc.call [ "git" ; "checkout"; commit ]
+  else
+  if exists then
+    Misc.call [ "git" ; "checkout"; "master" ];
   if exists && commit = "" then
     Misc.call [ "git" ; "pull" ];
   ( dir, exists )
@@ -64,10 +74,28 @@ let install_tonos_cli ~toolchain ~distclean =
   Misc.call [ "cargo"; "clean" ];
   ()
 
-let install_solc ~toolchain ~distclean =
+let install_solc ~toolchain ?version ~distclean () =
+  let version, branch = match version with
+    | None ->
+        if String.contains toolchain.repo_solc '!' ||
+           String.contains toolchain.repo_solc '#' then
+          "master", ""
+        else
+          "master", "#master"
+    | Some n ->
+        let version = string_of_int n in
+        let tag =
+          if n < 46 then
+            Printf.sprintf "0.%s" version
+          else
+            Printf.sprintf "0.%s.0" version
+        in
+        version, "!" ^ tag
+  in
   let ( dir, _exists ) =
     git_clone ~toolchain ~distclean
-      toolchain.repo_solc "TON-Solidity-Compiler"
+      ( Printf.sprintf "%s%s"
+          toolchain.repo_solc branch )  "TON-Solidity-Compiler"
   in
   Printf.eprintf "If deps are missing, use:\n";
   Printf.eprintf "  cd %s\n" dir;
@@ -79,8 +107,21 @@ let install_solc ~toolchain ~distclean =
   Misc.call [ "cmake" ; "--build" ; "." ; "--" ; "-j8" ];
   Unix.chdir "..";
 
-  bin_install ~toolchain "build/solc/solc" ;
-  bin_install ~toolchain "lib/stdlib_sol.tvm" ;
+  (* backup old files *)
+  begin
+    let old_dir = Globals.bin_dir ~toolchain in
+    let new_dir = old_dir // "master" in
+    List.iter (fun basename ->
+        let old_file = old_dir // basename in
+        if Sys.file_exists old_file then
+          let new_file = new_dir // basename in
+          EzFile.make_dir ~p:true new_dir ;
+          Misc.call [ "mv" ; old_file ; new_file ]
+      ) [ "solc"; "stdlib_sol.tvm" ];
+  end;
+
+  bin_install ~toolchain ~version "build/solc/solc" ;
+  bin_install ~toolchain ~version "lib/stdlib_sol.tvm" ;
   EzFile.make_dir ~p:true Globals.doc_dir ;
   Misc.call [ "cp"; "-f" ; "API.md"; Globals.doc_dir // "API.md" ];
   ()
@@ -113,7 +154,8 @@ let install_code_hashes () =
 
   ()
 
-let action ~distclean ~client ~solc ~linker ~code_hashes ?toolchain () =
+let action ~distclean ~client ~solc ~linker
+    ~code_hashes ?solc_version ?toolchain () =
   let config = Config.config () in
 
   if code_hashes then install_code_hashes ();
@@ -136,7 +178,7 @@ let action ~distclean ~client ~solc ~linker ~code_hashes ?toolchain () =
 
     if client then
       install_tonos_cli ~toolchain ~distclean ;
-    if solc then install_solc ~toolchain ~distclean ;
+    if solc then install_solc ~toolchain ?version:solc_version ~distclean () ;
     if linker then install_tvm_linker ~toolchain ~distclean ;
   end;
   ()
@@ -148,6 +190,7 @@ let cmd =
   let linker = ref false in
   let code_hashes = ref false in
   let toolchain = ref None in
+  let solc_version = ref None in
 
   EZCMD.sub
     "init"
@@ -159,7 +202,7 @@ let cmd =
              client, solc, linker, code_hashes
        in
        action ~distclean:!distclean ~client ~solc ~linker ~code_hashes
-         ?toolchain:!toolchain ()
+         ?solc_version:!solc_version ?toolchain:!toolchain ()
     )
     ~args: [
       [ "distclean" ], Arg.Set distclean,
@@ -175,6 +218,8 @@ let cmd =
       EZCMD.info "Create a database of code hashes from predefined contracts";
       [ "toolchain" ], Arg.String ( fun s -> toolchain := Some s ),
       EZCMD.info ~docv:"TOOLCHAIN" "Toolchain to initialize" ;
+      [ "solidity-version" ], Arg.Int ( fun n -> solc_version := Some n ),
+      EZCMD.info ~docv:"VERSION" "Version of solc to use" ;
 
     ]
     ~doc: "Initialize with TON Labs binary tools, compiled from sources."
