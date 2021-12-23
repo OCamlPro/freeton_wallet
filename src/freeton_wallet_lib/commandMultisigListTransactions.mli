@@ -11,3 +11,4 @@
 (**************************************************************************)
 
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
+val get_waiting : ?f:(Types.MULTISIG.transaction -> unit) -> string -> unit

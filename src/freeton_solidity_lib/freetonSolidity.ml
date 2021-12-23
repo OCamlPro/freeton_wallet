@@ -110,7 +110,9 @@ let register_primitives () =
        | None, Some ((AList [] | ANamed [])) ->
            Some (make_fun [] [] MPure)
        | None, Some ((AList [_] | ANamed [_])) ->
-           Some (make_fun [TString LMemory] [] MPure)
+           Some (make_fun [TUint 256] [] MPure)
+       | None, Some ((AList [_; _] | ANamed [_ ; _])) ->
+           Some (make_fun [TUint 256 ; TString LMemory] [] MPure)
        | _ -> None);
 
   (* Block/transaction properties *)
@@ -822,7 +824,7 @@ let register_primitives () =
     (fun _pos _opt t_opt ->
        match t_opt with
        | None when !for_freeton ->
-           Some (make_var (TUint 64))
+           Some (make_var (TUint 32))
        | _ -> None);
 
   register 59
@@ -1045,14 +1047,17 @@ let register_primitives () =
            end
        | _ -> None);
 
-  register 80
-    { prim_name = "byteLength";
-      prim_kind = PrimMemberFunction }
-    (fun _pos _opt t_opt ->
-       match t_opt with
-       | Some (TString _) when !for_freeton ->
-           Some (make_fun [] [TUint 256] MNonPayable)
-       | _ -> None);
+  let register_string n s from_ to_ =
+    register n
+      { prim_name = s;
+        prim_kind = PrimMemberFunction }
+      (fun _pos _opt t_opt ->
+         match t_opt with
+         | Some (TString _) when !for_freeton ->
+             Some (make_fun from_ to_ MNonPayable)
+         | _ -> None)
+  in
+  register_string 80 "byteLength" [] [TUint 256] ;
 
   register 81
     { prim_name = "rawReserve";
@@ -1177,6 +1182,8 @@ let register_primitives () =
        | Some (TMapping ( _from, _to, _loc )) when !for_freeton ->
            Some (make_fun [] [ TBool ] MNonPayable)
        | Some (TArray ( _, _, _ )) when !for_freeton ->
+           Some (make_fun [] [ TBool ] MNonPayable)
+       | Some (TString _) when !for_freeton ->
            Some (make_fun [] [ TBool ] MNonPayable)
        | _ -> None);
 
@@ -1451,6 +1458,50 @@ let register_primitives () =
     { prim_name = "divc";
       prim_kind = PrimMemberVariable } div_kind ;
 
+
+  register 131
+    { prim_name = "loadUnsigned";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmSlice) ->
+           (* return value should directly depend on argument value *)
+           Some (make_fun [TUint 16] [TUint 1] MNonPayable)
+       | _ -> None);
+
+  (*  register_string 132 "substr" [] [TUint 256] ; *)
+
+  register 132
+    { prim_name = "substr";
+      prim_kind = PrimMemberFunction }
+    (fun _pos opt t_opt ->
+       match t_opt with
+       | Some (TString _) when !for_freeton ->
+           begin
+             match opt.call_args with
+             | Some ( AList [  _from ] ) ->
+                 Some (make_fun [ TUint 256] [ TString LMemory ] MNonPayable )
+             | Some ( AList [  _from; _count ] ) ->
+                 Some (make_fun [ TUint 256 ; TUint 256 ] [ TString LMemory ] MNonPayable )
+
+             | _ -> None
+           end
+
+       | _ -> None);
+
+  let register_string_find n s =
+    register n
+      { prim_name = s;
+        prim_kind = PrimMemberFunction }
+      (fun _pos _opt t_opt ->
+         match t_opt with
+         | Some (TString _) when !for_freeton ->
+             Some (make_fun [ TString LMemory ] [ TOptional (TUint 32) ] MNonPayable )
+         | _ -> None)
+  in
+  register_string_find 133 "find";
+  register_string_find 134 "findLast";
+
   ()
 
 let handle_exception f x =
@@ -1506,7 +1557,7 @@ let type_options_fun opt env pos is_payable fo opts =
             (* FREETON *)
             (* TODO: check that mandatory fields are provided *)
         | "pubkey", ( KNewContract | KExtContractFun )
-           ->
+          ->
             expect_expression_type opt env e
               ( TOptional (TUint 256));
             fo, false (* TODO *)
@@ -1566,4 +1617,42 @@ let type_options_fun opt env pos is_payable fo opts =
     ) fo opts
 
 let () =
-  Solidity_typechecker.type_options_ref := type_options_fun
+  Solidity_typechecker.type_options_ref := type_options_fun;
+  let list =
+    Solidity_raw_parser.[
+      "inline", INLINE;
+      "static", STATIC;
+      "optional", OPTIONAL;
+      "onBounce", ONBOUNCE;
+      "repeat", REPEAT;
+      "responsible", RESPONSIBLE;
+
+      "TvmCell", TYPEABSTRACT "TvmCell";
+      "TvmSlice", TYPEABSTRACT "TvmSlice";
+      "TvmBuilder", TYPEABSTRACT "TvmBuilder";
+
+      "nano", NUMBERUNIT (Nanoton);
+      "nanoton", NUMBERUNIT (Nanoton);
+      "nTon", NUMBERUNIT (Nanoton);
+
+      "micro", NUMBERUNIT (Microton);
+      "microton", NUMBERUNIT (Microton);
+
+      "milli", NUMBERUNIT (Milliton);
+      "milliton", NUMBERUNIT (Milliton);
+
+      "ton", NUMBERUNIT (Ton);
+      "Ton", NUMBERUNIT (Ton);
+
+      "kiloton", NUMBERUNIT (Kiloton);
+      "kTon", NUMBERUNIT (Kiloton);
+
+      "megaton", NUMBERUNIT (Megaton);
+      "MTon", NUMBERUNIT (Megaton);
+
+      "gigaton", NUMBERUNIT (Gigaton);
+      "GTon", NUMBERUNIT (Gigaton);
+    ]
+
+  in
+  Solidity_lexer.init2 ~list ()

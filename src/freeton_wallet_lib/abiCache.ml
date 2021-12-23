@@ -165,5 +165,10 @@ let parse_message_body ~client ~abis m =
         | Some "Internal" ->
           parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
         | Some kind ->
-            Printf.eprintf "msg_msg_type_name: %s\n%!" kind;
+            begin
+              match kind with
+              | "ExtIn" -> ()
+
+              | _ -> Printf.eprintf "msg_msg_type_name: %s\n%!" kind;
+            end;
             parse_message_boc ~client ~abis ~boc ~address:m.msg_dst

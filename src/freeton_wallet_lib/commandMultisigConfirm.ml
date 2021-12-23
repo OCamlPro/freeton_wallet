@@ -38,7 +38,7 @@ let send_confirm ~account ?src ~tx_id () =
     ~src
     ()
 
-let action ~account ~transactions ~src =
+let action ~account ~transactions ?src () =
   List.iter (fun tx_id ->
       send_confirm ~account ~tx_id ?src ()
     ) transactions
@@ -46,14 +46,26 @@ let action ~account ~transactions ~src =
 let cmd =
   let args = ref [] in
   let src = ref None in
+  let all = ref false in
   EZCMD.sub
     "multisig confirm"
     (fun () ->
        match !args with
-       | [] | [ _ ] ->
-           Error.raise "You must at least provide the ACCOUNT and the TX_ID"
+       | [] ->
+           Error.raise "You must provide the MULTISIG address first"
        | account :: transactions ->
-           action ~account ~transactions ~src:!src
+           match transactions with
+           | [] ->
+               if !all then
+                 CommandMultisigListTransactions.get_waiting
+                   ~f:(fun tr ->
+                       send_confirm ~account ~tx_id:tr.id ?src:!src ()
+                     )
+                   account
+               else
+                 Error.raise "You must provide the transaction ID or --all"
+           | _ ->
+               action ~account ~transactions ?src:!src ()
     )
     ~args:
       [
@@ -61,7 +73,10 @@ let cmd =
         EZCMD.info ~docv:"ACCOUNT TX_ID" "The multisig account and the TX_ID";
 
         [ "src" ], Arg.String (fun s -> src := Some s),
-        EZCMD.info ~docv:"ACCOUNT" "The multisig account";
+        EZCMD.info ~docv:"ACCOUNT" "The signing custodian";
+
+        [ "all" ], Arg.Set all,
+        EZCMD.info "Sign all pending transactions";
 
       ]
     ~doc: "Confirm transactions on a multisig-wallet"
