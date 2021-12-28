@@ -1,8 +1,11 @@
 # Keep this file in your GIT repo to help drom track generated files
+# begin version
+version:0.6.0~dev
+# end version
 
 # hash of toml configuration files
 # used for generation of all files
-9549336e253a2b94cb47e977deb959ad:.
+a271c9887a543b0596240754456414f3:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -12,7 +15,7 @@
 
 # begin context for .gitignore
 # file .gitignore
-71eb31e2381be646926a69b5bca86270:.gitignore
+70a4dcd41987ab000986fdcfdec7b75f:.gitignore
 # end context for .gitignore
 
 # begin context for .ocamlformat
@@ -37,7 +40,7 @@ bb203bd782edcf9a04631b76387df826:CHANGES.md
 
 # begin context for LICENSE.md
 # file LICENSE.md
-02f5d892afcdc564e5fb067198a06740:LICENSE.md
+3e8c72433d2b8531f0e9716ab0e5fc8a:LICENSE.md
 # end context for LICENSE.md
 
 # begin context for Makefile
@@ -92,43 +95,43 @@ d8e1f86010b70962928b4fd5cad260e8:drom.toml
 
 # begin context for dune-project
 # file dune-project
-23e3083ed3b80a9930f077a9e8188228:dune-project
+6aeaf9f66e3d024f10ea42065e4c5c79:dune-project
 # end context for dune-project
 
-# begin context for freeton_crawler_db_updater.opam
-# file freeton_crawler_db_updater.opam
-2364dd2c745675b562544f8135def398:freeton_crawler_db_updater.opam
-# end context for freeton_crawler_db_updater.opam
+# begin context for opam/freeton_crawler_db_updater.opam
+# file opam/freeton_crawler_db_updater.opam
+e86ebc58a144744ad6b5cebfcce8d23d:opam/freeton_crawler_db_updater.opam
+# end context for opam/freeton_crawler_db_updater.opam
 
-# begin context for freeton_crawler_db_versions.opam
-# file freeton_crawler_db_versions.opam
-a3773d498d2de864896fb6d7ceb856f3:freeton_crawler_db_versions.opam
-# end context for freeton_crawler_db_versions.opam
+# begin context for opam/freeton_crawler_db_versions.opam
+# file opam/freeton_crawler_db_versions.opam
+940c41c91d43f04203c8e8032381aee8:opam/freeton_crawler_db_versions.opam
+# end context for opam/freeton_crawler_db_versions.opam
 
-# begin context for freeton_crawler_lib.opam
-# file freeton_crawler_lib.opam
-8784dd24f70db154d3451ae01d89c4b1:freeton_crawler_lib.opam
-# end context for freeton_crawler_lib.opam
+# begin context for opam/freeton_crawler_lib.opam
+# file opam/freeton_crawler_lib.opam
+013b0c34f58661b829db2df3d7c9d3e5:opam/freeton_crawler_lib.opam
+# end context for opam/freeton_crawler_lib.opam
 
-# begin context for freeton_solidity_lib.opam
-# file freeton_solidity_lib.opam
-d931cb259df27e1aa76d8567abb372a3:freeton_solidity_lib.opam
-# end context for freeton_solidity_lib.opam
+# begin context for opam/freeton_solidity_lib.opam
+# file opam/freeton_solidity_lib.opam
+df0ddbdb22a89b2d7f4f004cc6918faa:opam/freeton_solidity_lib.opam
+# end context for opam/freeton_solidity_lib.opam
 
-# begin context for freeton_wallet.opam
-# file freeton_wallet.opam
-e25ff57ec76c18968a0198e3a9a0693b:freeton_wallet.opam
-# end context for freeton_wallet.opam
+# begin context for opam/freeton_wallet.opam
+# file opam/freeton_wallet.opam
+6ca8ed495e39299606a23ad8830207c6:opam/freeton_wallet.opam
+# end context for opam/freeton_wallet.opam
 
-# begin context for freeton_wallet_lib.opam
-# file freeton_wallet_lib.opam
-7c41a0182cbb508ac6f58ea6ab01ca15:freeton_wallet_lib.opam
-# end context for freeton_wallet_lib.opam
+# begin context for opam/freeton_wallet_lib.opam
+# file opam/freeton_wallet_lib.opam
+ae39628321ee1d989f9bc5a84e437203:opam/freeton_wallet_lib.opam
+# end context for opam/freeton_wallet_lib.opam
 
-# begin context for ft.opam
-# file ft.opam
-f78d00a385bba4919674e4b9c370d25f:ft.opam
-# end context for ft.opam
+# begin context for opam/ft.opam
+# file opam/ft.opam
+65eff76a14ed5fefdab45d3d8c3857b7:opam/ft.opam
+# end context for opam/ft.opam
 
 # begin context for scripts/after.sh
 # file scripts/after.sh
@@ -172,7 +175,7 @@ cb118e5d830d1ab79f56d384c97020b1:sphinx/install.rst
 
 # begin context for sphinx/license.rst
 # file sphinx/license.rst
-8d984cbb854fe94fc5fa77b97b6ee046:sphinx/license.rst
+abc6ae223dbcd2a710665e948f370518:sphinx/license.rst
 # end context for sphinx/license.rst
 
 # begin context for src/freeton_crawler_db_updater/dune
@@ -187,7 +190,7 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_db_updater/version.mlt
 # file src/freeton_crawler_db_updater/version.mlt
-7d95213ccfb3e4203d38948b51b1cead:src/freeton_crawler_db_updater/version.mlt
+959d160d86aff863e3d46e620d4c23f0:src/freeton_crawler_db_updater/version.mlt
 # end context for src/freeton_crawler_db_updater/version.mlt
 
 # begin context for src/freeton_crawler_db_versions/dune
@@ -207,7 +210,7 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_db_versions/version.mlt
 # file src/freeton_crawler_db_versions/version.mlt
-7d95213ccfb3e4203d38948b51b1cead:src/freeton_crawler_db_versions/version.mlt
+959d160d86aff863e3d46e620d4c23f0:src/freeton_crawler_db_versions/version.mlt
 # end context for src/freeton_crawler_db_versions/version.mlt
 
 # begin context for src/freeton_crawler_lib/dune
@@ -232,7 +235,7 @@ d14517b970c183dd496c0eb3fd0c6d73:src/freeton_crawler_db_updater/dune
 
 # begin context for src/freeton_crawler_lib/version.mlt
 # file src/freeton_crawler_lib/version.mlt
-7d95213ccfb3e4203d38948b51b1cead:src/freeton_crawler_lib/version.mlt
+959d160d86aff863e3d46e620d4c23f0:src/freeton_crawler_lib/version.mlt
 # end context for src/freeton_crawler_lib/version.mlt
 
 # begin context for src/freeton_solidity_lib/dune
@@ -252,7 +255,7 @@ a5031ea129fae9ca960536994189e4dd:src/freeton_solidity_lib/index.mld
 
 # begin context for src/freeton_solidity_lib/version.mlt
 # file src/freeton_solidity_lib/version.mlt
-7d95213ccfb3e4203d38948b51b1cead:src/freeton_solidity_lib/version.mlt
+959d160d86aff863e3d46e620d4c23f0:src/freeton_solidity_lib/version.mlt
 # end context for src/freeton_solidity_lib/version.mlt
 
 # begin context for src/freeton_wallet/package.toml
@@ -272,7 +275,7 @@ a5031ea129fae9ca960536994189e4dd:src/freeton_solidity_lib/index.mld
 
 # begin context for src/freeton_wallet_lib/version.mlt
 # file src/freeton_wallet_lib/version.mlt
-7d95213ccfb3e4203d38948b51b1cead:src/freeton_wallet_lib/version.mlt
+959d160d86aff863e3d46e620d4c23f0:src/freeton_wallet_lib/version.mlt
 # end context for src/freeton_wallet_lib/version.mlt
 
 # begin context for src/ft-crawler/package.toml
@@ -287,7 +290,7 @@ a5031ea129fae9ca960536994189e4dd:src/freeton_solidity_lib/index.mld
 
 # begin context for src/ft/main.ml
 # file src/ft/main.ml
-8d43a40919182fd8737f7f64bc470431:src/ft/main.ml
+70de8fb623060c9efa2c22f5e1c29b28:src/ft/main.ml
 # end context for src/ft/main.ml
 
 # begin context for src/ft/package.toml
