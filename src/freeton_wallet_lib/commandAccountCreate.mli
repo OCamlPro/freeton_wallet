@@ -21,9 +21,9 @@ val genkey :
 val gen_address :
   Types.config -> Ton_sdk.TYPES.keypair ->
   string ->
-  initial_data:string option ->
-  initial_pubkey:string option ->
-  wc:int option ->
+  ?initial_data:string ->
+  ?initial_pubkey:string ->
+  ?wc:int -> unit ->
   string
 
 val change_account :
@@ -32,6 +32,6 @@ val change_account :
   ?passphrase:string ->
   ?address:string ->
   ?contract:string ->
-  initial_data:string option ->
-  initial_pubkey:string option ->
+  ?initial_data:string ->
+  ?initial_pubkey:string ->
   ?keyfile:string -> ?wc:int -> unit -> unit
