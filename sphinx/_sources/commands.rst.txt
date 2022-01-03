@@ -18,6 +18,9 @@ Overview of sub-commands::
   account create
     Create new accounts in the wallet
   
+  account history
+    Get account info (local or from blockchain).
+  
   account info
     Get account info (local or from blockchain).
   
@@ -258,6 +261,31 @@ Where options are:
 * :code:`--surf`   Contract should be TON Surf contract
 
 * :code:`--wc WORKCHAIN`   The workchain (default is 0)
+
+
+ft account history
+~~~~~~~~~~~~~~~~~~~~
+
+Get account info (local or from blockchain).
+
+
+
+**DESCRIPTION**
+
+
+This command displays the history of the given account
+
+**USAGE**
+::
+  
+  ft account history ARGUMENT [OPTIONS]
+
+Where options are:
+
+
+* :code:`ARGUMENT`   Address of account
+
+* :code:`--limit NUM`   Limit the number of results to NUM
 
 
 ft account info
@@ -1255,7 +1283,9 @@ Where options are:
 
 * :code:`ACCOUNT TX_ID`   The multisig account and the TX_ID
 
-* :code:`--src ACCOUNT`   The multisig account
+* :code:`--all`   Sign all pending transactions
+
+* :code:`--src ACCOUNT`   The signing custodian
 
 
 ft multisig create

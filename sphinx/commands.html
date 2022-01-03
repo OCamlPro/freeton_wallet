@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (9f66916
-) (2022/01/03 09:26) documentation</title>
+ (c87d75a
+) (2022/01/03 09:49) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (9f66916
+ (c87d75a
 )
               </div>
             
@@ -106,6 +106,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ft-account-copy-from">ft account copy from</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-account-create">ft account create</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-account-history">ft account history</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-account-info">ft account info</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-account-list">ft account list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-account-remove">ft account remove</a></li>
@@ -237,6 +238,9 @@
 
 <span class="n">account</span> <span class="n">create</span>
   <span class="nc">Create</span> <span class="k">new</span> <span class="n">accounts</span> <span class="k">in</span> <span class="n">the</span> <span class="n">wallet</span>
+
+<span class="n">account</span> <span class="n">history</span>
+  <span class="nc">Get</span> <span class="n">account</span> <span class="n">info</span> <span class="o">(</span><span class="n">local</span> <span class="ow">or</span> <span class="n">from</span> <span class="n">blockchain</span><span class="o">).</span>
 
 <span class="n">account</span> <span class="n">info</span>
   <span class="nc">Get</span> <span class="n">account</span> <span class="n">info</span> <span class="o">(</span><span class="n">local</span> <span class="ow">or</span> <span class="n">from</span> <span class="n">blockchain</span><span class="o">).</span>
@@ -441,6 +445,21 @@
 <li><code class="code docutils literal notranslate"><span class="pre">--static-vars</span> <span class="pre">JSON</span></code>   Set static vars for account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--surf</span></code>   Contract should be TON Surf contract</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wc</span> <span class="pre">WORKCHAIN</span></code>   The workchain (default is 0)</li>
+</ul>
+</div>
+<div class="section" id="ft-account-history">
+<h2>ft account history<a class="headerlink" href="#ft-account-history" title="Permalink to this headline">¶</a></h2>
+<p>Get account info (local or from blockchain).</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command displays the history of the given account</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">account</span> <span class="n">history</span> <span class="nc">ARGUMENT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ARGUMENT</span></code>   Address of account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--limit</span> <span class="pre">NUM</span></code>   Limit the number of results to NUM</li>
 </ul>
 </div>
 <div class="section" id="ft-account-info">
@@ -1041,7 +1060,8 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <p>Where options are:</p>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span> <span class="pre">TX_ID</span></code>   The multisig account and the TX_ID</li>
-<li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The multisig account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--all</span></code>   Sign all pending transactions</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The signing custodian</li>
 </ul>
 </div>
 <div class="section" id="ft-multisig-create">
