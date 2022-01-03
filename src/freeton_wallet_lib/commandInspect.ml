@@ -108,7 +108,7 @@ let transaction ~abis ~level tr =
   }
 
 (* Simplify a message before display *)
-let message ~abis ~level m =
+let simplify_message ~abis ~level m =
   let msg_boc, msg_body =
     if level = 1 then None, None else
       m.ENCODING.msg_boc, m.msg_body
@@ -155,7 +155,7 @@ let string_of_transactions_with_messages ~abis ~level trs =
                 Printf.sprintf "\n  IN MESSAGE:%s%s"
                   ( indent "    "
                       ( ENCODING.string_of_message
-                          ( message ~abis ~level in_message )))
+                          ( simplify_message ~abis ~level in_message )))
                   (match in_body with
                    | None -> ""
                    | Some body -> Printf.sprintf "\n    %s\n" body )
@@ -168,7 +168,7 @@ let string_of_transactions_with_messages ~abis ~level trs =
                             Printf.sprintf "\n  OUT MESSAGE:%s%s"
                               ( indent "    "
                                   ( ENCODING.string_of_message
-                                      ( message ~abis ~level out_msg ) ) )
+                                      ( simplify_message ~abis ~level out_msg ) ) )
                               (match out_body with
                                | None -> ""
                                | Some body ->
@@ -242,7 +242,17 @@ let inspect_account ~level ?limit ~subst account =
   subst ~msg:"ACCOUNT" config
     (ENCODING.string_of_accounts accounts)
 
-let inspect_account_past ~level ?limit ~abis queue account =
+let print_transaction ~n ~abis ~level tr =
+  incr n;
+  let (t, _, _) = tr in
+    Printf.printf "Transaction: %Ld %s\n\n%!"
+    (match t.ENCODING.tr_lt with
+       None -> assert false
+     | Some lt -> Int64.of_string lt)
+    (string_of_transactions_with_messages ~abis ~level [tr])
+
+let inspect_account_past ~level ?limit ~abis ?(f = print_transaction)
+    ?(queue=ref []) account =
   let config = Config.config () in
   let abis = AbiCache.create config ~abis in
   let net = Config.current_network config in
@@ -253,21 +263,15 @@ let inspect_account_past ~level ?limit ~abis queue account =
   let url = node.node_url in
   let n = ref 0 in
   Lwt_main.run @@
-    REQUEST.iter_past_transactions
+  REQUEST.iter_past_transactions
     ~address ~url ~level ?limit
     (fun tr ->
-       incr n;
-       let> ( (t, _, _) as tr ) =
+       let> tr =
          transaction_with_message ~abis ~client queue config tr in
-       Printf.printf "Transaction: %Ld %s\n\n%!"
-         (match t.ENCODING.tr_lt with
-            None -> assert false
-          | Some lt -> Int64.of_string lt)
-         (string_of_transactions_with_messages ~abis ~level [tr]);
+       f ~n ~abis ~level tr ;
        Lwt.return_unit
     );
   Printf.printf "%d transactions printed\n%!" !n
-
 
 let inspect_message ~level ?limit ~subst id =
   Lwt_main.run (
@@ -385,7 +389,7 @@ let cmd =
            | Head ->
                inspect_head ~level:!level ?limit:!limit ~shard:!shard ~subst ()
            | AccountPast ->
-               inspect_account_past queue ~level:!level ?limit:!limit s
+               inspect_account_past ~queue ~level:!level ?limit:!limit s
                  ~abis:!abis
          ) (List.rev !inspect)
     )

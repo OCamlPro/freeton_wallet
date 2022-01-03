@@ -40,6 +40,7 @@ module MAIN = struct
         [ "account" ; "list" ], CommandAccountList.cmd;
         [ "account" ; "set" ], CommandAccountSet.cmd;
         [ "account" ; "remove" ], CommandAccountRemove.cmd;
+        [ "account" ; "history" ], CommandAccountHistory.cmd;
 
         [ "client" ], CommandClient.cmd;
         [ "exec" ], CommandExec.cmd;

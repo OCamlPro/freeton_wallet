@@ -15,7 +15,7 @@ open EZCMD.TYPES
 
 open Types.MULTISIG
 
-let get_waiting account =
+let get_waiting ?(f = fun _ -> ()) account =
   let config = Config.config () in
   let net = Config.current_network config in
   let key = Misc.find_key_exn net account in
@@ -60,6 +60,7 @@ let get_waiting account =
               Printf.printf "     Flags: %s\n%!" tr.sendFlags ;
             if not tr.bounce then
               Printf.printf "     Bounce: %b\n%!" tr.bounce ;
+            f tr
           ) trs
 
   in
