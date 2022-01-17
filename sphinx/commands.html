@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (c87d75a
-) (2022/01/03 09:49) documentation</title>
+ (0f1dad6
+) (2022/01/17 15:52) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (c87d75a
+ (0f1dad6
 )
               </div>
             
@@ -154,6 +154,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#ft-switch-remove">ft switch remove</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-switch-to">ft switch to</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-test">ft test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-token-list">ft token list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-token-wton">ft token wton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-token-wton-credit">ft token wton credit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-token-wton-withdraw">ft token wton withdraw</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-utils">ft utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-watch">ft watch</a></li>
 </ul>
@@ -382,6 +386,18 @@
 
 <span class="n">test</span>
   <span class="nc">For</span> <span class="n">testing</span> <span class="n">only</span>
+
+<span class="n">token</span> <span class="kt">list</span>
+  <span class="nc">Display</span> <span class="n">token</span> <span class="n">wallet</span> <span class="n">info</span>
+
+<span class="n">token</span> <span class="n">wton</span>
+  <span class="nc">Display</span> <span class="n">token</span> <span class="n">wallet</span> <span class="n">info</span>
+
+<span class="n">token</span> <span class="n">wton</span> <span class="n">credit</span>
+  <span class="nc">Display</span> <span class="n">token</span> <span class="n">wallet</span> <span class="n">info</span>
+
+<span class="n">token</span> <span class="n">wton</span> <span class="n">withdraw</span>
+  <span class="nc">Display</span> <span class="n">token</span> <span class="n">wallet</span> <span class="n">info</span>
 
 <span class="n">utils</span>
   <span class="nc">Some</span> <span class="n">useful</span> <span class="n">tools</span>
@@ -823,6 +839,7 @@
 <li><code class="code docutils literal notranslate"><span class="pre">--contract</span> <span class="pre">CONTRACT</span></code>   Name of contract to build</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--force</span></code> or <code class="code docutils literal notranslate"><span class="pre">-f</span></code>   Override existing contracts</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--make</span></code>   Build contract if needed (only for .spp)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--prefix</span> <span class="pre">STRING</span></code>   Prefix all contracts with this prefix</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--solidity-version</span> <span class="pre">VERSION</span></code>   Version of Solidity to use</li>
 </ul>
 </div>
@@ -1469,6 +1486,54 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">ARGUMENTS</span></code>   args</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--test</span> <span class="pre">INT</span></code>   NUM Run test NUM</li>
+</ul>
+</div>
+<div class="section" id="ft-token-list">
+<h2>ft token list<a class="headerlink" href="#ft-token-list" title="Permalink to this headline">¶</a></h2>
+<p>Display token wallet info</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">token</span> <span class="kt">list</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   The associated multisig wallet</li>
+</ul>
+</div>
+<div class="section" id="ft-token-wton">
+<h2>ft token wton<a class="headerlink" href="#ft-token-wton" title="Permalink to this headline">¶</a></h2>
+<p>Display token wallet info</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">token</span> <span class="n">wton</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   The associated multisig wallet</li>
+</ul>
+</div>
+<div class="section" id="ft-token-wton-credit">
+<h2>ft token wton credit<a class="headerlink" href="#ft-token-wton-credit" title="Permalink to this headline">¶</a></h2>
+<p>Display token wallet info</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">token</span> <span class="n">wton</span> <span class="n">credit</span> <span class="nc">ACCOUNT</span> <span class="nc">AMOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span> <span class="pre">AMOUNT</span></code>   The associated multisig wallet</li>
+</ul>
+</div>
+<div class="section" id="ft-token-wton-withdraw">
+<h2>ft token wton withdraw<a class="headerlink" href="#ft-token-wton-withdraw" title="Permalink to this headline">¶</a></h2>
+<p>Display token wallet info</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">token</span> <span class="n">wton</span> <span class="n">withdraw</span> <span class="nc">ACCOUNT</span> <span class="nc">AMOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span> <span class="pre">AMOUNT</span></code>   The associated multisig wallet</li>
 </ul>
 </div>
 <div class="section" id="ft-utils">
