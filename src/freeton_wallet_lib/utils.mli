@@ -48,3 +48,17 @@ val abi_of_account : Types.config -> string -> string option (* content *)
 val get_account_info : Types.config -> string -> ( bool * Z.t ) option
 
 val show_abi : contract:string -> string
+
+val call_run :
+  Types.config ->
+  ?client:Sdk_types.client ->
+  wait:bool ->
+  server_url:string ->
+  address:string ->
+  abi:string ->
+  meth:string ->
+  params:string ->
+  local:bool ->
+  ?keypair:Sdk_types.keypair ->
+  unit ->
+  string

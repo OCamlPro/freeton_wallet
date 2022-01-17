@@ -1,0 +1,82 @@
+{
+	"ABI version": 2,
+	"version": "2.1",
+	"header": ["time"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"token_factory_","type":"address"},
+				{"name":"value_","type":"uint128"},
+				{"name":"send_gas_to_","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "terminate",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onGetDetails",
+			"inputs": [
+				{"components":[{"name":"name","type":"bytes"},{"name":"symbol","type":"bytes"},{"name":"decimals","type":"uint8"},{"name":"root_public_key","type":"uint256"},{"name":"root_owner_address","type":"address"},{"name":"total_supply","type":"uint128"}],"name":"details","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "notifyTokenRootDeployed",
+			"inputs": [
+				{"name":"value0","type":"uint32"},
+				{"name":"token_root","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "notifyTokenRootNotDeployed",
+			"inputs": [
+				{"name":"value0","type":"uint32"},
+				{"name":"value1","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"_nonce","type":"uint32"},
+		{"key":2,"name":"vault","type":"address"},
+		{"key":3,"name":"pair","type":"address"},
+		{"key":4,"name":"left_root","type":"address"},
+		{"key":5,"name":"right_root","type":"address"}
+	],
+	"events": [
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"LP_TOKEN_SYMBOL_PREFIX","type":"string"},
+		{"name":"LP_TOKEN_SYMBOL_SEPARATOR","type":"string"},
+		{"name":"LP_TOKEN_DECIMALS","type":"uint8"},
+		{"name":"_nonce","type":"uint32"},
+		{"name":"vault","type":"address"},
+		{"name":"pair","type":"address"},
+		{"name":"left_root","type":"address"},
+		{"name":"right_root","type":"address"},
+		{"name":"token_factory","type":"address"},
+		{"name":"lp_token_root","type":"address"},
+		{"name":"deploy_value","type":"uint128"},
+		{"name":"send_gas_to","type":"address"},
+		{"name":"need_to_terminate","type":"bool"},
+		{"name":"pending_messages","type":"uint8"},
+		{"components":[{"name":"name","type":"bytes"},{"name":"symbol","type":"bytes"},{"name":"decimals","type":"uint8"}],"name":"left_root_details","type":"tuple"},
+		{"name":"left_root_details_received","type":"bool"},
+		{"components":[{"name":"name","type":"bytes"},{"name":"symbol","type":"bytes"},{"name":"decimals","type":"uint8"}],"name":"right_root_details","type":"tuple"},
+		{"name":"right_root_details_received","type":"bool"}
+	]
+}

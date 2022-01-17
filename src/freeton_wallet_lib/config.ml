@@ -39,8 +39,12 @@ let remote_account ?key_pair ?key_passphrase key_name ?contract:acc_contract acc
   }
 
 let mainnet_keys = [
+
   remote_account "debot-multisig"
     "0:9ce35b55a00da91cfc70f649b2a2a58414d3e21ee8d1eb80dab834d442f33606" ;
+
+  remote_account "wton-vault"
+    "0:d0936a9fc29b5175487208b1d07ab8042ce7ddbc2de7e271c4087ca833b865cc" ;
 ]
 
 let surf_account acc_address =
@@ -50,6 +54,9 @@ let surf_account acc_address =
           acc_workchain = None ;
           acc_static_vars = None ;
         }
+
+let tokens_manifest =
+  "https://raw.githubusercontent.com/broxus/ton-assets/master/manifest.json"
 
 let testnet_keys = [
   remote_account "giver"

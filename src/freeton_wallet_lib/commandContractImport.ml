@@ -60,91 +60,102 @@ let import ~contract ~tvc ~abi ~force ~src =
   end
 
 
-let action ~force ~filename ~make ?contract ?solidity_version () =
-  let dirname = if make then "" else Filename.dirname filename in
-  let basename = Filename.basename filename in
-  let contract_name, ext = EzString.cut_at basename '.' in
-  let abi = ref [] in
-  let tvc = ref [] in
-  let src = ref [] in
-  let files = [
-    abi, "abi.json";
-    abi, "abi";
-    tvc, "tvm";
-    tvc, "tvc";
-    src, "sol";
-    src, "cpp";
-    src, "hpp";
-  ] in
+let rec action ~force ~filename ~make ?contract ?solidity_version
+    ?(prefix="") () =
 
-  List.iter (fun (kind, ext) ->
-      let filename = Filename.concat dirname ( contract_name ^ "." ^ ext) in
-      if Sys.file_exists filename then
-        kind := filename :: !kind
-    ) files;
-  let contract = match contract with
-    | None -> contract_name
-    | Some contract -> contract
-  in
-  begin
-    match !abi, !tvc with
-    | [ abi ], [ tvc ] ->
-        begin
-          let build_file =
-            if make then
-              if ext = "spp" then
-                let new_filename = contract ^ ".sol" in
-                let tmp_filename = Filename.temp_file contract ".sol" in
-                let files, need_build = CommandContractBuild.preprocess_solidity
-                    ~old_file:new_filename
-                    ~from_:filename
-                    ~to_: tmp_filename
-                    ()
-                in
-                let tvc_time = (Unix.lstat tvc).Unix.st_mtime in
-                let need_build = ref need_build in
-                if not !need_build then
-                  List.iter (fun file ->
-                      let time = try
-                          (Unix.lstat file).Unix.st_mtime
-                        with _ -> 0.
-                      in
-                      (* Printf.eprintf "Check %S\n%!" file; *)
-                      need_build := !need_build
-                                    ||  ( time > tvc_time );
-                      (* Printf.eprintf "need_build: %b\n%!" !need_build; *)
-                    ) (filename :: files);
-                if !need_build then begin
-                  Printf.eprintf "contract: %S\n%!" contract;
-                  Sys.rename tmp_filename new_filename;
-                  Some new_filename
-                end else begin
-                  Sys.remove tmp_filename ;
+  if Sys.is_directory filename then
+    let files = Sys.readdir filename in
+    if make then Error.raise "Cannot --make on a directory";
+    Array.iter (fun file ->
+        if Filename.check_suffix file ".tvc" then
+          let filename = Filename.concat filename file in
+          action ~force ~filename ~make ~prefix ()
+      ) files
+  else
+    let dirname = if make then "" else Filename.dirname filename in
+    let basename = Filename.basename filename in
+    let contract_name, ext = EzString.cut_at basename '.' in
+    let abi = ref [] in
+    let tvc = ref [] in
+    let src = ref [] in
+    let files = [
+      abi, "abi.json";
+      abi, "abi";
+      tvc, "tvm";
+      tvc, "tvc";
+      src, "sol";
+      src, "cpp";
+      src, "hpp";
+    ] in
+
+    List.iter (fun (kind, ext) ->
+        let filename = Filename.concat dirname ( contract_name ^ "." ^ ext) in
+        if Sys.file_exists filename then
+          kind := filename :: !kind
+      ) files;
+    let contract = match contract with
+      | Some contract -> contract
+      | None -> prefix ^ contract_name
+    in
+    begin
+      match !abi, !tvc with
+      | [ abi ], [ tvc ] ->
+          begin
+            let build_file =
+              if make then
+                if ext = "spp" then
+                  let new_filename = contract ^ ".sol" in
+                  let tmp_filename = Filename.temp_file contract ".sol" in
+                  let files, need_build = CommandContractBuild.preprocess_solidity
+                      ~old_file:new_filename
+                      ~from_:filename
+                      ~to_: tmp_filename
+                      ()
+                  in
+                  let tvc_time = (Unix.lstat tvc).Unix.st_mtime in
+                  let need_build = ref need_build in
+                  if not !need_build then
+                    List.iter (fun file ->
+                        let time = try
+                            (Unix.lstat file).Unix.st_mtime
+                          with _ -> 0.
+                        in
+                        (* Printf.eprintf "Check %S\n%!" file; *)
+                        need_build := !need_build
+                                      ||  ( time > tvc_time );
+                        (* Printf.eprintf "need_build: %b\n%!" !need_build; *)
+                      ) (filename :: files);
+                  if !need_build then begin
+                    Printf.eprintf "contract: %S\n%!" contract;
+                    Sys.rename tmp_filename new_filename;
+                    Some new_filename
+                  end else begin
+                    Sys.remove tmp_filename ;
+                    None
+                  end else begin
+                  Printf.eprintf "Warning: --make on .sol file does not rebuild. Use .spp instead\n%!";
                   None
-                end else begin
-                Printf.eprintf "Warning: --make on .sol file does not rebuild. Use .spp instead\n%!";
+                end else
                 None
-              end else
-              None
-          in
-          match build_file with
-          | None ->
-              import ~contract ~abi ~tvc ~src:!src ~force
-          | Some filename ->
-              CommandContractBuild.action ~filename ~force ~contract
-                ?solidity_version ()
-        end
-    | _, []
-    | [], _
- when make ->
-   CommandContractBuild.action ~filename ~force ~contract
-     ?solidity_version ()
-    | [], _ -> Error.raise "Missing abi file"
-    | _, [] -> Error.raise "Missing tvc file"
-    | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
-    | _, _ -> Error.raise "Ambiguity with tvc files (.tvc/.tvm)"
+            in
+            match build_file with
+            | None ->
+                import ~contract ~abi ~tvc ~src:!src ~force
+            | Some filename ->
+                CommandContractBuild.action ~filename ~force ~contract
+                  ?solidity_version ()
+          end
+      | _, []
+      | [], _
+        when make ->
+          CommandContractBuild.action ~filename ~force ~contract
+            ?solidity_version ()
+      | [], _ -> Error.raise "Missing abi file"
+      | _, [] -> Error.raise "Missing tvc file"
+      | _, [_] -> Error.raise "Ambiguity with abi files (.abi.json/.abi)"
+      | _, _ -> Error.raise "Ambiguity with tvc files (.tvc/.tvm)"
 
-  end
+    end
 
 let cmd =
   let force = ref false in
@@ -152,6 +163,7 @@ let cmd =
   let filename = ref None in
   let contract = ref None in
   let solidity_version = ref "master" in
+  let prefix = ref None in
   EZCMD.sub
     "contract import"
     (fun () ->
@@ -164,6 +176,7 @@ let cmd =
              ~filename
              ?contract:!contract
              ~solidity_version:!solidity_version
+             ?prefix:!prefix
              ()
     )
     ~args:
@@ -180,6 +193,9 @@ let cmd =
 
         [ "contract"], Arg.String (fun s -> contract := Some s),
         EZCMD.info ~docv:"CONTRACT" "Name of contract to build";
+
+        [ "prefix"], Arg.String (fun s -> prefix := Some s),
+        EZCMD.info ~docv:"STRING" "Prefix all contracts with this prefix";
 
         [ "solidity-version" ], Arg.String ( fun s -> solidity_version := s ),
         EZCMD.info ~docv:"VERSION" "Version of Solidity to use" ;

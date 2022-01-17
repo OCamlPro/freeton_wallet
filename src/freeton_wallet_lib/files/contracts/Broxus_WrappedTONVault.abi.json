@@ -1,0 +1,138 @@
+{
+	"ABI version": 2,
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"owner_","type":"address"},
+				{"name":"root","type":"address"},
+				{"name":"root_tunnel","type":"address"},
+				{"name":"receive_safe_fee","type":"uint128"},
+				{"name":"settings_deploy_wallet_grams","type":"uint128"},
+				{"name":"initial_balance","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "drain",
+			"inputs": [
+				{"name":"receiver","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setConfiguration",
+			"inputs": [
+				{"components":[{"name":"root_tunnel","type":"address"},{"name":"root","type":"address"},{"name":"receive_safe_fee","type":"uint128"},{"name":"settings_deploy_wallet_grams","type":"uint128"},{"name":"initial_balance","type":"uint128"}],"name":"_configuration","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdraw",
+			"inputs": [
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "grant",
+			"inputs": [
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "receiveTokenWalletAddress",
+			"inputs": [
+				{"name":"wallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "wrap",
+			"inputs": [
+				{"name":"tokens","type":"uint128"},
+				{"name":"wallet_public_key","type":"uint256"},
+				{"name":"owner_address","type":"address"},
+				{"name":"gas_back_address","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "tokensReceivedCallback",
+			"inputs": [
+				{"name":"token_wallet_","type":"address"},
+				{"name":"token_root_","type":"address"},
+				{"name":"tokens_amount","type":"uint128"},
+				{"name":"value3","type":"uint256"},
+				{"name":"value4","type":"address"},
+				{"name":"value5","type":"address"},
+				{"name":"original_gas_to","type":"address"},
+				{"name":"value7","type":"uint128"},
+				{"name":"value8","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"owner_","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "renounceOwnership",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"owner","type":"address"}
+			]
+		},
+		{
+			"name": "configuration",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"root_tunnel","type":"address"},{"name":"root","type":"address"},{"name":"receive_safe_fee","type":"uint128"},{"name":"settings_deploy_wallet_grams","type":"uint128"},{"name":"initial_balance","type":"uint128"}],"name":"configuration","type":"tuple"}
+			]
+		},
+		{
+			"name": "token_wallet",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"token_wallet","type":"address"}
+			]
+		},
+		{
+			"name": "total_wrapped",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"total_wrapped","type":"uint128"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"_randomNonce","type":"uint256"}
+	],
+	"events": [
+	]
+}

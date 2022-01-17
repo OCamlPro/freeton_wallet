@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let get_account_info config address =
+let get_address_info config address =
   let addr = Misc.raw_address address in
   let open Ton_sdk in
   let level = if !Globals.verbosity > 1 then 3 else 1 in
@@ -51,7 +51,7 @@ let get_account_info config address =
 
 
 let get_account_info config ~name ~address =
-  match get_account_info config address with
+  match get_address_info config address with
   | None ->
       Printf.printf "Account %S: not yet created (empty balance)\n%!" name
   | Some account ->
@@ -115,8 +115,8 @@ let action accounts ~live =
 let cmd =
   let accounts = ref [] in
   let live = ref false in
-  EZCMD.sub
-    "account state"
+  Misc.cmd
+    ["account" ; "state"]
     (fun () -> action !accounts ~live:!live
     )
     ~args:
