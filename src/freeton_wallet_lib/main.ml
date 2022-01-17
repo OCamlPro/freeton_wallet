@@ -36,7 +36,7 @@ module MAIN = struct
         [ "account" ; "create" ], CommandAccountCreate.cmd;
         [ "account" ; "whois" ], CommandAccountWhois.cmd;
         [ "account" ; "info" ], CommandAccountInfo.cmd;
-        [ "account" ; "state" ], CommandAccountState.cmd;
+        CommandAccountState.cmd;
         [ "account" ; "list" ], CommandAccountList.cmd;
         [ "account" ; "set" ], CommandAccountSet.cmd;
         [ "account" ; "remove" ], CommandAccountRemove.cmd;
@@ -88,6 +88,13 @@ module MAIN = struct
         (*      [ "debot" ], CommandDebot.cmd; *)
         [ "debot" ; "new" ], CommandDebotNew.cmd;
         [ "debot" ; "fetch" ], CommandDebotFetch.cmd;
+
+        (*        CommandWallet.cmd; *)
+        (*        CommandTokenRootCreate.cmd; *)
+        CommandTokenList.cmd;
+        CommandTokenWTON.cmd;
+        CommandTokenWTONCredit.cmd;
+        CommandTokenWTONWithdraw.cmd;
       ]
 
   let main () =

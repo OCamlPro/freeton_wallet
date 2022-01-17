@@ -453,3 +453,6 @@ let string_of_nanoton v =
   in
   let s = Printf.sprintf "%s.%s" tons nanotons in
   s
+
+let cmd list action ~args ~doc ~man =
+  list, Ezcmd.V2.EZCMD.sub ( String.concat " " list ) action ~args ~doc ~man

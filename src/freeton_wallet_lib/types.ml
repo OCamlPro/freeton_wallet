@@ -99,3 +99,35 @@ module MULTISIG = struct
   [@@deriving json_encoding]
 
 end
+
+module MANIFEST = struct
+
+  type token = {
+    token_name : string ;
+    token_chainId : int ;
+    token_symbol : string ;
+    token_decimals : int ;
+    token_address : string ;
+    token_logoURI : string option ;
+    token_version : int ;
+  }
+  [@@deriving json_encoding]
+
+  type version = {
+    major : int ;
+    minor : int ;
+    patch : int ;
+  }
+  [@@deriving json_encoding]
+
+  type t = {
+    schema : string ; [@key "$schema"]
+    name : string ;
+    version : version ;
+    keywords : string list ;
+    timestamp : string ;
+    tokens : token list ;
+  }
+  [@@deriving json_encoding]
+
+end

@@ -1,4 +1,11 @@
 
+## v0.8.1
+* Add basic token management:
+  * ft token list ACCOUNT: list all Broxus tokens associated with ACCOUNT
+  * ft token wton ACCOUNT: balance of ACCOUNT in WTON
+  * ft token wton credit ACCOUNT AMOUNT: credit AMOUNT tons to WTON wallet
+  * ft token wton withdraw ACCOUNT AMOUNT: withdraw AMOUNT wtons from wallet
+
 ## v0.6.1
 * Add --send option to `ft multisig transfer` to force use of sendTransaction.
   May be useful when submitTransaction fails with out-of-gas.
