@@ -92,6 +92,8 @@ module MAIN = struct
         (*        CommandWallet.cmd; *)
         (*        CommandTokenRootCreate.cmd; *)
         CommandTokenList.cmd;
+        CommandTokenTransfer.cmd;
+        CommandTokenSwap.cmd;
         CommandTokenWTON.cmd;
         CommandTokenWTONCredit.cmd;
         CommandTokenWTONWithdraw.cmd;

@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzFile.OP
 open Ezcmd.V2
 open EZCMD.TYPES
 
@@ -42,9 +43,14 @@ let destruct name enc s =
 
 let manifest =
   lazy (
-    let manifest = match Files.read "manifest.json" with
-      | None -> assert false
-      | Some manifest -> manifest
+    let manifest_file = Globals.ft_dir // "tokens.json" in
+    let manifest =
+      if Sys.file_exists manifest_file then
+        EzFile.read_file manifest_file
+      else
+        match Files.read "manifest.json" with
+        | None -> assert false
+        | Some manifest -> manifest
     in
     destruct "manifest file" Types.MANIFEST.enc manifest
   )
@@ -143,7 +149,19 @@ let get_token_balance_gas ctxt wallet_address =
       let balance = Int64.of_string balance in
       Some ( balance, gas )
 
-let print_wallet config account =
+let print_wallet ctxt ~address ~wallet_address ~token =
+  Printf.printf "wallet address: %s (for contract %s)\n%!"
+    wallet_address address;
+  match get_token_balance_gas ctxt wallet_address with
+  | None ->
+      Printf.printf "  Broxus_TONTokenWallet contract not yet deployed\n%!";
+  | Some ( balance, gas ) ->
+      Printf.printf "  balance %s %s (gas %s TON)\n%!"
+        ( Misc.string_of_nanoton balance )
+        token.Types.MANIFEST.token_symbol
+        ( Misc.string_of_nanoton gas )
+
+let print_wallets config account =
   let ctxt = get_context config in
   let key = Misc.find_key_exn ctxt.net account in
   let contract = CommandMultisigCreate.check_key_contract key in
@@ -155,15 +173,7 @@ let print_wallet config account =
 
       let wallet_address = get_token_wallet_address ctxt token address in
 
-      match get_token_balance_gas ctxt wallet_address with
-      | None -> ()
-      | Some ( balance, gas ) ->
-          Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
-          Printf.printf "    address: %s\n%!" wallet_address;
-          Printf.printf "    balance %s %s (gas %s TON)\n%!"
-            ( Misc.string_of_nanoton balance )
-            token.Types.MANIFEST.token_symbol
-            ( Misc.string_of_nanoton gas )
+      print_wallet ctxt ~address ~wallet_address ~token
     ) manifest.Types.MANIFEST.tokens
 
 let cmd =
@@ -172,7 +182,7 @@ let cmd =
     ["token"; "list"]
     (fun () ->
        let config = Config.config () in
-       List.iter ( print_wallet config ) !args;
+       List.iter ( print_wallets config ) !args;
        ()
     )
     ~args:

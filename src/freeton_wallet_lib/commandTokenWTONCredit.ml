@@ -27,7 +27,7 @@ let action config ~account ~amount () =
   Printf.eprintf "Adding 1ton of fees\n%!";
   let token = CommandTokenList.get_token_by_symbol ctxt "WTON" in
 
-  let vault_address = Utils.address_of_account ctxt.net "wton-vault" in
+  let vault_address = Utils.address_of_account ctxt.net "broxus-wton-vault" in
   let vault_address = Misc.raw_address vault_address in
   let wallet_address =
     CommandTokenList.get_token_wallet_address ctxt token account_address in
