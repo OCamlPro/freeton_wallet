@@ -1446,6 +1446,43 @@ let register_primitives () =
   tvm_prim (next_pid ()) "sendrawmsg" [TAbstract TvmCell; TUint 8] [TAbstract TvmCell];
 
   register (next_pid ())
+    { prim_name = "buildExtMsg";
+      prim_kind = PrimMemberFunction }
+    (fun pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMagic (TTvm)),  Some (ANamed _) ->
+           make_surcharged_fun ~nreq:7 pos [
+             "callbackId", TAny, false; (* (uint32 | functionIdentifier) *)
+             "call", TAny, false;
+             "dest", TAddress true, false;
+             "expire", TUint 32, true;
+             "pubkey", TOptional (TUint 256), true;
+             "onErrorId", TAny, false; (* (uint32 | functionIdentifier) *)
+             "signBoxHandle", TOptional (TUint 32), true;
+             "sign", TBool, true;
+             "stateInit", TAbstract TvmCell, false;
+             "time", TUint 64, false;
+           ] opt [ TAbstract TvmCell ]
+       | _ -> None);
+
+  register (next_pid ())
+    { prim_name = "buildIntMsg";
+      prim_kind = PrimMemberFunction }
+    (fun pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMagic (TTvm)),  Some (ANamed _) ->
+           make_surcharged_fun ~nreq:3 pos [
+             "call", TAny, false;
+             "dest", TAddress true, false;
+             "value", TUint 128, false;
+             "bounce", TBool, true;
+             "stateInit", TAbstract TvmCell, true;
+             "currencies",
+             TMapping (TUint 32, TUint 256, LStorage false), true;
+           ] opt [ TAbstract TvmCell ]
+       | _ -> None);
+
+  register (next_pid ())
     { prim_name = "logtvm";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
