@@ -19,6 +19,9 @@ let error = type_error
 
 open Solidity_primitives.UTILS
 
+let prim_id_cnt = ref 0
+let next_pid () = incr prim_id_cnt; !prim_id_cnt
+
 let rec list_sub n list =
   if n = 0 then [] else
     match list with
@@ -31,7 +34,7 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
   | None -> assert false (* TODO *)
   | Some (AList list) ->
       let len = List.length list in
-      if len <= nreq then
+      if len < nreq then
         error pos "Not enough arguments"
       else
       if len > List.length expected_args then
@@ -40,7 +43,7 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
         Some
           ( make_fun (List.map (fun (_, type_, _optiona) ->
                 type_) ( list_sub len expected_args )) result
-              MNonPayable )
+                MNonPayable )
   | Some (ANamed list) ->
       let expected_args =
         List.mapi (fun i (name, type_, optional) ->
@@ -67,10 +70,10 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
                 ( type_, Some ( Ident.of_string name ) ) ::
                 iter args (n-1)
               else
-                if optional then
-                  iter args n
-                else
-                  error pos "Missing argument %S" name
+              if optional then
+                iter args n
+              else
+                error pos "Missing argument %S" name
       in
       let expected_args = iter expected_args nargs in
       Some ( primitive_fun_named expected_args result MNonPayable )
@@ -79,7 +82,7 @@ let make_surcharged_fun ~nreq pos expected_args opt result =
 let register_primitives () =
   (* Error handling *)
 
-  register 1
+  register (next_pid ())
     { prim_name = "assert";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -88,7 +91,7 @@ let register_primitives () =
            Some (make_fun [TBool] [] MPure)
        | _ -> None);
 
-  register 2
+  register (next_pid ())
     { prim_name = "require";
       prim_kind = PrimFunction }
     (fun _pos opt t_opt ->
@@ -102,7 +105,7 @@ let register_primitives () =
              Some (make_fun [TBool; TString LMemory] [] MPure)
        | _ -> None);
 
-  register 3
+  register (next_pid ())
     { prim_name = "revert";
       prim_kind = PrimFunction }
     (fun _pos opt t_opt ->
@@ -117,7 +120,7 @@ let register_primitives () =
 
   (* Block/transaction properties *)
 
-  register 4
+  register (next_pid ())
     { prim_name = "blockhash";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -126,7 +129,7 @@ let register_primitives () =
            Some (make_fun [TUint 256] [TFixBytes 32] MView)
        | _ -> None);
 
-  register 5
+  register (next_pid ())
     { prim_name = "gasleft";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -135,7 +138,7 @@ let register_primitives () =
            Some (make_fun [] [TUint 256] MView)
        | _ -> None);
 
-  register 6
+  register (next_pid ())
     { prim_name = "block";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -143,7 +146,7 @@ let register_primitives () =
        | None -> Some (make_var (TMagic (TBlock)))
        | _ -> None);
 
-  register 7
+  register (next_pid ())
     { prim_name = "coinbase";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -151,7 +154,7 @@ let register_primitives () =
        | Some (TMagic (TBlock)) -> Some (make_var (TAddress (true)))
        | _ -> None);
 
-  register 8
+  register (next_pid ())
     { prim_name = "difficulty";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -159,7 +162,7 @@ let register_primitives () =
        | Some (TMagic (TBlock)) -> Some (make_var (TUint 256))
        | _ -> None);
 
-  register 9
+  register (next_pid ())
     { prim_name = "gaslimit";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -167,7 +170,7 @@ let register_primitives () =
        | Some (TMagic (TBlock)) -> Some (make_var (TUint 256))
        | _ -> None);
 
-  register 10
+  register (next_pid ())
     { prim_name = "number";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -175,7 +178,7 @@ let register_primitives () =
        | Some (TMagic (TBlock)) -> Some (make_var (TUint 256))
        | _ -> None);
 
-  register 11
+  register (next_pid ())
     { prim_name = "timestamp";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -183,7 +186,7 @@ let register_primitives () =
        | Some (TMagic (TBlock)) -> Some (make_var (TUint 256))
        | _ -> None);
 
-  register 12
+  register (next_pid ())
     { prim_name = "msg";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -191,7 +194,7 @@ let register_primitives () =
        | None -> Some (make_var (TMagic (TMsg)))
        | _ -> None);
 
-  register 13
+  register (next_pid ())
     { prim_name = "data";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -199,7 +202,7 @@ let register_primitives () =
        | Some (TMagic (TMsg)) -> Some (make_var (TBytes (LCalldata)))
        | _ -> None);
 
-  register 14
+  register (next_pid ())
     { prim_name = "sender";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -207,7 +210,7 @@ let register_primitives () =
        | Some (TMagic (TMsg)) -> Some (make_var (TAddress (true)))
        | _ -> None);
 
-  register 15
+  register (next_pid ())
     { prim_name = "sig";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -215,7 +218,7 @@ let register_primitives () =
        | Some (TMagic (TMsg)) -> Some (make_var (TFixBytes 4))
        | _ -> None);
 
-  register 16
+  register (next_pid ())
     { prim_name = "value";
       prim_kind = PrimMemberVariable }
     (fun pos _opt t_opt ->
@@ -231,7 +234,7 @@ let register_primitives () =
            Some (make_var (TUint 256))
        | _ -> None);
 
-  register 17
+  register (next_pid ())
     { prim_name = "tx";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -239,7 +242,7 @@ let register_primitives () =
        | None -> Some (make_var (TMagic (TTx)))
        | _ -> None);
 
-  register 18
+  register (next_pid ())
     { prim_name = "gasprice";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -247,7 +250,7 @@ let register_primitives () =
        | Some (TMagic (TTx)) -> Some (make_var (TUint 256))
        | _ -> None);
 
-  register 19
+  register (next_pid ())
     { prim_name = "origin";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -257,7 +260,7 @@ let register_primitives () =
 
   (* ABI encoding/decoding *)
 
-  register 20
+  register (next_pid ())
     { prim_name = "abi";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -265,7 +268,7 @@ let register_primitives () =
        | None -> Some (make_var (TMagic (TAbi)))
        | _ -> None);
 
-  register 21
+  register (next_pid ())
     { prim_name = "decode";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -325,7 +328,7 @@ let register_primitives () =
            end
        | _ -> None);
 
-  register 22
+  register (next_pid ())
     { prim_name = "encode";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -335,7 +338,7 @@ let register_primitives () =
            Some (make_fun atl [TBytes LMemory] MPure)
        | _ -> None);
 
-  register 23
+  register (next_pid ())
     { prim_name = "encodePacked";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -345,7 +348,7 @@ let register_primitives () =
            Some (make_fun atl [TBytes LMemory] MPure)
        | _ -> None);
 
-  register 24
+  register (next_pid ())
     { prim_name = "encodeWithSelector";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -356,7 +359,7 @@ let register_primitives () =
            Some (make_fun atl [TBytes LMemory] MPure)
        | _ -> None);
 
-  register 25
+  register (next_pid ())
     { prim_name = "encodeWithSignature";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -370,7 +373,7 @@ let register_primitives () =
 
   (* Mathematical/cryptographic functions *)
 
-  register 26
+  register (next_pid ())
     { prim_name = "addmod";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -379,7 +382,7 @@ let register_primitives () =
            Some (make_fun [TUint 256; TUint 256; TUint 256] [TUint 256] MPure)
        | _ -> None);
 
-  register 27
+  register (next_pid ())
     { prim_name = "mulmod";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -388,7 +391,7 @@ let register_primitives () =
            Some (make_fun [TUint 256; TUint 256; TUint 256] [TUint 256] MPure)
        | _ -> None);
 
-  register 28
+  register (next_pid ())
     { prim_name = "keccak256";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -397,7 +400,7 @@ let register_primitives () =
            Some (make_fun [TBytes LMemory] [TFixBytes 32] MPure)
        | _ -> None);
 
-  register 29
+  register (next_pid ())
     { prim_name = "sha256";
       prim_kind = PrimFunction }
     (fun _pos opt t_opt ->
@@ -412,7 +415,7 @@ let register_primitives () =
            end
        | _ -> None);
 
-  register 30
+  register (next_pid ())
     { prim_name = "ripemd160";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -421,7 +424,7 @@ let register_primitives () =
            Some (make_fun [TBytes LMemory] [TFixBytes 20] MPure)
        | _ -> None);
 
-  register 31
+  register (next_pid ())
     { prim_name = "ecrecover";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -434,7 +437,7 @@ let register_primitives () =
 
   (* Contract related *)
 
-  register 32
+  register (next_pid ())
     { prim_name = "this";
       prim_kind = PrimVariable }
     (fun _pos opt t_opt ->
@@ -445,7 +448,7 @@ let register_primitives () =
        | _ ->
            None);
 
-  register 33
+  register (next_pid ())
     { prim_name = "super";
       prim_kind = PrimVariable }
     (fun _pos opt t_opt ->
@@ -456,7 +459,7 @@ let register_primitives () =
        | _ ->
            None);
 
-  register 34
+  register (next_pid ())
     { prim_name = "selfdestruct";
       prim_kind = PrimFunction }
     (fun _pos _opt t_opt ->
@@ -467,7 +470,7 @@ let register_primitives () =
 
   (* Members of address type *)
 
-  register 35
+  register (next_pid ())
     { prim_name = "balance";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -478,7 +481,7 @@ let register_primitives () =
            Some (make_var (TUint 256))
        | _ -> None);
 
-  register 36
+  register (next_pid ())
     { prim_name = "transfer";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -489,7 +492,10 @@ let register_primitives () =
                "bounce", TBool, true ;
                "flag", TUint 16, true ;
                "body", TAbstract TvmCell, true ;
-               (* not yet: "currencies", ExtraCurrencyCollection *)
+               "currencies",
+               TMapping (TUint 32, TUint 256, LStorage false),
+               true;
+               "stateInit", TAbstract TvmCell, true;
              ] opt []
        | Some (TAddress (true)) ->
            Some (make_fun [TUint 256] [] MNonPayable)
@@ -499,7 +505,7 @@ let register_primitives () =
                       not \"address\""
        | _ -> None);
 
-  register 37
+  register (next_pid ())
     { prim_name = "send";
       prim_kind = PrimMemberFunction }
     (fun pos _opt t_opt ->
@@ -514,7 +520,7 @@ let register_primitives () =
                       not \"address\""
        | _ -> None);
 
-  register 38
+  register (next_pid ())
     { prim_name = "call";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -523,7 +529,7 @@ let register_primitives () =
            Some (make_fun [TBytes (LMemory)] [TBool; TBytes (LMemory)] MPayable)
        | _ -> None);
 
-  register 39
+  register (next_pid ())
     { prim_name = "delegatecall";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -533,7 +539,7 @@ let register_primitives () =
                    [TBytes (LMemory)] [TBool; TBytes (LMemory)] MNonPayable)
        | _ -> None);
 
-  register 40
+  register (next_pid ())
     { prim_name = "staticcall";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -544,7 +550,7 @@ let register_primitives () =
 
   (* Type information (members of type) *)
 
-  register 41
+  register (next_pid ())
     { prim_name = "type";
       prim_kind = PrimFunction }
     (fun pos opt t_opt ->
@@ -557,7 +563,7 @@ let register_primitives () =
            Some (make_fun [TType (TTuple [])] [] MPure)
        | _ -> None);
 
-  register 42
+  register (next_pid ())
     { prim_name = "name";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -566,7 +572,7 @@ let register_primitives () =
            Some (make_var (TString (LMemory)))
        | _ -> None);
 
-  register 43
+  register (next_pid ())
     { prim_name = "creationCode";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -575,7 +581,7 @@ let register_primitives () =
            Some (make_var (TBytes (LMemory)))
        | _ -> None);
 
-  register 44
+  register (next_pid ())
     { prim_name = "runtimeCode";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -584,7 +590,7 @@ let register_primitives () =
            Some (make_var (TBytes (LMemory)))
        | _ -> None);
 
-  register 45
+  register (next_pid ())
     { prim_name = "interfaceId";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -632,7 +638,7 @@ let register_primitives () =
       Some t
   in
 
-  register 46
+  register (next_pid ())
     { prim_name = "min";
       prim_kind = PrimMemberVariable }
     (fun pos opt t_opt ->
@@ -661,7 +667,7 @@ let register_primitives () =
        | _ -> None);
 
 
-  register 47
+  register (next_pid ())
     { prim_name = "max";
       prim_kind = PrimMemberVariable }
     (fun pos opt t_opt ->
@@ -691,7 +697,7 @@ let register_primitives () =
 
   (* Members of array type *)
 
-  register 48
+  register (next_pid ())
     { prim_name = "length";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -702,7 +708,7 @@ let register_primitives () =
            Some (make_var (TUint 8))
        | _ -> None);
 
-  register 49
+  register (next_pid ())
     { prim_name = "push";
       prim_kind = PrimMemberFunction }
     (fun _pos opt t_opt ->
@@ -731,18 +737,20 @@ let register_primitives () =
            Some (make_fun [TFixBytes (1)] [] MNonPayable)
        | _ -> None);
 
-  register 50
+  register (next_pid ())
     { prim_name = "pop";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
        match t_opt with
+       | Some (TArray (_, _, LMemory) | TBytes LMemory) when !for_freeton ->
+           Some (make_fun [] [] MNonPayable)
        | Some (TArray (_, None, (LStorage _)) | TBytes (LStorage _)) ->
            Some (make_fun [] [] MNonPayable)
        | _ -> None);
 
   (* Members of function type *)
 
-  register 51
+  register (next_pid ())
     { prim_name = "address";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -751,7 +759,7 @@ let register_primitives () =
            Some (make_var (TAddress (false)))
        | _ -> None);
 
-  register 52
+  register (next_pid ())
     { prim_name = "selector";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -760,7 +768,7 @@ let register_primitives () =
            Some (make_var (TFixBytes (4)))
        | _ -> None);
 
-  register 53
+  register (next_pid ())
     { prim_name = "gas";
       prim_kind = PrimMemberFunction }
     (fun pos _opt t_opt ->
@@ -771,7 +779,7 @@ let register_primitives () =
        | _ -> None);
 
   (* TODO: allow functions with constant arity ? *)
-  register 54
+  register (next_pid ())
     { prim_name = "store";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -780,7 +788,7 @@ let register_primitives () =
            Some (make_fun [TDots] [] MNonPayable)
        | _ -> None);
 
-  register 55
+  register (next_pid ())
     { prim_name = "tvm";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -788,7 +796,7 @@ let register_primitives () =
        | None when !for_freeton -> Some (make_var (TMagic (TTvm)))
        | _ -> None);
 
-  register 56
+  register (next_pid ())
     { prim_name = "toCell";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -797,7 +805,7 @@ let register_primitives () =
            Some (make_fun [] [TAbstract TvmCell] MNonPayable)
        | _ -> None);
 
-  register 57
+  register (next_pid ())
     { prim_name = "hash";
       prim_kind = PrimMemberFunction }
     (fun _pos opt t_opt ->
@@ -818,7 +826,7 @@ let register_primitives () =
            end
        | _ -> None);
 
-  register 58
+  register (next_pid ())
     { prim_name = "now";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -827,7 +835,7 @@ let register_primitives () =
            Some (make_var (TUint 32))
        | _ -> None);
 
-  register 59
+  register (next_pid ())
     { prim_name = "fetch";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -836,7 +844,7 @@ let register_primitives () =
            Some (make_fun [ from_ ] [ TOptional to_ ] MNonPayable)
        | _ -> None);
 
-  register 60
+  register (next_pid ())
     { prim_name = "hasValue";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -845,7 +853,7 @@ let register_primitives () =
            Some (make_fun [] [ TBool ] MNonPayable)
        | _ -> None);
 
-  register 61
+  register (next_pid ())
     { prim_name = "get";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -854,7 +862,7 @@ let register_primitives () =
            Some (make_fun [] [ to_ ] MNonPayable)
        | _ -> None);
 
-  register 62
+  register (next_pid ())
     { prim_name = "accept";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -863,7 +871,7 @@ let register_primitives () =
            Some (make_fun [] [] MNonPayable)
        | _ -> None);
 
-  register 63
+  register (next_pid ())
     { prim_name = "pubkey";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -872,18 +880,42 @@ let register_primitives () =
            Some (make_fun [] [TUint 256] MNonPayable)
        | _ -> None);
 
-  register 64
+  register (next_pid ())
     { prim_name = "next";
       prim_kind = PrimMemberFunction }
-    (fun _pos _opt t_opt ->
-       match t_opt with
-       | Some (TMapping ( from_, to_, _loc )) when !for_freeton ->
+    (fun _pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMapping ( from_, to_, _loc )), _ when !for_freeton ->
            Some (make_fun [ from_ ]
                    [ TOptional (TTuple [ Some from_ ;
                                          Some to_ ] ) ] MNonPayable)
+       | Some (TMagic TRnd), Some (AList [(TInt _| TUint _) as ty]) ->
+           Some (make_fun [ty] [ty] MNonPayable)
+       | Some (TMagic TRnd), Some (AList []) ->
+           Some (make_fun [] [TUint 256] MNonPayable)
        | _ -> None);
 
-  register 65
+  register (next_pid ())
+    { prim_name = "getSeed";
+      prim_kind = PrimMemberFunction }
+    (fun _pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMagic TRnd), Some (AList []) ->
+           Some (make_fun [] [TUint 256] MNonPayable)
+       | _ -> None);
+
+  register (next_pid ())
+    { prim_name = "shuffle";
+      prim_kind = PrimMemberFunction }
+    (fun _pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMagic TRnd), Some (AList [TUint _]) ->
+           Some (make_fun [TUint 256] [] MNonPayable)
+       | Some (TMagic TRnd), Some (AList []) ->
+           Some (make_fun [] [] MNonPayable)
+       | _ -> None);
+
+  register (next_pid ())
     { prim_name = "toSlice";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -894,17 +926,17 @@ let register_primitives () =
            Some (make_fun [] [TAbstract TvmSlice] MNonPayable)
        | _ -> None);
 
-  register 66
+  register (next_pid ())
     { prim_name = "functionId";
       prim_kind = PrimMemberFunction }
-    (fun _pos _opt t_opt ->
-       match t_opt with
-       | Some ( TMagic TTvm ) when !for_freeton ->
-           (* TODO: only allow constructor and functions *)
-           Some (make_fun [ TAny ] [ TUint 32 ] MNonPayable)
+    (fun _pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TMagic (TTvm)),
+         Some (AList [TFunction _ | TContract _ as ty ]) ->
+           Some (make_fun [ty] [TUint 32] MNonPayable)
        | _ -> None);
 
-  register 67
+  register (next_pid ())
     { prim_name = "exists";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -913,7 +945,7 @@ let register_primitives () =
            Some (make_fun [ from_ ] [ TBool ] MNonPayable)
        | _ -> None);
 
-  register 68
+  register (next_pid ())
     { prim_name = "reset";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -922,7 +954,7 @@ let register_primitives () =
            Some (make_fun [] [] MNonPayable)
        | _ -> None);
 
-  register 69
+  register (next_pid ())
     { prim_name = "storeRef";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -931,7 +963,7 @@ let register_primitives () =
            Some (make_fun [TDots] [] MNonPayable)
        | _ -> None);
 
-  register 70
+  register (next_pid ())
     { prim_name = "append";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -940,7 +972,7 @@ let register_primitives () =
            Some (make_fun [TString loc] [] MNonPayable)
        | _ -> None);
 
-  register 71
+  register (next_pid ())
     { prim_name = "vergrth16";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -949,7 +981,7 @@ let register_primitives () =
            Some (make_fun [ TString LMemory ] [ TBool ] MNonPayable)
        | _ -> None);
 
-  register 72
+  register (next_pid ())
     { prim_name = "buildStateInit";
       prim_kind = PrimMemberFunction }
     (fun pos opt t_opt ->
@@ -967,7 +999,7 @@ let register_primitives () =
              [ TAbstract TvmCell ]
        | _ -> None);
 
-  register 73
+  register (next_pid ())
     { prim_name = "commit";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -976,7 +1008,7 @@ let register_primitives () =
            Some (make_fun [] [] MNonPayable)
        | _ -> None);
 
-  register 74
+  register (next_pid ())
     { prim_name = "setcode";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -985,7 +1017,7 @@ let register_primitives () =
            Some (make_fun [TAbstract TvmCell] [] MNonPayable)
        | _ -> None);
 
-  register 75
+  register (next_pid ())
     { prim_name = "setCurrentCode";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -994,7 +1026,7 @@ let register_primitives () =
            Some (make_fun [TAbstract TvmCell] [] MNonPayable)
        | _ -> None);
 
-  register 76
+  register (next_pid ())
     { prim_name = "resetStorage";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1003,7 +1035,7 @@ let register_primitives () =
            Some (make_fun [] [] MNonPayable)
        | _ -> None);
 
-  register 77
+  register (next_pid ())
     { prim_name = "makeAddrStd";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1013,7 +1045,7 @@ let register_primitives () =
        | _ ->
            None);
 
-  register 78
+  register (next_pid ())
     { prim_name = "loadRef";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1022,7 +1054,7 @@ let register_primitives () =
            Some (make_fun [] [TAbstract TvmCell] MNonPayable)
        | _ -> None);
 
-  register 79
+  register (next_pid ())
     { prim_name = "format";
       prim_kind = PrimFunction }
     (fun _pos opt t_opt ->
@@ -1057,9 +1089,9 @@ let register_primitives () =
              Some (make_fun from_ to_ MNonPayable)
          | _ -> None)
   in
-  register_string 80 "byteLength" [] [TUint 256] ;
+  register_string (next_pid ()) "byteLength" [] [TUint 256] ;
 
-  register 81
+  register (next_pid ())
     { prim_name = "rawReserve";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1068,7 +1100,7 @@ let register_primitives () =
            Some (make_fun [ TUint 256; TUint 8] [] MNonPayable)
        | _ -> None);
 
-  register 82
+  register (next_pid ())
     { prim_name = "math";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -1076,7 +1108,7 @@ let register_primitives () =
        | None when !for_freeton -> Some (make_var (TMagic TMath))
        | _ -> None);
 
-  register 83
+  register (next_pid ())
     { prim_name = "rnd";
       prim_kind = PrimVariable }
     (fun _pos _opt t_opt ->
@@ -1084,7 +1116,15 @@ let register_primitives () =
        | None when !for_freeton -> Some (make_var (TMagic TRnd))
        | _ -> None);
 
-  register 84
+  register (next_pid ())
+    { prim_name = "null";
+      prim_kind = PrimVariable }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | None when !for_freeton -> Some (make_var (TOptional TAny))
+       | _ -> None);
+
+  register (next_pid ())
     { prim_name = "set";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1093,7 +1133,7 @@ let register_primitives () =
            Some (make_fun [ to_ ] [] MNonPayable)
        | _ -> None);
 
-  register 85
+  register (next_pid ())
     { prim_name = "wid";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -1102,7 +1142,7 @@ let register_primitives () =
            Some (make_var (TInt 8))
        | _ -> None);
 
-  register 86
+  register (next_pid ())
     { prim_name = "encodeBody";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1111,7 +1151,7 @@ let register_primitives () =
            Some (make_fun [ TDots ] [ TAbstract TvmCell ] MNonPayable)
        | _ -> None);
 
-  register 87
+  register (next_pid ())
     { prim_name = "muldivmod";
       prim_kind = PrimMemberVariable }
     (fun pos opt t_opt ->
@@ -1132,7 +1172,7 @@ let register_primitives () =
            end
        | _ -> None);
 
-  register 88
+  register (next_pid ())
     { prim_name = "deploy";
       prim_kind = PrimMemberVariable }
     (fun _pos _opt t_opt ->
@@ -1164,17 +1204,17 @@ let register_primitives () =
         end
     | _ -> None
   in
-  register 89
+  register (next_pid ())
     { prim_name = "muldiv";
       prim_kind = PrimMemberVariable } muldiv_kind ;
-  register 90
+  register (next_pid ())
     { prim_name = "muldivr";
       prim_kind = PrimMemberVariable } muldiv_kind ;
-  register 91
+  register (next_pid ())
     { prim_name = "muldivc";
       prim_kind = PrimMemberVariable } muldiv_kind ;
 
-  register 92
+  register (next_pid ())
     { prim_name = "empty";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1187,7 +1227,7 @@ let register_primitives () =
            Some (make_fun [] [ TBool ] MNonPayable)
        | _ -> None);
 
-  register 93
+  register (next_pid ())
     { prim_name = "stoi";
       prim_kind = PrimFunction }
     (fun _pos _opt _t_opt ->
@@ -1195,7 +1235,7 @@ let register_primitives () =
                [ TUint 256; TBool ] MNonPayable)
     );
 
-  register 94
+  register (next_pid ())
     { prim_name = "makeAddrNone";
       prim_kind = PrimMemberFunction }
     (fun pos _opt t_opt ->
@@ -1208,7 +1248,7 @@ let register_primitives () =
        | None -> None
     );
 
-  register 95
+  register (next_pid ())
     { prim_name = "storeTons";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1217,7 +1257,7 @@ let register_primitives () =
            Some (make_fun [ TUint 128 ] [] MNonPayable)
        | _ -> None);
 
-  register 96
+  register (next_pid ())
     { prim_name = "storeUnsigned";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1226,7 +1266,7 @@ let register_primitives () =
            Some (make_fun [ TUint 256 ; TUint 16 ] [] MNonPayable)
        | _ -> None);
 
-  register 97
+  register (next_pid ())
     { prim_name = "add";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1235,7 +1275,7 @@ let register_primitives () =
            Some (make_fun [ from_  ; to_ ] [] MNonPayable)
        | _ -> None);
 
-  register 98
+  register (next_pid ())
     { prim_name = "at";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1245,7 +1285,7 @@ let register_primitives () =
            Some (make_fun [ from_ ] [ to_ ] MNonPayable)
        | _ -> None);
 
-  register 99
+  register (next_pid ())
     { prim_name = "prev";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1256,7 +1296,7 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | _ -> None);
 
-  register 100
+  register (next_pid ())
     { prim_name = "nextOrEq";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1267,7 +1307,7 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | _ -> None);
 
-  register 101
+  register (next_pid ())
     { prim_name = "prevOrEq";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1278,7 +1318,7 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | _ -> None);
 
-  register 102
+  register (next_pid ())
     { prim_name = "delMin";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1289,7 +1329,7 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | _ -> None);
 
-  register 103
+  register (next_pid ())
     { prim_name = "delMax";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1300,7 +1340,7 @@ let register_primitives () =
                                          Some to_ ] ) ] MNonPayable)
        | _ -> None);
 
-  register 104
+  register (next_pid ())
     { prim_name = "replace";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1309,7 +1349,7 @@ let register_primitives () =
            Some ( make_fun [ from_ ; to_ ] [ TBool ] MNonPayable )
        | _ -> None);
 
-  register 105
+  register (next_pid ())
     { prim_name = "getSet";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1318,7 +1358,7 @@ let register_primitives () =
            Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
        | _ -> None);
 
-  register 106
+  register (next_pid ())
     { prim_name = "getAdd";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1327,7 +1367,7 @@ let register_primitives () =
            Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
        | _ -> None);
 
-  register 107
+  register (next_pid ())
     { prim_name = "getReplace";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1336,7 +1376,7 @@ let register_primitives () =
            Some ( make_fun [ from_ ; to_ ] [ TOptional to_ ] MNonPayable )
        | _ -> None);
 
-  register 108
+  register (next_pid ())
     { prim_name = "getType";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1345,7 +1385,7 @@ let register_primitives () =
            Some ( make_fun [] [ TUint 8] MNonPayable )
        | _ -> None);
 
-  register 109
+  register (next_pid ())
     { prim_name = "isStdZero";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1354,7 +1394,7 @@ let register_primitives () =
            Some ( make_fun [] [ TBool] MNonPayable )
        | _ -> None);
 
-  register 110
+  register (next_pid ())
     { prim_name = "isExternZero";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1363,7 +1403,7 @@ let register_primitives () =
            Some ( make_fun [] [ TBool] MNonPayable )
        | _ -> None);
 
-  register 111
+  register (next_pid ())
     { prim_name = "isNone";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1372,7 +1412,7 @@ let register_primitives () =
            Some ( make_fun [] [ TBool] MNonPayable )
        | _ -> None);
 
-  register 112
+  register (next_pid ())
     { prim_name = "unpack";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1391,18 +1431,30 @@ let register_primitives () =
              Some (make_fun from_ to_ MNonPayable )
          | _ -> None);
   in
-  tvm_prim 113 "codeSalt"
+  tvm_prim (next_pid ()) "codeSalt"
     [ TAbstract TvmCell ]
     [ TOptional ( TAbstract TvmCell ) ];
-  tvm_prim 114 "rawCommit" [] [];
-  tvm_prim 115 "setData" [ TAbstract TvmCell ] [];
-  tvm_prim 116 "log" [ TString LMemory ] []; (* also "logtvm" *)
-  tvm_prim 117 "hexdump" [ TAny ] [];
-  tvm_prim 118 "bindump" [ TAny ] [];
-  tvm_prim 119 "configParam" [ TUint 8 ] [ TDots ];
-  tvm_prim 120 "rawConfigParam" [ TUint 8 ] [ TAbstract TvmCell ; TBool ];
+  tvm_prim (next_pid ()) "rawCommit" [] [];
+  tvm_prim (next_pid ()) "setData" [ TAbstract TvmCell ] [];
+  tvm_prim (next_pid ()) "log" [ TString LMemory ] [];
+  tvm_prim (next_pid ()) "hexdump" [ TAny ] [];
+  tvm_prim (next_pid ()) "bindump" [ TAny ] [];
+  tvm_prim (next_pid ()) "configParam" [ TUint 8 ] [ TDots ];
+  tvm_prim (next_pid ())
+    "rawConfigParam" [ TUint 8 ] [ TAbstract TvmCell ; TBool ];
 
-  register 121
+  tvm_prim (next_pid ()) "sendrawmsg" [TAbstract TvmCell; TUint 8] [TAbstract TvmCell];
+
+  register (next_pid ())
+    { prim_name = "logtvm";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TMagic TTvm) ->
+           Some (make_fun [TString LMemory] [] MView)
+       | _ -> None);
+
+  register (next_pid ())
     { prim_name = "checkSign";
       prim_kind = PrimFunction }
     (fun _pos opt t_opt ->
@@ -1421,18 +1473,76 @@ let register_primitives () =
            end
        | _ -> None);
 
-  tvm_prim 122 "insertPubkey" [ TAbstract TvmCell ; TUint 256 ]
+  tvm_prim (next_pid ()) "insertPubkey" [ TAbstract TvmCell ; TUint 256 ]
     [ TAbstract TvmCell ];
-  tvm_prim 123 "buildEmptyData" [ TUint 256 ] [ TAbstract TvmCell ];
-  tvm_prim 124 "code" [] [ TAbstract TvmCell ];
-  tvm_prim 125 "setCodeSalt" [ TAbstract TvmCell; TAbstract TvmCell ] [ TAbstract TvmCell ];
-  tvm_prim 126 "setPubkey" [ TUint 256 ] [ ];
-  tvm_prim 127 "exit" [ ] [ ];
-  tvm_prim 128 "exit1" [ ] [ ];
+  tvm_prim (next_pid ()) "buildEmptyData" [ TUint 256 ] [ TAbstract TvmCell ];
+  tvm_prim (next_pid ()) "code" [] [ TAbstract TvmCell ];
+  tvm_prim (next_pid ()) "setCodeSalt" [ TAbstract TvmCell; TAbstract TvmCell ] [ TAbstract TvmCell ];
+  tvm_prim (next_pid ()) "setPubkey" [ TUint 256 ] [ ];
+  tvm_prim (next_pid ()) "exit" [ ] [ ];
+  tvm_prim (next_pid ()) "exit1" [ ] [ ];
   (* missing TVM instructions:
       * [tvm.buildExtMsg()](#tvmbuildextmsg)
       * [tvm.buildIntMsg()](#tvmbuildintmsg)
   *)
+
+  register (next_pid ())
+    { prim_name = "bits";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmSlice | TAbstract TvmBuilder) ->
+           Some (make_fun [] [TUint 16] MNonPayable)
+       | _ -> None);
+
+  register (next_pid ())
+    { prim_name = "loadRefAsSlice";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmSlice) ->
+           Some (make_fun [] [TAbstract TvmSlice] MNonPayable)
+       | _ -> None);
+
+  register (next_pid ())
+    { prim_name = "decodeFunctionParams";
+      prim_kind = PrimMemberFunction }
+    (fun _pos opt t_opt ->
+       match t_opt, opt.call_args with
+       | Some (TAbstract TvmSlice),
+         Some (
+           AList [TFunction (
+               { function_def = Some {fun_responsible = true; _ };
+                 function_params; _
+               } as desc,
+               opt
+             )]
+         ) ->
+           Some (
+             make_fun [TFunction (desc, opt)]
+               (TUint 32 :: List.map fst function_params)
+               MNonPayable
+           )
+       | Some (TAbstract TvmSlice),
+         Some (AList [TFunction ({ function_params; _ } as desc, opt)]) ->
+           Some (
+             make_fun [TFunction (desc, opt)]
+               (List.map fst function_params)
+               MNonPayable
+           )
+       | Some (TAbstract TvmSlice),
+         Some (AList [TContract (id, desc, super)]) ->
+           Some (make_fun [TContract (id, desc, super)] [TDots] MNonPayable)
+       | _ -> None);
+
+  register (next_pid ())
+    { prim_name = "size";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmSlice | TAbstract TvmBuilder) ->
+           Some (make_fun [] [TUint 16; TUint 8] MView)
+       | _ -> None);
 
   let div_kind pos opt t_opt =
     match t_opt with
@@ -1451,15 +1561,15 @@ let register_primitives () =
         end
     | _ -> None
   in
-  register 129
+  register (next_pid ())
     { prim_name = "divr";
       prim_kind = PrimMemberVariable } div_kind ;
-  register 130
+  register (next_pid ())
     { prim_name = "divc";
       prim_kind = PrimMemberVariable } div_kind ;
 
 
-  register 131
+  register (next_pid ())
     { prim_name = "loadUnsigned";
       prim_kind = PrimMemberFunction }
     (fun _pos _opt t_opt ->
@@ -1471,7 +1581,7 @@ let register_primitives () =
 
   (*  register_string 132 "substr" [] [TUint 256] ; *)
 
-  register 132
+  register (next_pid ())
     { prim_name = "substr";
       prim_kind = PrimMemberFunction }
     (fun _pos opt t_opt ->
@@ -1499,8 +1609,8 @@ let register_primitives () =
              Some (make_fun [ TString LMemory ] [ TOptional (TUint 32) ] MNonPayable )
          | _ -> None)
   in
-  register_string_find 133 "find";
-  register_string_find 134 "findLast";
+  register_string_find (next_pid ()) "find";
+  register_string_find (next_pid ()) "findLast";
 
   ()
 
@@ -1516,6 +1626,9 @@ let handle_exception f x =
       Error ( Solidity_exceptions.string_of_exn exn )
 
 let parse_file = Solidity_parser.parse_file ~freeton:true
+
+let parse_files = Solidity_parser.parse_files ~freeton:true
+
 let typecheck_ast =
   Solidity_typechecker.type_program ~init:register_primitives
 let string_of_ast = Solidity_printer.string_of_program ~freeton:true
@@ -1652,6 +1765,28 @@ let () =
 
       "gigaton", NUMBERUNIT (Gigaton);
       "GTon", NUMBERUNIT (Gigaton);
+
+      (* "nano", NUMBERUNIT (Ever); *)
+      "nanoever", NUMBERUNIT (Nanoever);
+      "nEver", NUMBERUNIT (Nanoever);
+
+      "micro", NUMBERUNIT (Microever);
+      "microever", NUMBERUNIT (Microever);
+
+      "milli", NUMBERUNIT (Milliever);
+      "milliever", NUMBERUNIT (Milliever);
+
+      "ever", NUMBERUNIT (Ever);
+      "Ever", NUMBERUNIT (Ever);
+
+      "kiloever", NUMBERUNIT (Kiloever);
+      "kEver", NUMBERUNIT (Kiloever);
+
+      "megaever", NUMBERUNIT (Megaever);
+      "MEver", NUMBERUNIT (Megaever);
+
+      "gigaever", NUMBERUNIT (Gigaever);
+      "GEver", NUMBERUNIT (Gigaever);
     ]
 
   in
