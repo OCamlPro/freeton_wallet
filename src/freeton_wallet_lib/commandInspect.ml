@@ -87,7 +87,7 @@ let query_messages ~client ~abis queue config ~level ids =
                 { m with msg_body = None ;
                          msg_boc = None ;
                 },
-                Some body )
+                Some ( AbiCache.string_of_message_body ( Some body ) ))
         ) ms
     ) ids in
   Lwt.return (List.flatten res)

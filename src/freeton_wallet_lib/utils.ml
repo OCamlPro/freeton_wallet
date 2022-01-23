@@ -300,11 +300,11 @@ let post config req =
   | Ok r -> r
   | Error exn -> raise exn
 
-let track_messages config queue =
+let track_messages ?accounts ?(event = fun _ -> ()) config queue =
   let last_time = ref ( Unix.gettimeofday () ) in
   let node = Config.current_node config in
   let client = Ton_sdk.CLIENT.create node.node_url in
-  let abis = AbiCache.create config ~abis:[] in
+  let abis = AbiCache.create ?accounts config in
 
   while not ( Queue.is_empty queue ) do
     let msg_id = Queue.peek queue in
@@ -359,9 +359,8 @@ let track_messages config queue =
                           (AbiCache.replace_addr
                              ~abis ~address:msg.msg_dst);
                         let body =
-                          match AbiCache.parse_message_body ~client ~abis msg with
-                          | None -> ""
-                          | Some body -> body
+                          AbiCache.string_of_message_body
+                            ( AbiCache.parse_message_body ~client ~abis msg )
                         in
                         Printf.printf "       value: %s %s\n%!"
                           ( match msg.msg_value with
@@ -377,7 +376,12 @@ let track_messages config queue =
                                   ~client ~abis msg with
                           | None -> ()
                           | Some body ->
-                              Printf.printf "       %s\n%!" body
+                              Printf.printf "       %s\n%!"
+                                ( AbiCache.string_of_message_body ( Some body ));
+                              match body with
+                              | _, None -> ()
+                              | _, Some m ->
+                                  event m
                         end
                     | Some _kind -> ()
                   end
@@ -392,7 +396,11 @@ let track_messages config queue =
   done
 
 let call_run config ?client ~wait
-    ~server_url ~address ~abi ~meth ~params ~local ?keypair () =
+    ~server_url ~address ~abi ~meth ~params ~local
+    ?keypair ?accounts () =
+  if Misc.verbose 2 then begin
+    Printf.eprintf "Calling %s: %s %s\n%!" address meth params
+  end;
   if wait then
     let client =
       match client with
@@ -408,9 +416,12 @@ let call_run config ?client ~wait
         ~client ~abi ~msg:msg.message res in
     let queue = Queue.create () in
     Queue.add msg.message_id queue;
-(*    let shards = Hashtbl.create 100 in
-      Hashtbl.add shards address res.shard_block_id ; *)
-    track_messages config queue ;
+    (*    let shards = Hashtbl.create 100 in
+          Hashtbl.add shards address res.shard_block_id ; *)
+    track_messages ?accounts config queue ;
+    if Misc.verbose 2 then begin
+      Printf.eprintf "  result: %s\n%!" result
+    end;
     result
   else
     Ton_sdk.CALL.call ?client ~server_url
@@ -425,7 +436,7 @@ let call_run config ?client ~wait
 
 let call_contract
     config ~address ~contract ~meth ~params
-    ?client ?src ?(local=false) ?subst ?(wait=false)  () =
+    ?client ?src ?(local=false) ?subst ?(wait=false) ?accounts  () =
   Misc.with_contract_abi contract
     (fun ~contract_abi ->
        if Globals.use_ton_sdk then
@@ -455,6 +466,7 @@ let call_contract
              ~meth ~params
              ~local
              ?keypair
+             ?accounts
              ~wait
              ()
          in

@@ -25,8 +25,6 @@ let action config ~account ~amount () =
   let amount = Misc.nanotokens_of_string amount  in
   let token = CommandTokenList.get_token_by_symbol ctxt "WTON" in
 
-  let vault_address = Utils.address_of_account ctxt.net "broxus-wton-vault" in
-  let vault_address = Misc.raw_address vault_address in
   let wallet_address =
     CommandTokenList.get_token_wallet_address ctxt token account_address in
 
@@ -44,7 +42,7 @@ let action config ~account ~amount () =
         "notify_receiver": true,
         "payload": ""
        }|}
-        vault_address
+        ctxt.vault_address
         ( Int64.to_string amount )
         account_address
     in
@@ -77,9 +75,8 @@ let action config ~account ~amount () =
   | Some ( balance, gas ) ->
       Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
       Printf.printf "    address: %s\n%!" wallet_address;
-      Printf.printf "    balance %s %s (gas %s TON)\n%!"
-        ( Misc.string_of_nanoton balance )
-        token.Types.MANIFEST.token_symbol
+      Printf.printf "    balance %s (gas %s TON)\n%!"
+        ( CommandTokenList.string_of_amount_token balance token )
         ( Misc.string_of_nanoton gas )
 
 (*

@@ -15,10 +15,23 @@ type t
 val check_account :
   ?unknown:string list ref -> Types.config -> abis:t -> address:string -> unit
 val replace_addr : abis:t -> address:string -> string
-val create : Types.config -> abis:string list -> t
+val create :
+  ?abis:string list ->
+  ?accounts:(string * string * string) list -> (* name, address, contract *)
+  Types.config -> t
+
+type message_body = {
+  m_address : string ;
+  m_contract_name : string ;
+  m_body_type : string ;
+  m_body_name : string ;
+  m_body_args : string ;
+}
 
 val parse_message_body :
-  client:Ton_sdk.TYPES.client ->
+  client:Sdk_types.client ->
   abis:t ->
-  Ton_sdk.ENCODING.message ->
-  string option
+  Ton_sdk.ENCODING.message -> (string * message_body option) option
+
+val string_of_message_body :
+  (string * message_body option) option -> string

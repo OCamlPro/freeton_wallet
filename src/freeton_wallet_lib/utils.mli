@@ -21,6 +21,7 @@ val call_contract :
   ?local:bool ->
   ?subst:(msg:string -> Types.config -> string -> unit) ->
   ?wait:bool -> (* false by default *)
+  ?accounts:(string * string * string) list ->
   unit -> unit
 
 val post :
@@ -60,5 +61,6 @@ val call_run :
   params:string ->
   local:bool ->
   ?keypair:Sdk_types.keypair ->
+  ?accounts:(string * string * string) list ->
   unit ->
   string

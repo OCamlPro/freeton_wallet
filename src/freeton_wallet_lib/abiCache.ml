@@ -86,7 +86,7 @@ let replace_addr ~abis ~address =
     | exception Not_found -> address
 
 
-let create config ~abis =
+let create ?(abis=[]) ?(accounts=[]) config =
   let net = Config.current_network config in
   let abis_address2abi = Hashtbl.create 113 in
   let abis_contract2abi = Hashtbl.create 113 in
@@ -121,9 +121,24 @@ let create config ~abis =
                     contract , lazy ( get_contract_abi ~abis contract ) ))
       | _ -> ()
     ) net.net_keys;
+
+  List.iter (fun (name, address, contract) ->
+      Hashtbl.add abis_address2abi address
+        ( name, Some (
+              contract , lazy ( get_contract_abi ~abis contract ) ))
+    ) accounts;
+
   abis
 
 open Ton_sdk
+
+type message_body = {
+  m_address : string ;
+  m_contract_name : string ;
+  m_body_type : string ;
+  m_body_name : string ;
+  m_body_args : string ;
+}
 
 let parse_message_boc ~client ~abis ~boc ~address =
   match
@@ -132,43 +147,63 @@ let parse_message_boc ~client ~abis ~boc ~address =
   with
   | exception Not_found -> None
   | None -> None
-  | Some ( _ , abi ) ->
+  | Some ( m_contract_name , abi ) ->
       try
         let abi = Lazy.force abi in
         let decoded =
           BLOCK.decode_message_boc ~client ~boc ~abi in
-        let body =
-          Printf.sprintf "%s %s %s"
-            (match decoded.body_type with
+        Some {
+          m_contract_name ;
+          m_address = address;
+          m_body_type =
+            ( match decoded.body_type with
              | 0 -> "Call" (* Input *)
              | 1 -> "Reply" (* Output *)
              | 2 -> "InternalOutput"
              | 3 -> "Event"
-             | _ -> assert false)
-            decoded.body_name
-            (match decoded.body_args with
-             | None -> ""
-             | Some args -> args)
-        in
-        Some body
+             | _ -> assert false ) ;
+          m_body_name = decoded.body_name ;
+          m_body_args =
+            ( match decoded.body_args with
+              | None -> "{}"
+              | Some args -> args ) ;
+        }
       with
       | _ -> None
 
 let parse_message_body ~client ~abis m =
-    match m.ENCODING.msg_boc with
-    | None -> None
-    | Some boc ->
-        match m.ENCODING.msg_msg_type_name with
-        | None -> assert false
-        | Some "ExtOut" ->
-            parse_message_boc ~client ~abis ~boc ~address:m.msg_src
-        | Some "Internal" ->
-          parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
-        | Some kind ->
-            begin
-              match kind with
-              | "ExtIn" -> ()
+  match m.ENCODING.msg_boc with
+  | None -> None
+  | Some boc ->
+      match m.ENCODING.msg_msg_type_name with
+      | None -> assert false
+      | Some kind ->
+          Some ( kind,
+                 match kind with
+                 | "ExtOut" ->
+                     parse_message_boc ~client ~abis ~boc ~address:m.msg_src
+                 | "Internal" ->
+                     parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
+                 | kind ->
+                     begin
+                       match kind with
+                       | "ExtIn" -> ()
 
-              | _ -> Printf.eprintf "msg_msg_type_name: %s\n%!" kind;
-            end;
-            parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
+                       | _ -> Printf.eprintf "msg_msg_type_name: %s\n%!" kind;
+                     end;
+                     parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
+               )
+
+let string_of_message_body m =
+  match m with
+  | None -> ""
+  | Some ( kind, m ) ->
+      Printf.sprintf "%s: %s" kind
+        ( match m with
+          | None -> "?"
+          | Some m ->
+              Printf.sprintf "%s %s %s"
+                m.m_body_type
+                m.m_body_name
+                m.m_body_args
+        )

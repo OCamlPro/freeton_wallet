@@ -27,15 +27,13 @@ let action config ~account ~amount () =
   Printf.eprintf "Adding 1ton of fees\n%!";
   let token = CommandTokenList.get_token_by_symbol ctxt "WTON" in
 
-  let vault_address = Utils.address_of_account ctxt.net "broxus-wton-vault" in
-  let vault_address = Misc.raw_address vault_address in
   let wallet_address =
     CommandTokenList.get_token_wallet_address ctxt token account_address in
 
   let allBalance = false in
   let params = Printf.sprintf
       {|{"dest":"%s","value":%s,"bounce":%b,"flags":%d,"payload":"%s"}|}
-      vault_address
+      ctxt.vault_address
       (if allBalance then "0" else Int64.to_string amount)
       true
       (if allBalance then 128 else 0)
@@ -60,9 +58,8 @@ let action config ~account ~amount () =
   | Some ( balance, gas ) ->
       Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
       Printf.printf "    address: %s\n%!" wallet_address;
-      Printf.printf "    balance %s %s (gas %s TON)\n%!"
-        ( Misc.string_of_nanoton balance )
-        token.Types.MANIFEST.token_symbol
+      Printf.printf "    balance %s (gas %s TON)\n%!"
+        ( CommandTokenList.string_of_amount_token balance token )
         ( Misc.string_of_nanoton gas )
 
 (*

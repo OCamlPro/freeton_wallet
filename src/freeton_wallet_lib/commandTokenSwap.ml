@@ -20,6 +20,18 @@ https://github.com/broxus/ton-dex/blob/master/build/DexRoot.abi.json#L189
 
 Parameters are two token addresses in any position
 
+{
+			"name": "getExpectedPairAddress",
+			"inputs": [
+				{"name":"answerId","type":"uint32"},
+				{"name":"left_root","type":"address"},
+				{"name":"right_root","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+
 2) Get your token wallets address for both tokens
 
 wallet_public_key_: 0,
@@ -32,6 +44,17 @@ Also check that they are deployed, by asking state or balance of evers
 3) Construct payload
 
 call https://github.com/broxus/ton-dex/blob/master/build/DexPairV4.abi.json#L118
+               {
+                        "name": "buildExchangePayload",
+                        "inputs": [
+                                {"name":"id","type":"uint64"},
+                                {"name":"deploy_wallet_grams","type":"uint128"},
+                                {"name":"expected_amount","type":"uint128"}
+                        ],
+                        "outputs": [
+                                {"name":"value0","type":"cell"}
+                        ]
+                },
 
 id - any number
 deploy_wallet_grams - here 100000000 (0.1 ever) if you don't have deployed wallet or 0 if you have wallet deployed
@@ -39,6 +62,20 @@ expectedAmount - here you input how much tokens minimum you want to recieve. if 
 
 Or you can input in expectedamount results of execution decreased by slippage amount
 https://github.com/broxus/ton-dex/blob/master/build/DexPairV4.abi.json#L229
+
+       {
+                        "name": "expectedExchange",
+                        "inputs": [
+                                {"name":"answerId","type":"uint32"},
+                                {"name":"amount","type":"uint128"},
+                                {"name":"spent_token_root","type":"address"}
+                        ],
+                        "outputs": [
+                                {"name":"expected_amount","type":"uint128"},
+                                {"name":"expected_fee","type":"uint128"}
+                        ]
+                },
+
 
 4) Than on wallet of token that is being sold
 https://github.com/broxus/ton-eth-bridge-token-contracts/blob/master/free-ton/build/TONTokenWallet.abi.json#L84
@@ -76,15 +113,46 @@ let action config ~amount ~token ~from_ ~to_ () =
   let from_token = CommandTokenList.get_token_by_symbol ctxt token in
   let to_token = CommandTokenList.get_token_by_symbol ctxt to_ in
 
-  let root_address = Utils.address_of_account ctxt.net "broxus-dex-root"
-                     |> Misc.raw_address in
-
   let from_wallet_address =
     CommandTokenList.get_token_wallet_address ctxt from_token from_address in
   let to_wallet_address =
     CommandTokenList.get_token_wallet_address ctxt to_token from_address in
 
-  (*
+  let dexpair_address =
+    CommandTokenList.get_dexpair_address ctxt from_token to_token in
+  let _from_address_status =
+    CommandTokenList.get_token_balance_gas ctxt from_wallet_address in
+  let to_address_status =
+    CommandTokenList.get_token_balance_gas ctxt to_wallet_address in
+
+
+  let payload =
+
+    let params =
+      Printf.sprintf {|{ "id": 1,
+                         "deploy_wallet_grams": "%Ld",
+                         "expected_amount": "%Ld" }|}
+        ( match to_address_status with
+          | None -> 100_000_000L
+          | Some _ -> 0L )
+        0L
+    in
+    let reply =
+      Utils.call_run
+        ctxt.config
+        ~client:ctxt.client
+        ~wait:false
+        ~server_url:ctxt.server_url
+        ~address:dexpair_address
+        ~abi:ctxt.dexpair_contract_abi
+        ~meth:"buildExchangePayload"
+        ~params
+        ~local:true
+        ()
+    in
+    CommandTokenList.address_of_reply ~query:"buildExchangePayload" ~reply
+  in
+
   let payload =
     let abi = ctxt.wallet_contract_abi in
     let meth = "transferToRecipient" in
@@ -97,23 +165,30 @@ let action config ~amount ~token ~from_ ~to_ () =
         "transfer_grams": 0,
         "send_gas_to": "%s",
         "notify_receiver": true,
-        "payload": ""
+        "payload": "%s"
        }|}
-        to_address
+        dexpair_address
         ( Int64.to_string amount )
         from_address
+        payload
     in
     Ton_sdk.ABI.encode_body ~abi ~meth ~params
   in
   let params = Printf.sprintf
       {|{"dest":"%s","value":%Ld,"bounce":%b,"flags":%d,"payload":"%s"}|}
       from_wallet_address
-      2_000_000_000L
+      ( Int64.add amount 2_000_000_000L )
       true
       0
       payload
   in
-*)
+
+  let accounts = [
+    "dexroot", ctxt.dexroot_address, "Broxus_DexRoot" ;
+    "dexpair", dexpair_address, "Broxus_DexPairV4" ;
+    "from_wallet", from_wallet_address, "Broxus_TONTokenWallet" ;
+    "to_wallet", to_wallet_address, "Broxus_TONTokenWallet" ;
+  ] in
 
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
@@ -122,7 +197,6 @@ let action config ~amount ~token ~from_ ~to_ () =
   CommandTokenList.print_wallet ctxt
     ~wallet_address:to_wallet_address ~address:from_address ~token:to_token;
 
-  (*
   Utils.call_contract config
     ~contract:from_contract
     ~address:from_address
@@ -131,18 +205,17 @@ let action config ~amount ~token ~from_ ~to_ () =
     ~local:false
     ~src:from_key
     ~wait:true
+    ~accounts
     ();
 
   Printf.printf "AFTER TRANSFER:\n%!";
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:from_wallet_address ~address:from_address ~token;
+    ~wallet_address:from_wallet_address ~address:from_address ~token:from_token;
   Printf.printf "Destination:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:to_wallet_address ~address:to_address ~token;
-*)
+    ~wallet_address:to_wallet_address ~address:from_address ~token:to_token;
 
-  ignore ( from_contract, amount, root_address );
   ()
 
 let cmd =
