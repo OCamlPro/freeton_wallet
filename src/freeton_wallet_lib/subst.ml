@@ -502,6 +502,10 @@ Do SUBST to generate a TVC filename, then:
 
 Escaping of '}' is done using '\}'.
 
+Dynamic substitutions:
+* apply:create-account:NAME:ADDRESS
+* create-contract:NAME:CONTACT:ADDRESS
+
 |}
 
 

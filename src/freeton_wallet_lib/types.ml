@@ -115,6 +115,16 @@ module MULTISIG = struct
   }
   [@@deriving json_encoding]
 
+  type parameters = {
+    maxQueuedTransactions : string ; (* uint8 *)
+    maxCustodianCount : string ; (* uint8 *)
+    expirationTime : string; (* uint64 *)
+    minValue : string ; (* uint128 *)
+    requiredTxnConfirms : string ; (* uint8 *)
+    requiredUpdConfirms : string ; [@dft "0" ] (* uint8 *)
+  }
+  [@@deriving json_encoding]
+
 end
 
 module MANIFEST = struct

@@ -1661,7 +1661,7 @@ let handle_exception f x =
 
 let parse_file = Solidity_parser.parse_file ~freeton:true
 
-let parse_files = Solidity_parser.parse_files ~freeton:true
+(* let parse_files = Solidity_parser.parse_files ~freeton:true *)
 
 let typecheck_ast =
   Solidity_typechecker.type_program ~init:register_primitives
