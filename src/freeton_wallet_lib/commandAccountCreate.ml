@@ -171,7 +171,7 @@ let gen_address config keypair contract
          | _ -> Error.raise "Cannot use FT_USE_TONOS with initial data/pubkey"
     )
 
-let add_account config ~initial_data ~initial_pubkey
+let add_account config ~initial_data ~initial_pubkey ~pubkey
     ~name ~passphrase ~address ~contract ~wc ~keyfile ~force =
   let net = Config.current_network config in
   let key_name = name in
@@ -188,8 +188,8 @@ let add_account config ~initial_data ~initial_pubkey
   let contract = Option.map Misc.fully_qualified_contract contract in
 
   let key_passphrase =
-    match passphrase, keyfile, address with
-    | None, None, None -> Some ( gen_passphrase config )
+    match passphrase, keyfile, pubkey, address with
+    | None, None, None, None -> Some ( gen_passphrase config )
     | _ -> passphrase
   in
 
@@ -201,6 +201,18 @@ let add_account config ~initial_data ~initial_pubkey
     | None, Some passphrase ->
         Some ( gen_keypair config passphrase )
     | Some file, None -> Some ( Misc.read_json_file Encoding.keypair file )
+  in
+
+  let key_pair =
+    match key_pair, pubkey with
+    | None, None -> None
+    | Some _, Some _ ->
+        Error.raise "--pubkey is incompatible with --passphrase or --keyfile"
+    | None, Some public ->
+        if String.length public <> 64 then
+          Error.raise "Pubkey should be 64 bytes hexa (no 0x)";
+        Some { Sdk_types.public ; secret = None }
+    | key_pair, None -> key_pair
   in
 
   let key_account = match address, contract, key_pair with
@@ -594,7 +606,7 @@ let genkey ?name ?contract ?initial_data ?initial_pubkey config ~force =
           change_account config ~name ~contract
             ?initial_data ?initial_pubkey ()
 
-let action accounts ~passphrase ~address ~contract ~keyfile ~wc
+let action accounts ~passphrase ~address ~contract ~keyfile ~wc ~pubkey
     ~force ~initial_data =
   let config = Config.config () in
 
@@ -603,8 +615,8 @@ let action accounts ~passphrase ~address ~contract ~keyfile ~wc
   let initial_data = Option.map subst initial_data in
   let keyfile = Option.map subst keyfile in
 
-  match passphrase, address, contract, keyfile, wc with
-  | None, None, _, None, None when
+  match passphrase, address, contract, keyfile, wc, pubkey with
+  | None, None, _, None, None, None when
       ( contract = None ) ->
       begin
         match accounts with
@@ -623,7 +635,7 @@ let action accounts ~passphrase ~address ~contract ~keyfile ~wc
       | [] -> Error.raise "A new key name must be provided"
       | [ name ] ->
           add_account config
-            ~name ~passphrase ~address ~contract ~keyfile ~wc ~force
+            ~name ~passphrase ~address ~contract ~keyfile ~wc ~force ~pubkey
             ~initial_data ~initial_pubkey:None
 
 let cmd =
@@ -635,6 +647,7 @@ let cmd =
   let wc = ref None in
   let force = ref false in
   let static_vars = ref None in
+  let pubkey = ref None in
   EZCMD.sub
     "account create"
     (fun () ->
@@ -647,6 +660,7 @@ let cmd =
         ~wc:!wc
         ~force:!force
         ~initial_data:!static_vars
+        ~pubkey:!pubkey
     )
     ~args:
       [ [],
@@ -686,6 +700,10 @@ let cmd =
         Arg.String (fun s -> keyfile := Some s),
         EZCMD.info ~docv:"KEYFILE" "Key file for account";
 
+        [ "pubkey"],
+        Arg.String (fun s -> pubkey := Some s),
+        EZCMD.info ~docv:"0xPUBKEY" "Public Key for account";
+
         [ "wc" ], Arg.Int (fun s -> wc := Some s),
         EZCMD.info ~docv:"WORKCHAIN" "The workchain (default is 0)";
 
@@ -722,7 +740,9 @@ let () =
              ~wc:None
              ~force:false
              ~initial_data:None
-             ~initial_pubkey:None;
+             ~initial_pubkey:None
+             ~pubkey:None
+           ;
            address
        | _ -> Error.raise "Wrong arity for create-account:NAME:ADDRESS"
     ) ;
@@ -741,7 +761,8 @@ let () =
              ~wc:None
              ~force:false
              ~initial_data:None
-             ~initial_pubkey:None;
+             ~initial_pubkey:None
+             ~pubkey:None;
            address
        | _ -> Error.raise "Wrong arity for create-contract:NAME:CONTRACT:ADDRESS"
     ) ;

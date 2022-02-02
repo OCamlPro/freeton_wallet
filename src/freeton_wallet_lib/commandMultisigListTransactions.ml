@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat (* for StringMap *)
 open Ezcmd.V2
 open EZCMD.TYPES
 
@@ -17,62 +18,55 @@ open Types.MULTISIG
 
 let get_waiting ?(f = fun _ -> ()) account =
   let config = Config.config () in
-  let net = Config.current_network config in
-  let key = Misc.find_key_exn net account in
-  let contract = CommandMultisigCreate.check_key_contract key in
-  let address = Misc.get_key_address_exn key in
-
-  let subst ~msg:_ _config res =
-    match EzEncoding.destruct Types.MULTISIG.transactions_enc res with
-    | exception exn ->
-        Printf.eprintf "Can't parse: %s\n%!" ( Printexc.to_string exn );
-        Printf.printf "call result:\n%s\n%!" res
-    | trs ->
-        let trs = trs.transactions in
-        Printf.printf "%d transactions waiting\n%!" (List.length trs);
-        List.iter (fun tr ->
-            let id = Int64.of_string tr.id in
-            let generation_time = Int64.to_float
-                (Int64.shift_right id 32 ) in
-            let delay = Unix.gettimeofday () -. generation_time in
-            let delay = int_of_float delay in
-            let hours = delay / 3600 in
-            let secs = delay - hours * 3600 in
-            let mins = secs / 60 in
-            let secs = secs - mins * 60 in
-            Printf.printf "Transaction id: %Ld\n%!" id ;
-            Printf.printf "   Age: %dh%dm%ds\n%!" hours mins secs ;
-            Printf.printf "   Confirmations: %s/%s\n%!"
-              tr.signsReceived tr.signsRequired ;
-            Printf.printf "   Confirmed by:";
-            let confirmationsMask = int_of_string tr.confirmationsMask in
-            for i = 0 to 31 do
-              if confirmationsMask land (1 lsl i) <> 0 then
-                Printf.printf " (%d)" i
-            done;
-            Printf.printf "\n%!";
-            Printf.printf "   Creator: %s (%s)\n%!"
-              tr.creator tr.index ;
-            Printf.printf "     Dest: %s\n%!" tr.dest ;
-            Printf.printf "     Value: %s\n%!"
-              ( Misc.string_of_nanoton (Int64.of_string tr.value ) ) ;
-            if tr.sendFlags <> "0" then
-              Printf.printf "     Flags: %s\n%!" tr.sendFlags ;
-            if not tr.bounce then
-              Printf.printf "     Bounce: %b\n%!" tr.bounce ;
-            f tr
-          ) trs
-
+  let ctxt = Multisig.get_context config account in
+  let trs = Multisig.get_transactions ctxt in
+  let custodians = Multisig.get_custodians ctxt in
+  let name_by_pubkey = Multisig.name_by_pubkey ctxt.net in
+  let custodian_by_index =
+    Multisig.custodian_by_index ~name_by_pubkey custodians in
+  let name_by_pubkey s =
+    match StringMap.find s name_by_pubkey with
+    | exception Not_found -> s
+    | name -> Printf.sprintf "%s (%s)" name s
   in
 
-  Utils.call_contract config
-    ~contract
-    ~address
-    ~meth:"getTransactions"
-    ~params:"{}"
-    ~local:true
-    ~subst
-    ()
+  Printf.printf "%d transactions waiting\n%!" (List.length trs);
+  List.iter (fun tr ->
+      let id = Int64.of_string tr.id in
+      let generation_time = Int64.to_float
+          (Int64.shift_right id 32 ) in
+      let delay = Unix.gettimeofday () -. generation_time in
+      let delay = int_of_float delay in
+      let hours = delay / 3600 in
+      let secs = delay - hours * 3600 in
+      let mins = secs / 60 in
+      let secs = secs - mins * 60 in
+      Printf.printf "Transaction id: %Ld\n%!" id ;
+      Printf.printf "   Age: %dh%dm%ds\n%!" hours mins secs ;
+      Printf.printf "   Confirmations: %s/%s\n%!"
+        tr.signsReceived tr.signsRequired ;
+      if int_of_string tr.signsRequired > 0 then begin
+        Printf.printf "   Confirmed by:\n";
+        let confirmationsMask = int_of_string tr.confirmationsMask in
+        for i = 0 to 31 do
+          if confirmationsMask land (1 lsl i) <> 0 then
+            Printf.printf "    %d: %s\n" i
+              ( match StringMap.find  (string_of_int i) custodian_by_index with
+                | name -> name)
+        done;
+      end;
+      Printf.printf "\n%!";
+      Printf.printf "   Creator: %s (%s)\n%!"
+        (name_by_pubkey tr.creator) tr.index ;
+      Printf.printf "     Dest: %s\n%!" tr.dest ;
+      Printf.printf "     Value: %s\n%!"
+        ( Misc.string_of_nanoton (Int64.of_string tr.value ) ) ;
+      if tr.sendFlags <> "0" then
+        Printf.printf "     Flags: %s\n%!" tr.sendFlags ;
+      if not tr.bounce then
+        Printf.printf "     Bounce: %b\n%!" tr.bounce ;
+      f tr
+    ) trs
 
 let action account =
 

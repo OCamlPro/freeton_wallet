@@ -424,14 +424,19 @@ let call_run config ?client ~wait
     end;
     result
   else
-    Ton_sdk.CALL.call ?client ~server_url
-      ~address
-      ~abi
-      ~meth ~params
-      ~local
-      ?keypair
-      ()
-
+    let result =
+      Ton_sdk.CALL.call ?client ~server_url
+        ~address
+        ~abi
+        ~meth ~params
+        ~local
+        ?keypair
+        ()
+    in
+    if Misc.verbose 2 then begin
+      Printf.eprintf "  result: %s\n%!" result
+    end;
+    result
 
 
 let call_contract
