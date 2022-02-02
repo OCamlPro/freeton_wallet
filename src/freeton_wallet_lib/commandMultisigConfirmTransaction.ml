@@ -47,8 +47,8 @@ let cmd =
   let args = ref [] in
   let src = ref None in
   let all = ref false in
-  EZCMD.sub
-    "multisig confirm"
+  Misc.cmd
+    [ "multisig" ; "confirm" ; "transaction" ]
     (fun () ->
        match !args with
        | [] ->

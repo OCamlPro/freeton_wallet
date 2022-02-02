@@ -54,8 +54,10 @@ module MAIN = struct
         CommandMultisigListTransactions.cmd;
         [ "multisig" ; "list" ; "custodians" ],
         CommandMultisigListCustodians.cmd;
-        [ "multisig" ; "confirm" ], CommandMultisigConfirm.cmd;
+        CommandMultisigConfirmTransaction.cmd;
         [ "multisig" ; "debot" ], CommandMultisigDebot.cmd;
+        CommandMultisigListUpdates.cmd;
+        CommandMultisigConfirmUpdate.cmd;
 
         [ "contract"; "list" ], CommandContractList.cmd;
         [ "contract"; "new" ], CommandContractNew.cmd;
@@ -92,6 +94,8 @@ module MAIN = struct
         (*        CommandWallet.cmd; *)
         (*        CommandTokenRootCreate.cmd; *)
         CommandTokenList.cmd;
+        CommandTokenTransfer.cmd;
+        CommandTokenSwap.cmd;
         CommandTokenWTON.cmd;
         CommandTokenWTONCredit.cmd;
         CommandTokenWTONWithdraw.cmd;

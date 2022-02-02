@@ -98,6 +98,23 @@ module MULTISIG = struct
   }
   [@@deriving json_encoding]
 
+  type update = {
+    update_id : string ;
+    update_index : string ; (* uint8 *)
+    update_signs : string ; (* uint8 *)
+    update_confirmationsMask : string ; (* uint32 *)
+    update_creator : string ; (* pubkey *)
+    update_codeHash : string ;
+    update_custodians : string list ;
+    update_reqConfirms : string ; (* uint8 *)
+  }
+  [@@deriving json_encoding]
+
+  type updates = {
+    updates : update list ;
+  }
+  [@@deriving json_encoding]
+
 end
 
 module MANIFEST = struct

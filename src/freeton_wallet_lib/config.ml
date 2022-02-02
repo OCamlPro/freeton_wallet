@@ -43,8 +43,12 @@ let mainnet_keys = [
   remote_account "debot-multisig"
     "0:9ce35b55a00da91cfc70f649b2a2a58414d3e21ee8d1eb80dab834d442f33606" ;
 
-  remote_account "wton-vault"
+  remote_account "broxus-wton-vault"
     "0:d0936a9fc29b5175487208b1d07ab8042ce7ddbc2de7e271c4087ca833b865cc" ;
+
+  remote_account "broxus-dex-root"
+    "0:943bad2e74894aa28ae8ddbe673be09a0f3818fd170d12b4ea8ef1ea8051e940" ;
+
 ]
 
 let surf_account acc_address =

@@ -35,9 +35,8 @@ let print_wallet config account =
     | Some ( balance, gas ) ->
         Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
         Printf.printf "    address: %s\n%!" wallet_address;
-        Printf.printf "    balance %s %s (gas %s TON)\n%!"
-          ( Misc.string_of_nanoton balance )
-          token.Types.MANIFEST.token_symbol
+        Printf.printf "    balance %s (gas %s TON)\n%!"
+          ( CommandTokenList.string_of_amount_token balance token )
           ( Misc.string_of_nanoton gas )
 
 
