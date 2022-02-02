@@ -102,8 +102,11 @@ Overview of sub-commands::
   inspect
     Inspect information stored on the blockchain: display information on accounts, blocks, messages and transactions.
   
-  multisig confirm
+  multisig confirm transaction
     Confirm transactions on a multisig-wallet
+  
+  multisig confirm update
+    Confirm updates on a multisig-wallet
   
   multisig create
     Manage a multisig-wallet (create, confirm, send)
@@ -115,6 +118,9 @@ Overview of sub-commands::
     List owners/custodians of a multisig wallet
   
   multisig list transactions
+    Display waiting transactions in a multisig wallet
+  
+  multisig list updates
     Display waiting transactions in a multisig wallet
   
   multisig transfer
@@ -164,6 +170,12 @@ Overview of sub-commands::
   
   token list
     Display token wallet info
+  
+  token swap
+    Swap tokens in DEX
+  
+  token transfer
+    Transfer tokens between two token wallets
   
   token wton
     Display token wallet info
@@ -267,6 +279,8 @@ Where options are:
 * :code:`--multisig`   Contract should be multisig
 
 * :code:`--passphrase PASSPHRASE`   BIP39 Passphrase for account
+
+* :code:`--pubkey 0xPUBKEY`   Public Key for account
 
 * :code:`--static-vars JSON`   Set static vars for account
 
@@ -1255,8 +1269,8 @@ Where options are:
 * :code:`--with ACCOUNT:CONTRACT`   Define partner account automatically defined
 
 
-ft multisig confirm
-~~~~~~~~~~~~~~~~~~~~~
+ft multisig confirm transaction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Confirm transactions on a multisig-wallet
 
@@ -1290,7 +1304,7 @@ Get the transaction ID from above, and use:
 **USAGE**
 ::
   
-  ft multisig confirm ACCOUNT TX_ID [OPTIONS]
+  ft multisig confirm transaction ACCOUNT TX_ID [OPTIONS]
 
 Where options are:
 
@@ -1298,6 +1312,53 @@ Where options are:
 * :code:`ACCOUNT TX_ID`   The multisig account and the TX_ID
 
 * :code:`--all`   Sign all pending transactions
+
+* :code:`--src ACCOUNT`   The signing custodian
+
+
+ft multisig confirm update
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm updates on a multisig-wallet
+
+
+
+**DESCRIPTION**
+
+
+This command is used to confirm updates on a multisig wallet.
+
+
+**LIST WAITING UPDATES**
+
+
+Display updates waiting for confirmations:
+::
+
+  # ft multisig list updates MY-ACCOUNT
+
+
+
+**CONFIRM UPDATE**
+
+
+Get the update ID from above, and use:
+::
+
+  # ft multisig confirm MY-ACCOUNT TX_ID
+
+
+**USAGE**
+::
+  
+  ft multisig confirm update ACCOUNT TX_ID [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT TX_ID`   The multisig account and the TX_ID
+
+* :code:`--all`   Sign all pending updates
 
 * :code:`--src ACCOUNT`   The signing custodian
 
@@ -1459,6 +1520,39 @@ Display transactions waiting for confirmations:
 ::
   
   ft multisig list transactions ACCOUNT [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT`   The multisig account
+
+
+ft multisig list updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Display waiting transactions in a multisig wallet
+
+
+
+**DESCRIPTION**
+
+
+This command can be used to display the currently waiting transactions in a multisig wallet
+
+
+**LIST WAITING TRANSACTIONS**
+
+
+Display transactions waiting for confirmations:
+::
+
+  # ft multisig list transactions MY-ACCOUNT
+
+
+**USAGE**
+::
+  
+  ft multisig list updates ACCOUNT [OPTIONS]
 
 Where options are:
 
@@ -2002,6 +2096,48 @@ Where options are:
 
 
 * :code:`ACCOUNT`   The associated multisig wallet
+
+
+ft token swap
+~~~~~~~~~~~~~~~
+
+Swap tokens in DEX
+
+
+**USAGE**
+::
+  
+  ft token swap AMOUNT TOKEN [OPTIONS]
+
+Where options are:
+
+
+* :code:`AMOUNT TOKEN`   Amount and token symbol
+
+* :code:`----for OWNER`   Token account owner
+
+* :code:`----to TOKEN`   Destination token
+
+
+ft token transfer
+~~~~~~~~~~~~~~~~~~~
+
+Transfer tokens between two token wallets
+
+
+**USAGE**
+::
+  
+  ft token transfer AMOUNT TOKEN [OPTIONS]
+
+Where options are:
+
+
+* :code:`AMOUNT TOKEN`   Amount and token symbol
+
+* :code:`----from OWNER`   Source account owner
+
+* :code:`----to OWNER`   Destination account owner
 
 
 ft token wton
