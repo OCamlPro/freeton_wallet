@@ -10,4 +10,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val cmd : Ezcmd.V2.EZCMD.TYPES.sub
+val cmd : string list * Ezcmd.V2.EZCMD.TYPES.sub
+val get_waiting : ?f:(Types.MULTISIG.update -> unit) -> string -> unit
