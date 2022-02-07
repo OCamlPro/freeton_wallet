@@ -115,7 +115,7 @@
  (depends
    (ocaml (>= 4.08.0))
    solidity-typechecker
-   (solidity-parser (and (>= 0.4.0) (< 1.0.0)))
+   (solidity-parser (and (>= 0.5.0) (< 1.0.0)))
    ocplib_stuff
    ez_file
    ppx_inline_test

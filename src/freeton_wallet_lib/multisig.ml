@@ -37,9 +37,17 @@ let get_context config account =
     let server_url = node.node_url in
     client, server_url
   in
-  let key = Misc.find_key_exn net account in
-  let multisig_contract = CommandMultisigCreate.check_key_contract key in
-  let multisig_address = Misc.get_key_address_exn key in
+  let multisig_address, multisig_contract =
+    match Misc.is_address account with
+    | Some address -> address, "SafeMultisigWallet"
+    | None ->
+        let account_key = Misc.find_key_exn net account in
+        let account_addr = Misc.get_key_address_exn account_key in
+        let account_contract =
+          CommandMultisigCreate.check_key_contract account_key in
+        ( account_addr, account_contract )
+  in
+
   let multisig_contract_abi =
 
     let abifile = Misc.get_contract_abifile multisig_contract in
@@ -112,3 +120,10 @@ let custodian_by_index ~name_by_pubkey custodians =
 let get_updates ctxt =
   let r = call ctxt "getUpdateRequests" Types.MULTISIG.updates_enc in
   r.updates
+
+let string_of_seconds delay =
+  let hours = delay / 3600 in
+  let secs = delay - hours * 3600 in
+  let mins = secs / 60 in
+  let secs = secs - mins * 60 in
+  Printf.sprintf "%dh%dm%ds" hours mins secs

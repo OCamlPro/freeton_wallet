@@ -10,29 +10,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module TYPES : sig
-  type ctxt = {
-    config : Types.config;
-    net : Types.network;
-    client : Sdk_types.client ;
-    server_url : string ;
-    multisig_address : string ;
-    multisig_contract : string ;
-    multisig_contract_abi : string ;
-  }
-end
-
-val get_context : Types.config -> string -> TYPES.ctxt
-
-val get_custodians : TYPES.ctxt -> Types.MULTISIG.custodian list
-val get_transactions : TYPES.ctxt -> Types.MULTISIG.transaction list
-val get_updates : TYPES.ctxt -> Types.MULTISIG.update list
-val get_parameters : TYPES.ctxt -> Types.MULTISIG.parameters
-
-(* pubkeys start with 0x *)
-val name_by_pubkey : Types.network -> string EzCompat.StringMap.t
-val custodian_by_index :
-  name_by_pubkey:string EzCompat.StringMap.t ->
-  Types.MULTISIG.custodian list -> string EzCompat.StringMap.t
-
-val string_of_seconds : int -> string
+val cmd : string list * Ezcmd.V2.EZCMD.TYPES.sub
