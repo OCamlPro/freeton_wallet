@@ -16,26 +16,29 @@ open EZCMD.TYPES
 let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     ?(wait=false) ?(send=false) () =
   let config = Config.config () in
-  let net = Config.current_network config in
+  let ctxt = Multisig.get_context config account in
 
   let src = match src with
       None -> account
     | Some src -> src
   in
-  let src_key = Misc.find_key_exn net src in
+  let src_key = Misc.find_key_exn ctxt.net src in
 
-  let account_addr, account_contract =
-    match Misc.is_address account with
-    | Some address -> address, "SafeMultisigWallet"
+  begin
+    match src_key.key_pair with
     | None ->
-        let account_key = Misc.find_key_exn net account in
-        let account_addr = Misc.get_key_address_exn account_key in
-        let account_contract =
-          CommandMultisigCreate.check_key_contract account_key in
-        ( account_addr, account_contract )
-  in
-  let net = Config.current_network config in
-  let dst_addr = Utils.address_of_account net dst in
+        Error.raise "No private key associated with signed %S" src
+    | Some key_pair ->
+        let custodians = Multisig.get_custodians ctxt in
+        if not (List.exists (fun c ->
+            c.Types.MULTISIG.pubkey = key_pair.public
+          ) custodians ) then
+          Error.raise
+            "Key %S is not among custodians (use 'ft multisig info %s')"
+            src account
+  end;
+
+  let dst_addr = Utils.address_of_account ctxt.net dst in
   let dst_addr = Misc.raw_address dst_addr in
 
   let nanotokens, allBalance =
@@ -46,7 +49,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
       Misc.nanotokens_of_string amount, false
   in
 
-  begin match Utils.get_account_info config account_addr with
+  begin match Utils.get_account_info config ctxt.multisig_address with
     | Some (account_exists, account_balance) ->
         if not account_exists then
           Error.raise "Account %s does not exist yet." account ;
@@ -74,7 +77,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
   in
   let payload = match args with
     | Some ( meth , params ) ->
-        let dst_key = Misc.find_key_exn net dst in
+        let dst_key = Misc.find_key_exn ctxt.net dst in
         let dst_contract = Misc.get_key_contract_exn dst_key in
         let abi_file = Misc.get_contract_abifile dst_contract in
         let abi = EzFile.read_file abi_file in
@@ -107,8 +110,8 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
       in
       meth, params
   in
-  Utils.call_contract config ~contract:account_contract
-    ~address:account_addr
+  Utils.call_contract config ~contract:ctxt.multisig_contract
+    ~address:ctxt.multisig_address
     ~meth ~params
     ~local:false
     ~src:src_key

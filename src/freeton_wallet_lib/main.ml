@@ -58,6 +58,7 @@ module MAIN = struct
         [ "multisig" ; "debot" ], CommandMultisigDebot.cmd;
         CommandMultisigListUpdates.cmd;
         CommandMultisigConfirmUpdate.cmd;
+        CommandMultisigInfo.cmd;
 
         [ "contract"; "list" ], CommandContractList.cmd;
         [ "contract"; "new" ], CommandContractNew.cmd;

@@ -1203,13 +1203,13 @@ let register_primitives () =
   in
   register 92
     { prim_name = "muldiv";
-      prim_kind = PrimMemberVariable } muldiv_kind ;
+      prim_kind = PrimMemberFunction } muldiv_kind ;
   register 93
     { prim_name = "muldivr";
-      prim_kind = PrimMemberVariable } muldiv_kind ;
+      prim_kind = PrimMemberFunction } muldiv_kind ;
   register 94
     { prim_name = "muldivc";
-      prim_kind = PrimMemberVariable } muldiv_kind ;
+      prim_kind = PrimMemberFunction } muldiv_kind ;
 
   register 95
     { prim_name = "empty";
@@ -1421,7 +1421,7 @@ let register_primitives () =
   let tvm_prim num prim_name from_ to_ =
     register num
       { prim_name ;
-        prim_kind = PrimMemberVariable }
+        prim_kind = PrimMemberFunction }
       (fun _pos _opt t_opt ->
          match t_opt with
          | Some (TMagic TTvm) ->
@@ -1597,10 +1597,10 @@ let register_primitives () =
   in
   register 140
     { prim_name = "divr";
-      prim_kind = PrimMemberVariable } div_kind ;
+      prim_kind = PrimMemberFunction } div_kind ;
   register 141
     { prim_name = "divc";
-      prim_kind = PrimMemberVariable } div_kind ;
+      prim_kind = PrimMemberFunction } div_kind ;
 
 
   register 142
@@ -1646,6 +1646,15 @@ let register_primitives () =
   register_string_find 144 "find";
   register_string_find 145 "findLast";
 
+  register 146
+    { prim_name = "extMsg";
+      prim_kind = PrimMemberVariable }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmCall) ->
+           Some (make_var (TAbstract TvmExtCall))
+       | _ -> None);
+
   ()
 
 let handle_exception f x =
@@ -1661,7 +1670,7 @@ let handle_exception f x =
 
 let parse_file = Solidity_parser.parse_file ~freeton:true
 
-(* let parse_files = Solidity_parser.parse_files ~freeton:true *)
+let parse_files = Solidity_parser.parse_files ~freeton:true
 
 let typecheck_ast =
   Solidity_typechecker.type_program ~init:register_primitives

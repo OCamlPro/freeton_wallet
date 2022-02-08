@@ -37,12 +37,8 @@ let get_waiting ?(f = fun _ -> ()) account =
           (Int64.shift_right id 32 ) in
       let delay = Unix.gettimeofday () -. generation_time in
       let delay = int_of_float delay in
-      let hours = delay / 3600 in
-      let secs = delay - hours * 3600 in
-      let mins = secs / 60 in
-      let secs = secs - mins * 60 in
       Printf.printf "Transaction id: %Ld\n%!" id ;
-      Printf.printf "   Age: %dh%dm%ds\n%!" hours mins secs ;
+      Printf.printf "   Age: %s\n%!" ( Multisig.string_of_seconds delay) ;
       Printf.printf "   Confirmations: %s/%s\n%!"
         tr.signsReceived tr.signsRequired ;
       if int_of_string tr.signsRequired > 0 then begin
