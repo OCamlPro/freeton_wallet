@@ -114,6 +114,9 @@ Overview of sub-commands::
   multisig debot
     Executes the multisig debot
   
+  multisig info
+    List owners/custodians of a multisig wallet
+  
   multisig list custodians
     List owners/custodians of a multisig wallet
   
@@ -1463,6 +1466,35 @@ Where options are:
 
 
 * :code:`ACCOUNT`   The debot account
+
+
+ft multisig info
+~~~~~~~~~~~~~~~~~~
+
+List owners/custodians of a multisig wallet
+
+
+
+**DESCRIPTION**
+
+
+This command can be used to display the pubkeys of the owners/custodians of a multisig wallet
+
+To get the list of signers:
+::
+
+  # ft multisig list custodians MY-ACCOUNT"
+
+
+**USAGE**
+::
+  
+  ft multisig info ACCOUNT [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT`   The multisig account
 
 
 ft multisig list custodians
