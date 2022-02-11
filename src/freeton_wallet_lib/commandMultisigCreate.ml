@@ -33,34 +33,31 @@ let check_key_contract key =
   | _ ->
       "SafeMultisigWallet"
 
-let is_hexa name =
-  let rec iter name i len =
-    if i = len then true
-    else
-      match name.[i] with
-      | '0'..'9'
-      | 'a'..'f'
-      | 'A'..'F' -> iter name (i+1) len
-      | _ -> false
-  in
-  iter name 0 (String.length name)
+(* without 0x *)
+let pubkey_of_custodian net name =
+  match Misc.find_key net name with
+  | None ->
+      begin match Misc.is_uint256 name with
+        | None ->
+            Error.raise "Key %S does not exist" name
+        | Some name -> name
+      end
+  | Some key ->
+      match key.key_pair with
+      | None -> Error.raise "Key %S has no key pair" name
+      | Some pair ->
+          match pair.secret with
+          | None ->
+              (* We should add an option to allow this *)
+              Error.raise "Key %S has no secret" name
+          | Some _ -> pair.public
 
-let is_pubkey name =
-  if String.length name = 64 && is_hexa name then
-    Some name
-  else
-  if String.length name = 66 &&
-     name.[0] = '0' && name.[1] = 'x' then
-    let name = String.sub name 2 64 in
-    if is_hexa name then Some name else None
-  else
-    None
 
 let create_multisig
     ?client
     ?(custodians=[])
     ?(not_owner=false)
-    ?(req=1)
+    ?req
     ?wc
     ?contract
     account
@@ -74,29 +71,20 @@ let create_multisig
 
   let owners = StringSet.to_list owners in
 
-  let owners = List.map (fun name ->
-      match Misc.find_key net name with
-      | None ->
-          begin match is_pubkey name with
-            | None ->
-                Error.raise "Key %S does not exist" name
-            | Some name -> name
-          end
-      | Some key ->
-          match key.key_pair with
-          | None -> Error.raise "Key %S has no key pair" name
-          | Some pair ->
-              match pair.secret with
-              | None ->
-                  (* We should add an option to allow this *)
-                  Error.raise "Key %S has no secret" name
-              | Some _ -> pair.public
-    ) owners in
+  let owners = List.map (pubkey_of_custodian net) owners in
 
   let nowners = List.length owners in
-  if req < 1 || req > nowners then
-    Error.raise "Invalid --req %d, should be 0 < REQ <= %d (nbr owners)"
-      req nowners;
+  if nowners = 0 then
+    Error.raise "Multisig requires at least one custodian";
+  let req = match req with
+    | Some req ->
+        if req < 1 || req > nowners then
+          Error.raise "Invalid --req %d, should be 0 < REQ <= %d (nbr owners)"
+            req nowners;
+        req
+    | None ->
+        nowners / 2 + 1
+  in
 
   let params =
     Printf.sprintf "{\"owners\":[ \"0x%s\" ],\"reqConfirms\":%d}"

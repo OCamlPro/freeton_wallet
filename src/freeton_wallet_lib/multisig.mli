@@ -36,3 +36,11 @@ val custodian_by_index :
   Types.MULTISIG.custodian list -> string EzCompat.StringMap.t
 
 val string_of_seconds : int -> string
+
+val call :
+  TYPES.ctxt ->
+  ?params:string ->
+  ?local:bool ->
+  ?keypair:Sdk_types.keypair ->
+  ?subst:(msg:string -> Types.config -> string -> unit) ->
+  string -> 'a Json_encoding.encoding -> 'a

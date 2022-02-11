@@ -125,6 +125,11 @@ module MULTISIG = struct
   }
   [@@deriving json_encoding]
 
+  type submitUpdate_reply = {
+    updateId : string ;
+  }
+  [@@deriving json_encoding]
+
 end
 
 module MANIFEST = struct

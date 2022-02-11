@@ -59,6 +59,9 @@ module MAIN = struct
         CommandMultisigListUpdates.cmd;
         CommandMultisigConfirmUpdate.cmd;
         CommandMultisigInfo.cmd;
+        CommandMultisigUpdate.cmd;
+        CommandMultisigExecuteUpdate.cmd;
+        CommandMultisigNew.cmd;
 
         [ "contract"; "list" ], CommandContractList.cmd;
         [ "contract"; "new" ], CommandContractNew.cmd;

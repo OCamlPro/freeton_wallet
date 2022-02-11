@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types
 
-let action ~switch ~url ~image ?(toolchain="") () =
+let action ~switch ~url ~image ~force ?(toolchain="") () =
   match switch with
   | None ->
       Error.raise
@@ -66,13 +66,27 @@ let action ~switch ~url ~image ?(toolchain="") () =
           let n = int_of_string n in
           let local_port = 7080+n in
           let node_local = { local_port } in
-          Misc.call [
-            "docker"; "create";
-            "--name"; CommandNodeStart.container_of_node node_local ;
-            "-e" ; "USER_AGREEMENT=yes" ;
-            Printf.sprintf "-p%d:80" local_port ;
-            image
-          ];
+          let container = CommandNodeStart.container_of_node node_local in
+          let docker_start () =
+            Misc.call [
+              "docker"; "create";
+              "--name"; container ;
+              "-e" ; "USER_AGREEMENT=yes" ;
+              Printf.sprintf "-p%d:80" local_port ;
+              image
+            ];
+          in
+          begin
+            try
+              docker_start ()
+            with exn ->
+              if force then begin
+                Misc.call [ "docker" ; "rm" ; container ];
+                docker_start ()
+              end
+              else
+                raise exn
+          end;
           add_network
             ~net_keys:Config.sandbox_keys
             ~net_deployer:"user1"
@@ -87,6 +101,7 @@ let cmd =
   let url = ref None in
   let toolchain = ref None in
   let image = ref "tonlabs/local-node" in
+  let force = ref false in
   EZCMD.sub
     "switch create"
     (fun () ->
@@ -95,6 +110,7 @@ let cmd =
          ~url:!url
          ~image:!image
          ?toolchain:!toolchain
+         ~force:!force
          ()
     )
     ~args: (
@@ -107,6 +123,9 @@ let cmd =
 
         [ "image" ], Arg.String ( fun s -> image := s ),
         EZCMD.info ~docv:"DOCKER" "Docker image to use for sandboxes" ;
+
+        [ "force" ], Arg.Set force,
+        EZCMD.info "Force switch creation, killing docker container if needed" ;
 
         [ "toolchain" ], Arg.String ( fun s -> toolchain := Some s ),
         EZCMD.info ~docv:"TOOLCHAIN" "Toolchain to use" ;

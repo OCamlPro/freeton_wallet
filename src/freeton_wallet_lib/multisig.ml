@@ -63,7 +63,7 @@ let get_context config account =
     multisig_address ;
   }
 
-let call ctxt ?(params="{}") meth encoding =
+let call ctxt ?(params="{}") ?(local=true) ?keypair ?subst meth encoding =
   Printf.eprintf "Multisig: calling %s %s\n%!" ctxt.multisig_address meth;
   let reply =
     Utils.call_run
@@ -75,9 +75,17 @@ let call ctxt ?(params="{}") meth encoding =
       ~abi:ctxt.multisig_contract_abi
       ~meth
       ~params
-      ~local:true
+      ~local
+      ?keypair
       ()
   in
+  begin
+    match subst with
+    | Some subst -> subst ~msg:"call result" ctxt.config reply
+    | None ->
+        if Misc.verbose 2 then
+          Printf.printf "call result:\n%s\n%!" reply
+  end;
   CommandTokenList.destruct meth encoding reply
 
 let get_custodians ctxt =

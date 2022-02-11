@@ -30,14 +30,14 @@ let get_waiting ?(f = fun _ -> ()) account =
     | name -> Printf.sprintf "%s (%s)" name s
   in
 
-  Printf.printf "%d transactions waiting\n%!" (List.length trs);
+  Printf.printf "%d transactions waiting:\n%!" (List.length trs);
   List.iter (fun tr ->
       let id = Int64.of_string tr.id in
       let generation_time = Int64.to_float
           (Int64.shift_right id 32 ) in
       let delay = Unix.gettimeofday () -. generation_time in
       let delay = int_of_float delay in
-      Printf.printf "Transaction id: %Ld\n%!" id ;
+      Printf.printf "\nTransaction id: %Ld\n%!" id ;
       Printf.printf "   Age: %s\n%!" ( Multisig.string_of_seconds delay) ;
       Printf.printf "   Confirmations: %s/%s\n%!"
         tr.signsReceived tr.signsRequired ;
