@@ -91,10 +91,10 @@ let cmd =
         [], Arg.Anon (0, fun s -> account := Some s),
         EZCMD.info ~docv:"ACCOUNT" "The multisig account";
       ]
-    ~doc: "List owners/custodians of a multisig wallet"
+    ~doc: "Display info on a multisig wallet"
     ~man:[
       `S "DESCRIPTION";
       `P "This command can be used to display the pubkeys of the owners/custodians of a multisig wallet";
       `P "To get the list of signers:";
-      `Pre {|# ft multisig list custodians MY-ACCOUNT"|};
+      `Pre {|# ft multisig info MY-ACCOUNT"|};
     ]

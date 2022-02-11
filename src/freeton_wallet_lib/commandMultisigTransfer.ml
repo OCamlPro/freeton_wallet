@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 
 let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
-    ?(wait=false) ?(send=false) () =
+    ?(wait=false) ?(send=false) ?subst () =
   let config = Config.config () in
   let ctxt = Multisig.get_context config account in
 
@@ -30,8 +30,11 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
         Error.raise "No private key associated with signed %S" src
     | Some key_pair ->
         let custodians = Multisig.get_custodians ctxt in
+        let public = "0x" ^ key_pair.public in
         if not (List.exists (fun c ->
-            c.Types.MULTISIG.pubkey = key_pair.public
+            Printf.eprintf "  %s = %s ??\n%!"
+              c.Types.MULTISIG.pubkey public;
+            c.Types.MULTISIG.pubkey = public
           ) custodians ) then
           Error.raise
             "Key %S is not among custodians (use 'ft multisig info %s')"
@@ -116,9 +119,10 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     ~local:false
     ~src:src_key
     ~wait
+    ?subst
     ()
 
-let action account args ~amount ~dst ~bounce ~src ~wait ~send =
+let action account args ~amount ~dst ~bounce ~src ~wait ~send ~subst =
 
   let config = Config.config () in
 
@@ -128,18 +132,21 @@ let action account args ~amount ~dst ~bounce ~src ~wait ~send =
     | Some account -> account
   in
 
-  Subst.with_subst ~config (fun subst ->
-      let account = subst account in
-      let args = List.map subst args in
-      match dst with
-      | Some dst ->
-          let dst = subst dst in
-          let amount = subst amount in
-          let src = Option.map subst src in
-          send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ()
-      | _ ->
-          Error.raise "The argument --to ACCOUNT is mandatory"
-    )
+  let account, args, src, dst, amount =
+    Subst.with_subst ~config (fun subst ->
+        let account = subst account in
+        let args = List.map subst args in
+        match dst with
+        | Some dst ->
+            let dst = subst dst in
+            let amount = subst amount in
+            let src = Option.map subst src in
+            account, args, src, dst, amount
+        | _ ->
+            Error.raise "The argument --to ACCOUNT is mandatory"
+      )
+  in
+  send_transfer ~account ?src ~dst ~bounce ~amount ~args ~wait ~send ~subst ()
 
 let cmd =
   let account = ref None in
@@ -149,6 +156,7 @@ let cmd =
   let src = ref None in
   let wait = ref false in
   let send = ref false in
+  let subst_args, subst = Subst.make_args () in
   EZCMD.sub
     "multisig transfer"
     (fun () ->
@@ -163,35 +171,37 @@ let cmd =
              ~src:!src
              ~wait:!wait
              ~send:!send
+             ~subst
     )
-    ~args:
-      [
-        [], Arg.Anons (fun list -> args := list),
-        EZCMD.info "Generic arguments" ;
+    ~args:(
+      subst_args
+        [
+          [], Arg.Anons (fun list -> args := list),
+          EZCMD.info "Generic arguments" ;
 
-        [ "from" ], Arg.String (fun s -> account := Some s),
-        EZCMD.info ~docv:"ACCOUNT" "The source of the transfer";
+          [ "from" ], Arg.String (fun s -> account := Some s),
+          EZCMD.info ~docv:"ACCOUNT" "The source of the transfer";
 
-        [ "src" ], Arg.String (fun s -> src := Some s),
-        EZCMD.info ~docv:"ACCOUNT"
-          "The custodian signing the multisig transfer";
+          [ "src" ], Arg.String (fun s -> src := Some s),
+          EZCMD.info ~docv:"ACCOUNT"
+            "The custodian signing the multisig transfer";
 
-        [ "wait" ], Arg.Set wait,
-        EZCMD.info "Wait for all transactions to finish";
+          [ "wait" ], Arg.Set wait,
+          EZCMD.info "Wait for all transactions to finish";
 
-        [ "send" ], Arg.Set send,
-        EZCMD.info "Force sendTransaction() instead of submitTransaction()";
+          [ "send" ], Arg.Set send,
+          EZCMD.info "Force sendTransaction() instead of submitTransaction()";
 
-        [ "parrain"; "sponsor" ], Arg.Clear bounce,
-        EZCMD.info " Transfer to inactive account";
+          [ "parrain"; "sponsor" ], Arg.Clear bounce,
+          EZCMD.info " Transfer to inactive account";
 
-        [ "bounce" ], Arg.Bool (fun b -> bounce := b),
-        EZCMD.info "BOOL Transfer to inactive account";
+          [ "bounce" ], Arg.Bool (fun b -> bounce := b),
+          EZCMD.info "BOOL Transfer to inactive account";
 
-        [ "to" ], Arg.String (fun s -> dst := Some s),
-        EZCMD.info ~docv:"ACCOUNT" "Target of a transfer";
+          [ "to" ], Arg.String (fun s -> dst := Some s),
+          EZCMD.info ~docv:"ACCOUNT" "Target of a transfer";
 
-      ]
+        ])
     ~doc: "Transfer TONs from a multisig wallet to another account"
     ~man:[
       `S "DESCRIPTION";

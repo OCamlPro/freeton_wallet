@@ -456,3 +456,33 @@ let string_of_nanoton v =
 
 let cmd list action ~args ~doc ~man =
   list, Ezcmd.V2.EZCMD.sub ( String.concat " " list ) action ~args ~doc ~man
+
+let is_hexa_string name =
+  let rec iter name i len =
+    if i = len then true
+    else
+      match name.[i] with
+      | '0'..'9'
+      | 'a'..'f'
+      | 'A'..'F' -> iter name (i+1) len
+      | _ -> false
+  in
+  iter name 0 (String.length name)
+
+let unjson_uin256 v =
+  if v.[0] = '0' && v.[1] = 'x' && String.length v = 66 then
+    String.sub v 2 64
+  else
+    Error.raise "%s is not a JSON uint256" v
+
+(* return uint256 hexa value without 0x *)
+let is_uint256 name =
+  if String.length name = 64 && is_hexa_string name then
+    Some name
+  else
+  if String.length name = 66 &&
+     name.[0] = '0' && name.[1] = 'x' then
+    let name = String.sub name 2 64 in
+    if is_hexa_string name then Some name else None
+  else
+    None

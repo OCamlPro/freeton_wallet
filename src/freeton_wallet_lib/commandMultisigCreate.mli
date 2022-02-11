@@ -17,3 +17,5 @@ val create_multisig :
   ?not_owner:bool -> ?req:int -> ?wc:int -> ?contract:string -> string -> unit
 
 val check_key_contract : Types.key -> string
+
+val pubkey_of_custodian : Types.network -> string -> string

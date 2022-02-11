@@ -10,14 +10,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val cmd : Ezcmd.V2.EZCMD.TYPES.sub
-
-val send_transfer :
-  account:string ->
-  ?src:string ->
-  dst:string ->
-  amount:string ->
-  ?bounce:bool -> ?args:string list -> ?wait:bool ->
-  ?send:bool ->
-  ?subst:(msg:string -> Types.config -> string -> unit) ->
-  unit -> unit
+val cmd : string list * Ezcmd.V2.EZCMD.TYPES.sub
