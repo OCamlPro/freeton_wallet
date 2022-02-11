@@ -114,8 +114,11 @@ Overview of sub-commands::
   multisig debot
     Executes the multisig debot
   
+  multisig execute update
+    Update a multisig wallet with setcode
+  
   multisig info
-    List owners/custodians of a multisig wallet
+    Display info on a multisig wallet
   
   multisig list custodians
     List owners/custodians of a multisig wallet
@@ -126,8 +129,14 @@ Overview of sub-commands::
   multisig list updates
     Display waiting transactions in a multisig wallet
   
+  multisig new
+    Create an independant multisig-wallet, similarly to 'multisig create', but not owner and perform crediting
+  
   multisig transfer
     Transfer TONs from a multisig wallet to another account
+  
+  multisig update
+    Update a multisig wallet with setcode
   
   node give
     Give TONs to accounts on sandbox networks
@@ -1468,10 +1477,10 @@ Where options are:
 * :code:`ACCOUNT`   The debot account
 
 
-ft multisig info
-~~~~~~~~~~~~~~~~~~
+ft multisig execute update
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-List owners/custodians of a multisig wallet
+Update a multisig wallet with setcode
 
 
 
@@ -1483,7 +1492,42 @@ This command can be used to display the pubkeys of the owners/custodians of a mu
 To get the list of signers:
 ::
 
-  # ft multisig list custodians MY-ACCOUNT"
+  # ft multisig update MY-ACCOUNT --nreqs 3"
+
+
+**USAGE**
+::
+  
+  ft multisig execute update ACCOUNT UPDATE_ID CODE [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT UPDATE_ID CODE`   The multisig account
+
+* :code:`--code CODE-BASE64`   New code from base64
+
+* :code:`--src ACCOUNT`   The signing custodian
+
+* :code:`--tvm TVM-FILENAME`   New code from file
+
+
+ft multisig info
+~~~~~~~~~~~~~~~~~~
+
+Display info on a multisig wallet
+
+
+
+**DESCRIPTION**
+
+
+This command can be used to display the pubkeys of the owners/custodians of a multisig wallet
+
+To get the list of signers:
+::
+
+  # ft multisig info MY-ACCOUNT"
 
 
 **USAGE**
@@ -1592,6 +1636,41 @@ Where options are:
 * :code:`ACCOUNT`   The multisig account
 
 
+ft multisig new
+~~~~~~~~~~~~~~~~~
+
+Create an independant multisig-wallet, similarly to 'multisig create', but not owner and perform crediting
+
+
+
+**DESCRIPTION**
+
+
+This command deploys a multisig contract on a new account.
+
+**USAGE**
+::
+  
+  ft multisig new ACCOUNT [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT`   Account name, and other custodians
+
+* :code:`--contract CONTRACT`   Use this contract
+
+* :code:`--credit TONS`   Initial credit for multisig (1 TON by default)
+
+* :code:`--creditor ACCOUNT`   Send credit from this account (default is to use the first custodian)
+
+* :code:`--req REQ`   Number of confirmations required (majority by default)
+
+* :code:`--surf`   Use Surf contract (default)
+
+* :code:`--wc WORKCHAIN`   The workchain (default is 0)
+
+
 ft multisig transfer
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1650,15 +1729,66 @@ Where options are:
 
 * :code:`--from ACCOUNT`   The source of the transfer
 
+* :code:`-o FILE` or :code:`--output FILE`   Save result to FILE (use - for stdout)
+
 * :code:`--parrain` or :code:`--sponsor`    Transfer to inactive account
 
 * :code:`--send`   Force sendTransaction() instead of submitTransaction()
 
 * :code:`--src ACCOUNT`   The custodian signing the multisig transfer
 
+* :code:`--subst FILE`   Read FILE and substitute results in the content
+
 * :code:`--to ACCOUNT`   Target of a transfer
 
 * :code:`--wait`   Wait for all transactions to finish
+
+
+ft multisig update
+~~~~~~~~~~~~~~~~~~~~
+
+Update a multisig wallet with setcode
+
+
+
+**DESCRIPTION**
+
+
+This command can be used to display the pubkeys of the owners/custodians of a multisig wallet
+
+To get the list of signers:
+::
+
+  # ft multisig update MY-ACCOUNT --nreqs 3"
+
+
+**USAGE**
+::
+  
+  ft multisig update ACCOUNT CUSTODIANS [OPTIONS]
+
+Where options are:
+
+
+* :code:`ACCOUNT CUSTODIANS`   The multisig account and the custodians
+
+* :code:`--code-hash CODEHASH`   New code hash for contract
+
+* :code:`--contract CONTRACT`   New code from contract
+
+* :code:`--keep-custodians`   Keep existing custodians, either adding new ones (with add: C1 C2...) or deleting old ones (with del: C1 C2...) or any combination of those commands
+
+* :code:`-o FILE` or :code:`--output FILE`   Save result to FILE (use - for stdout)
+
+* :code:`--req REQ`   New number of required confirmations for transactions
+
+* :code:`--reset-custodians`   Reset all custodians
+
+* :code:`--src ACCOUNT`   The custodian signing the multisig transfer
+
+* :code:`--subst FILE`   Read FILE and substitute results in the content
+
+* :code:`--tvm TVM-FILENAME`   New code from file
 
 
 ft node give
@@ -1985,6 +2115,8 @@ Where options are:
 
 
 * :code:`NETWORK`   Name of network switch to create
+
+* :code:`--force`   Force switch creation, killing docker container if needed
 
 * :code:`--image DOCKER`   Docker image to use for sandboxes
 

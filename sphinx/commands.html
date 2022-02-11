@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sub-commands and Arguments &mdash; freeton_wallet master
- (3766aec
-) (2022/02/08 09:22) documentation</title>
+ (fd9a1ed
+) (2022/02/11 17:40) documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
               <div class="version">
                 master
- (3766aec
+ (fd9a1ed
 )
               </div>
             
@@ -138,11 +138,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-confirm-update">ft multisig confirm update</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-create">ft multisig create</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-debot">ft multisig debot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-multisig-execute-update">ft multisig execute update</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-info">ft multisig info</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-list-custodians">ft multisig list custodians</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-list-transactions">ft multisig list transactions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-list-updates">ft multisig list updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-multisig-new">ft multisig new</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-multisig-transfer">ft multisig transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ft-multisig-update">ft multisig update</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-node-give">ft node give</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-node-live">ft node live</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ft-node-start">ft node start</a></li>
@@ -344,8 +347,11 @@
 <span class="n">multisig</span> <span class="n">debot</span>
   <span class="nc">Executes</span> <span class="n">the</span> <span class="n">multisig</span> <span class="n">debot</span>
 
+<span class="n">multisig</span> <span class="n">execute</span> <span class="n">update</span>
+  <span class="nc">Update</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span> <span class="k">with</span> <span class="n">setcode</span>
+
 <span class="n">multisig</span> <span class="n">info</span>
-  <span class="nc">List</span> <span class="n">owners</span><span class="o">/</span><span class="n">custodians</span> <span class="k">of</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span>
+  <span class="nc">Display</span> <span class="n">info</span> <span class="n">on</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span>
 
 <span class="n">multisig</span> <span class="kt">list</span> <span class="n">custodians</span>
   <span class="nc">List</span> <span class="n">owners</span><span class="o">/</span><span class="n">custodians</span> <span class="k">of</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span>
@@ -356,8 +362,14 @@
 <span class="n">multisig</span> <span class="kt">list</span> <span class="n">updates</span>
   <span class="nc">Display</span> <span class="n">waiting</span> <span class="n">transactions</span> <span class="k">in</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span>
 
+<span class="n">multisig</span> <span class="k">new</span>
+  <span class="nc">Create</span> <span class="n">an</span> <span class="n">independant</span> <span class="n">multisig</span><span class="o">-</span><span class="n">wallet</span><span class="o">,</span> <span class="n">similarly</span> <span class="k">to</span> <span class="k">&#39;</span><span class="n">multisig</span> <span class="n">create&#39;</span><span class="o">,</span> <span class="n">but</span> <span class="n">not</span> <span class="n">owner</span> <span class="ow">and</span> <span class="n">perform</span> <span class="n">crediting</span>
+
 <span class="n">multisig</span> <span class="n">transfer</span>
   <span class="nc">Transfer</span> <span class="nc">TONs</span> <span class="n">from</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span> <span class="k">to</span> <span class="n">another</span> <span class="n">account</span>
+
+<span class="n">multisig</span> <span class="n">update</span>
+  <span class="nc">Update</span> <span class="n">a</span> <span class="n">multisig</span> <span class="n">wallet</span> <span class="k">with</span> <span class="n">setcode</span>
 
 <span class="n">node</span> <span class="n">give</span>
   <span class="nc">Give</span> <span class="nc">TONs</span> <span class="k">to</span> <span class="n">accounts</span> <span class="n">on</span> <span class="n">sandbox</span> <span class="n">networks</span>
@@ -1191,13 +1203,34 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   The debot account</li>
 </ul>
 </div>
-<div class="section" id="ft-multisig-info">
-<h2>ft multisig info<a class="headerlink" href="#ft-multisig-info" title="Permalink to this headline">¶</a></h2>
-<p>List owners/custodians of a multisig wallet</p>
+<div class="section" id="ft-multisig-execute-update">
+<h2>ft multisig execute update<a class="headerlink" href="#ft-multisig-execute-update" title="Permalink to this headline">¶</a></h2>
+<p>Update a multisig wallet with setcode</p>
 <p><strong>DESCRIPTION</strong></p>
 <p>This command can be used to display the pubkeys of the owners/custodians of a multisig wallet</p>
 <p>To get the list of signers:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="kt">list</span> <span class="n">custodians</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span><span class="s2">&quot;</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">update</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="n">nreqs</span> <span class="mi">3</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">multisig</span> <span class="n">execute</span> <span class="n">update</span> <span class="nc">ACCOUNT</span> <span class="nc">UPDATE_ID</span> <span class="nc">CODE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span> <span class="pre">UPDATE_ID</span> <span class="pre">CODE</span></code>   The multisig account</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--code</span> <span class="pre">CODE-BASE64</span></code>   New code from base64</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The signing custodian</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--tvm</span> <span class="pre">TVM-FILENAME</span></code>   New code from file</li>
+</ul>
+</div>
+<div class="section" id="ft-multisig-info">
+<h2>ft multisig info<a class="headerlink" href="#ft-multisig-info" title="Permalink to this headline">¶</a></h2>
+<p>Display info on a multisig wallet</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command can be used to display the pubkeys of the owners/custodians of a multisig wallet</p>
+<p>To get the list of signers:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">info</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p><strong>USAGE</strong></p>
@@ -1265,6 +1298,26 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   The multisig account</li>
 </ul>
 </div>
+<div class="section" id="ft-multisig-new">
+<h2>ft multisig new<a class="headerlink" href="#ft-multisig-new" title="Permalink to this headline">¶</a></h2>
+<p>Create an independant multisig-wallet, similarly to ‘multisig create’, but not owner and perform crediting</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command deploys a multisig contract on a new account.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">multisig</span> <span class="k">new</span> <span class="nc">ACCOUNT</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span></code>   Account name, and other custodians</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--contract</span> <span class="pre">CONTRACT</span></code>   Use this contract</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--credit</span> <span class="pre">TONS</span></code>   Initial credit for multisig (1 TON by default)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--creditor</span> <span class="pre">ACCOUNT</span></code>   Send credit from this account (default is to use the first custodian)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--req</span> <span class="pre">REQ</span></code>   Number of confirmations required (majority by default)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--surf</span></code>   Use Surf contract (default)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--wc</span> <span class="pre">WORKCHAIN</span></code>   The workchain (default is 0)</li>
+</ul>
+</div>
 <div class="section" id="ft-multisig-transfer">
 <h2>ft multisig transfer<a class="headerlink" href="#ft-multisig-transfer" title="Permalink to this headline">¶</a></h2>
 <p>Transfer TONs from a multisig wallet to another account</p>
@@ -1297,11 +1350,40 @@ The ‘tvm_linker’ encoder from the TVM-linker repository</li>
 <li><code class="code docutils literal notranslate"><span class="pre">ARGUMENTS</span></code>   Generic arguments</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--bounce</span> <span class="pre">BOOL</span></code>   BOOL Transfer to inactive account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--from</span> <span class="pre">ACCOUNT</span></code>   The source of the transfer</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code>   Save result to FILE (use - for stdout)</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--parrain</span></code> or <code class="code docutils literal notranslate"><span class="pre">--sponsor</span></code>    Transfer to inactive account</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--send</span></code>   Force sendTransaction() instead of submitTransaction()</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The custodian signing the multisig transfer</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--subst</span> <span class="pre">FILE</span></code>   Read FILE and substitute results in the content</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--to</span> <span class="pre">ACCOUNT</span></code>   Target of a transfer</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--wait</span></code>   Wait for all transactions to finish</li>
+</ul>
+</div>
+<div class="section" id="ft-multisig-update">
+<h2>ft multisig update<a class="headerlink" href="#ft-multisig-update" title="Permalink to this headline">¶</a></h2>
+<p>Update a multisig wallet with setcode</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command can be used to display the pubkeys of the owners/custodians of a multisig wallet</p>
+<p>To get the list of signers:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">ft</span> <span class="n">multisig</span> <span class="n">update</span> <span class="nc">MY</span><span class="o">-</span><span class="nc">ACCOUNT</span> <span class="o">--</span><span class="n">nreqs</span> <span class="mi">3</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ft</span> <span class="n">multisig</span> <span class="n">update</span> <span class="nc">ACCOUNT</span> <span class="nc">CUSTODIANS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><code class="code docutils literal notranslate"><span class="pre">ACCOUNT</span> <span class="pre">CUSTODIANS</span></code>   The multisig account and the custodians</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--code-hash</span> <span class="pre">CODEHASH</span></code>   New code hash for contract</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--contract</span> <span class="pre">CONTRACT</span></code>   New code from contract</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--keep-custodians</span></code>   Keep existing custodians, either adding new ones (with add: C1 C2…) or deleting old ones (with del: C1 C2…) or any combination of those commands</li>
+<li><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code>   Save result to FILE (use - for stdout)</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--req</span> <span class="pre">REQ</span></code>   New number of required confirmations for transactions</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--reset-custodians</span></code>   Reset all custodians</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--src</span> <span class="pre">ACCOUNT</span></code>   The custodian signing the multisig transfer</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--subst</span> <span class="pre">FILE</span></code>   Read FILE and substitute results in the content</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--tvm</span> <span class="pre">TVM-FILENAME</span></code>   New code from file</li>
 </ul>
 </div>
 <div class="section" id="ft-node-give">
@@ -1496,6 +1578,7 @@ A set of 10 accounts ‘user0’ to ‘user9’. These accounts always have the 
 <p>Where options are:</p>
 <ul class="simple">
 <li><code class="code docutils literal notranslate"><span class="pre">NETWORK</span></code>   Name of network switch to create</li>
+<li><code class="code docutils literal notranslate"><span class="pre">--force</span></code>   Force switch creation, killing docker container if needed</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--image</span> <span class="pre">DOCKER</span></code>   Docker image to use for sandboxes</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--toolchain</span> <span class="pre">TOOLCHAIN</span></code>   Toolchain to use</li>
 <li><code class="code docutils literal notranslate"><span class="pre">--url</span> <span class="pre">URL</span></code>   URL of the default node in this network</li>
