@@ -1222,6 +1222,9 @@ let register_primitives () =
            Some (make_fun [] [ TBool ] MNonPayable)
        | Some (TString _) when !for_freeton ->
            Some (make_fun [] [ TBool ] MNonPayable)
+       | Some (TAbstract TvmSlice) when !for_freeton ->
+           Some (make_fun [] [ TBool ] MNonPayable)
+
        | _ -> None);
 
   register 96
@@ -1653,6 +1656,19 @@ let register_primitives () =
        match t_opt with
        | Some (TAbstract TvmCall) ->
            Some (make_var (TAbstract TvmExtCall))
+       | _ -> None );
+
+  register 147
+    { prim_name = "div";
+      prim_kind = PrimMemberVariable } div_kind ;
+
+  register 148
+    { prim_name = "refs";
+      prim_kind = PrimMemberFunction }
+    (fun _pos _opt t_opt ->
+       match t_opt with
+       | Some (TAbstract TvmSlice) when !for_freeton ->
+           Some (make_fun [] [ TUint 8 ] MNonPayable)
        | _ -> None);
 
   ()
