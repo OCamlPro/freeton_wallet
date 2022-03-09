@@ -5,7 +5,7 @@
 (name freeton_wallet)
 (allow_approximate_merlin)
 (generate_opam_files false)
-(version 0.9.0)
+(version 0.9.1)
 (formatting (enabled_for ocaml reason))
 
 (package
@@ -33,7 +33,7 @@
    (freeton_crawler_lib (= version))
    ezjsonm
    (ez_subst ( >= 0.1 ))
-   (ez_file (and (>= 0.2.0) (< 1.0.0)))
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (ez_config (and (>= 0.1.0) (< 1.0.0)))
    (ez_cmdliner (and (>= 0.4.2) (< 1.0.0)))
    (calendar ( >= 2 ))
@@ -118,7 +118,7 @@
    solidity-typechecker
    (solidity-parser (and (>= 0.5.0) (< 1.0.0)))
    ocplib_stuff
-   ez_file
+   (ez_file ( >= 0.3 ))
    ppx_inline_test
    ppx_expect
    odoc

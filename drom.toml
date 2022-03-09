@@ -11,7 +11,7 @@ license = "LGPL2"
 min-edition = "4.08.0"
 name = "freeton_wallet"
 synopsis = "The 'ft' tool is a multi-account terminal wallet for the Free TON blockchain (meta-package)"
-version = "0.9.0"
+version = "0.9.1"
 
 # keys that you could also define:
 # odoc-target = "...odoc-target..."

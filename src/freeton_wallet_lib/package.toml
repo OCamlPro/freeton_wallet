@@ -57,7 +57,7 @@ skip = ["main.ml", "index.mld"]
 calendar = ">=2"
 ez_cmdliner = "0.4.2"
 ez_config = "0.1.0"
-ez_file = "0.2.0"
+ez_file = "0.3.0"
 ez_subst = ">=0.1"
 ezjsonm = ""
 freeton_crawler_lib = "version"
