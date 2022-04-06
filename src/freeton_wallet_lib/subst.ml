@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ez_file.V1
 open EzCompat
 open Ez_subst.V1
 open Ezcmd.V2

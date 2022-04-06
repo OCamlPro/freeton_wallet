@@ -13,6 +13,7 @@
 (* These functions are 'misc' functions, except that they depend on
    the 'Config' module, so they cannot be in 'Misc'. *)
 
+open Ez_file.V1
 open EzCompat
 open EzFile.OP
 open Types

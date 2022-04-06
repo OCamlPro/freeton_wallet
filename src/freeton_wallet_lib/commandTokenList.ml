@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ez_file.V1
 open EzFile.OP
 open Ezcmd.V2
 open EZCMD.TYPES

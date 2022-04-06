@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ez_file.V1
 open EzCompat (* for StringMap *)
 
 open Types.MULTISIG

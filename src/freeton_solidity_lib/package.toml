@@ -47,7 +47,7 @@ skip = [ "main.ml" ]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 solidity-parser = "0.5.0" 
-ez_file = ""
+ez_file = "0.3"
 ocplib_stuff = ""
 solidity-typechecker = ""
 
