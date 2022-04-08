@@ -358,7 +358,7 @@ let track_messages ?accounts ?(event = fun _ -> ()) config queue =
                         Printf.printf "   * sent msg %s\n" msg_id ;
                         Printf.printf "       to %s\n%!"
                           (AbiCache.replace_addr
-                             ~abis ~address:msg.msg_dst);
+                             ~abis ~address: ( ADDRESS.of_string msg.msg_dst ));
                         let body =
                           AbiCache.string_of_message_body
                             ( AbiCache.parse_message_body ~client ~abis msg )
@@ -398,10 +398,12 @@ let track_messages ?accounts ?(event = fun _ -> ()) config queue =
 
 let call_run config ?client ~wait
     ~server_url ~address ~abi ~meth ~params ~local
-    ?keypair ?accounts () =
+    ?key_pair ?accounts () =
+  let address = ADDRESS.to_string address in
   if Misc.verbose 2 then begin
     Printf.eprintf "Calling %s: %s %s\n%!" address meth params
   end;
+  let keypair = Option.map Types.keypair_of_key_pair key_pair in
   if wait then
     let client =
       match client with
@@ -447,7 +449,7 @@ let call_contract
     (fun ~contract_abi ->
        if Globals.use_ton_sdk then
          let node = Config.current_node config in
-         let keypair = match src with
+         let key_pair = match src with
            | None -> None
            | Some key -> Some (Misc.get_key_pair_exn key)
          in
@@ -455,7 +457,7 @@ let call_contract
          in
          let abi = EzFile.read_file contract_abi in
          if Misc.verbose 1 then begin
-           Printf.eprintf "call: %s\n%!" address;
+           Printf.eprintf "call: %s\n%!" ( ADDRESS.to_string address );
            Printf.eprintf "method: %s\n%!" meth;
            Printf.eprintf "params: %s\n%!" params;
            begin
@@ -471,7 +473,7 @@ let call_contract
              ~abi
              ~meth ~params
              ~local
-             ?keypair
+             ?key_pair
              ?accounts
              ~wait
              ()
@@ -484,7 +486,7 @@ let call_contract
          let command = if local then "run" else "call" in
          let args =
            [
-             command ; address ;
+             command ; ADDRESS.to_string address ;
              meth ; params ;
              "--abi" ; contract_abi ;
            ]
@@ -510,7 +512,7 @@ let deploy_contract config ~key ?sign ~contract ~params
   in
   match sign.key_pair with
   | None -> Error.raise "Key has no secret key"
-  | Some keypair ->
+  | Some key_pair ->
       Misc.with_contract contract
         (fun ~contract_tvc ~contract_abi ->
 
@@ -523,6 +525,8 @@ let deploy_contract config ~key ?sign ~contract ~params
                  | None -> Ton_sdk.CLIENT.create node.node_url
                  | Some client -> client
                in
+               let keypair = Types.keypair_of_key_pair key_pair in
+
                let addr = Ton_sdk.ACTION.deploy
                    ~client
                    ~tvc_file: contract_tvc
@@ -530,7 +534,7 @@ let deploy_contract config ~key ?sign ~contract ~params
                    ~params
                    ~keypair
                    ?initial_data
-                   ?initial_pubkey
+                   ?initial_pubkey:(Option.map PUBKEY.to_string initial_pubkey)
                    ()
                in
                Printf.eprintf "Contract deployed at %s\n%!" addr;
@@ -555,6 +559,7 @@ let deploy_contract config ~key ?sign ~contract ~params
                    | [ "Contract" ; "deployed" ; "at" ; "address:"; address ] -> Some address
                    | _ -> None) lines
            in
+           let acc_address = ADDRESS.of_string acc_address in
            key.key_account <- Some { acc_address ;
                                      acc_contract = Some contract ;
                                      acc_workchain = wc ;
@@ -597,7 +602,7 @@ let abi_of_account config account =
 let get_account_info config address =
 
   let result = post config
-      (Ton_sdk.REQUEST.account ~level:1 address ) in
+      (Ton_sdk.REQUEST.account ~level:1 ( ADDRESS.to_string address ) ) in
   match result with
   | [ acc ] ->
       let balance =

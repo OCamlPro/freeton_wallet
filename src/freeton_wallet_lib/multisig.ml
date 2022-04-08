@@ -13,6 +13,7 @@
 open Ez_file.V1
 open EzCompat (* for StringMap *)
 
+open Types
 open Types.MULTISIG
 
 
@@ -22,7 +23,7 @@ module TYPES = struct
     net : Types.network;
     client : Sdk_types.client ;
     server_url : string ;
-    multisig_address : string ;
+    multisig_address : ADDRESS.t ;
     multisig_contract : string ;
     multisig_contract_abi : string ;
   }
@@ -64,8 +65,9 @@ let get_context config account =
     multisig_address ;
   }
 
-let call ctxt ?(params="{}") ?(local=true) ?keypair ?subst meth encoding =
-  Printf.eprintf "Multisig: calling %s %s\n%!" ctxt.multisig_address meth;
+let call ctxt ?(params="{}") ?(local=true) ?key_pair ?subst meth encoding =
+  Printf.eprintf "Multisig: calling %s %s\n%!"
+    ( ADDRESS.to_string ctxt.multisig_address ) meth;
   let reply =
     Utils.call_run
       ctxt.config
@@ -77,7 +79,7 @@ let call ctxt ?(params="{}") ?(local=true) ?keypair ?subst meth encoding =
       ~meth
       ~params
       ~local
-      ?keypair
+      ?key_pair
       ()
   in
   begin
@@ -106,21 +108,20 @@ let name_by_pubkey net =
       match key.Types.key_pair with
       | None -> ()
       | Some pair ->
-          map := StringMap.add ( "0x" ^ pair.public ) key.key_name !map
+          map := StringMap.add ( PUBKEY.to_json_string pair.public ) key.key_name !map
     ) net.Types.net_keys;
-  !map
+  function pubkey ->
+    let pubkey = JSON_PUBKEY.to_string pubkey in
+    match StringMap.find pubkey !map with
+    | exception Not_found -> pubkey
+    | name -> Printf.sprintf "%s ( %s )" name pubkey
 
 
 let custodian_by_index ~name_by_pubkey custodians =
 
   let map = ref StringMap.empty in
   List.iter (fun c ->
-      let name =
-        match StringMap.find c.pubkey name_by_pubkey with
-        | exception Not_found -> c.pubkey
-        | name ->
-            Printf.sprintf "%s (%s)" name c.pubkey
-      in
+      let name = name_by_pubkey c.pubkey in
       map := StringMap.add c.index name !map
     ) custodians ;
   !map

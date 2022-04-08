@@ -40,7 +40,7 @@ let pubkey_of_custodian net name =
       begin match Misc.is_uint256 name with
         | None ->
             Error.raise "Key %S does not exist" name
-        | Some name -> name
+        | Some name -> PUBKEY.of_string name
       end
   | Some key ->
       match key.key_pair with
@@ -87,8 +87,9 @@ let create_multisig
   in
 
   let params =
-    Printf.sprintf "{\"owners\":[ \"0x%s\" ],\"reqConfirms\":%d}"
-      ( String.concat "\", \"0x" owners )
+    Printf.sprintf "{\"owners\":[ \"%s\" ],\"reqConfirms\":%d}"
+      ( String.concat "\", \""
+          (List.map PUBKEY.to_json_string owners ) )
       req
   in
   let key = Misc.find_key_exn net account in

@@ -13,6 +13,7 @@
 open EzCompat (* for StringMap *)
 open Ezcmd.V2
 open EZCMD.TYPES
+open Types
 
 type code_hash =
     NoCodeHash
@@ -26,7 +27,7 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
   let old_custodians = Multisig.get_custodians ctxt in
   let updates = Multisig.get_updates ctxt in
   let old_custodians = List.map (fun c ->
-      Misc.unjson_uin256 c.Types.MULTISIG.pubkey) old_custodians in
+      PUBKEY.of_json c.Types.MULTISIG.pubkey) old_custodians in
   let info = CommandAccountState.get_address_info config
       ( RawAddress ctxt.multisig_address ) in
 
@@ -36,7 +37,7 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
   in
   let src_key = Misc.find_key_exn ctxt.net src in
 
-  let keypair =
+  let key_pair =
     match src_key.key_pair with
     | None ->
         Error.raise "No private key associated with signer %S" src
@@ -46,7 +47,7 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
             "Key %S is not among old custodians (use 'ft multisig info %s')"
             src account;
 
-        let public0x = "0x" ^ key_pair.public in
+        let public0x = PUBKEY.to_json key_pair.public in
         List.iter (fun up ->
             if up.Types.MULTISIG.update_creator = public0x then
               Printf.eprintf "WARNING: An update by %s already exists (call with fail with error 113 if not expired)\n\n%!" src;
@@ -74,7 +75,8 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
         List.map (CommandMultisigCreate.pubkey_of_custodian ctxt.net) custodians
     | Some false, custodians ->
         let set = ref StringSet.empty in
-        List.iter (fun c -> set := StringSet.add c !set) old_custodians ;
+        List.iter (fun c -> set := StringSet.add
+                        ( PUBKEY.to_string c ) !set) old_custodians ;
         let rec iter0 custodians =
           match custodians with
           | [] -> ()
@@ -89,9 +91,9 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
           | c :: custodians ->
               let pubkey = CommandMultisigCreate.pubkey_of_custodian
                   ctxt.net c in
-              if StringSet.mem pubkey !set then
+              if StringSet.mem ( PUBKEY.to_string pubkey ) !set then
                 Error.raise "%s is already a custodian" c;
-              set := StringSet.add pubkey !set;
+              set := StringSet.add ( PUBKEY.to_string pubkey ) !set;
               iter_add custodians
         and iter_del custodians =
           match custodians with
@@ -101,13 +103,14 @@ let action ~account ~custodians ~nreqs ~code_hash ?src ?reset_custodians ~subst 
           | c :: custodians ->
               let pubkey =  CommandMultisigCreate.pubkey_of_custodian
                   ctxt.net c in
-              if not ( StringSet.mem pubkey !set ) then
-                Error.raise "%s (%s) is not a former custodian" c pubkey;
-              set := StringSet.remove pubkey !set;
+              if not ( StringSet.mem ( PUBKEY.to_string pubkey ) !set ) then
+                Error.raise "%s (%s) is not a former custodian" c
+                  ( PUBKEY.to_string pubkey );
+              set := StringSet.remove ( PUBKEY.to_string pubkey ) !set;
               iter_del custodians
         in
         iter0 custodians;
-        StringSet.to_list !set
+        List.map PUBKEY.of_string @@ StringSet.to_list !set
     | None, _ ->
         Error.raise "Changing custodians requires --reset-custodians or --keep-custodians"
   in
@@ -147,13 +150,14 @@ function submitUpdate(uint256 codeHash, uint256[] owners, uint8 reqConfirms) pub
       code_hash
       ( String.concat ", "
           ( List.map (fun c ->
-                Printf.sprintf {| "0x%s"|} c
+                Printf.sprintf {| "%s"|} ( PUBKEY.to_json_string c )
               ) custodians ))
       nreqs
   in
   Printf.eprintf "submitUpdate %s\n%!" params;
   let r =
-    Multisig.call ctxt meth ~params ~local:false Types.MULTISIG.submitUpdate_reply_enc ~keypair ~subst
+    Multisig.call ctxt meth ~params ~local:false
+      Types.MULTISIG.submitUpdate_reply_enc ~key_pair ~subst
   in
   Printf.printf "Update %s will need %d extra confirmations\n%!"
     r.updateId (requiredUpdConfirms - 1)

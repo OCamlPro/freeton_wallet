@@ -25,11 +25,7 @@ let get_waiting ?(f = fun _ -> ()) account =
   let name_by_pubkey = Multisig.name_by_pubkey ctxt.net in
   let custodian_by_index =
     Multisig.custodian_by_index ~name_by_pubkey custodians in
-  let name_by_pubkey s =
-    match StringMap.find s name_by_pubkey with
-    | exception Not_found -> s
-    | name -> Printf.sprintf "%s (%s)" name s
-  in
+
   Printf.printf "%d updates waiting\n%!" (List.length trs);
   List.iter (fun tr ->
       let id = Int64.of_string tr.update_id in

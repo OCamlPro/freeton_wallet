@@ -28,6 +28,7 @@ let set_config = ref
 let set_temporary_switch net = set_config := Some net
 
 let remote_account ?key_pair ?key_passphrase key_name ?contract:acc_contract acc_address =
+  let acc_address = ADDRESS.of_string acc_address in
   { key_name ;
     key_passphrase ;
     key_pair ;
@@ -53,7 +54,7 @@ let mainnet_keys = [
 ]
 
 let surf_account acc_address =
-
+  let acc_address = ADDRESS.of_string acc_address in
   Some  { acc_address ;
           acc_contract = Some "SetcodeMultisigWallet2" ;
           acc_workchain = None ;
@@ -79,7 +80,8 @@ let sandbox_keys = [
   remote_account "msig"
     ~key_pair: {
       public =
-        "99c84f920c299b5d80e4fcce2d2054b05466ec9df19532a688c10eb6dd8d6b33";
+        PUBKEY.of_string
+          "99c84f920c299b5d80e4fcce2d2054b05466ec9df19532a688c10eb6dd8d6b33";
       secret =
         Some "73b60dc6a5b1d30a56a81ea85e0e453f6957dbfbeefb57325ca9f7be96d3fe1a";
     }
@@ -93,7 +95,8 @@ let sandbox_keys = [
         "nut slice spawn badge online term asset door pill version add sugar";
     key_pair = Some
         { public =
-            "a327b480cb40bdd0593b23ca85777ac9582ad250d67990b0dee778a1e2766382";
+            PUBKEY.of_string
+              "a327b480cb40bdd0593b23ca85777ac9582ad250d67990b0dee778a1e2766382";
           secret = Some
               "32582b1650409f5025454d57329a7bc05ecbd0303ff0080154f0f965d12437d8" };
     key_account =
@@ -105,7 +108,8 @@ let sandbox_keys = [
         "twelve used bean frog like blood gap type erase enter emerge security";
     key_pair = Some
         { public =
-            "d207f8fb2fccf047245e7b86866b39ac655c5f28baae3a02eafbae6d6427221d" ;
+            PUBKEY.of_string
+              "d207f8fb2fccf047245e7b86866b39ac655c5f28baae3a02eafbae6d6427221d" ;
           secret = Some
               "8973bbcd27e6e8eced2c734e326498a57b906bf4a8d61659a2ef58fb2c453afb" };
     key_account =
@@ -117,7 +121,8 @@ let sandbox_keys = [
         "frost balance pyramid parrot easy credit sister trip shrug special trophy speed";
     key_pair = Some
         { public =
-            "675a6987fbf9d6e5ed26936795492dc319e1c39fe4145745d73896c277542d52" ;
+            PUBKEY.of_string
+              "675a6987fbf9d6e5ed26936795492dc319e1c39fe4145745d73896c277542d52" ;
           secret = Some
               "14c354b9c554d68129cff59c1b9cbbe2950c0c8391eb9273001e1cbb45194a33" };
     key_account =
@@ -129,7 +134,8 @@ let sandbox_keys = [
         "alter oven hard acoustic century call despair common light palm neck saddle";
     key_pair = Some
         { public =
-            "a1155f4dad62d2936e2ee1da26f7e352a6574625cb0d9c4431f5bc4e4879fcc2" ;
+            PUBKEY.of_string
+              "a1155f4dad62d2936e2ee1da26f7e352a6574625cb0d9c4431f5bc4e4879fcc2" ;
           secret = Some
               "3a741642e6c01014d7c359a6548c216c118d9612d9d734dac11ed6c4217e43c6" };
     key_account =
@@ -141,7 +147,8 @@ let sandbox_keys = [
         "frown point legend unlock damage hockey gentle march easily relief person brief";
     key_pair = Some
         { public =
-            "43c9873928299e674c37f41b11b8fbf92b4131fcf5102fcce19e59469a8ab747" ;
+            PUBKEY.of_string
+              "43c9873928299e674c37f41b11b8fbf92b4131fcf5102fcce19e59469a8ab747" ;
           secret = Some
               "30b74dd563917bafe3269f298350cdfc5d10eb44efee4d7623a9635536d2af54" };
     key_account =
@@ -153,7 +160,8 @@ let sandbox_keys = [
         "dismiss episode cabin comic income code avoid wave frost false rocket abandon";
     key_pair = Some
         { public =
-            "c5f199fd3a88385901eab994fddbf90ff9899495e9fe3fb1ccbc076d134abf35" ;
+            PUBKEY.of_string
+              "c5f199fd3a88385901eab994fddbf90ff9899495e9fe3fb1ccbc076d134abf35" ;
           secret = Some
               "06090e0a7c3b9dacc64da8047096f81046736f28c49629f2f26ab8ae8e506bf0" };
     key_account = surf_account
@@ -164,7 +172,8 @@ let sandbox_keys = [
         "elite notable can skull polar anxiety basket defense acid absurd photo scheme";
     key_pair = Some
         { public =
-            "e950bca31326f661144c918020a10bfd6e1f3a6bd16dba504856c5983ae1363f" ;
+            PUBKEY.of_string
+              "e950bca31326f661144c918020a10bfd6e1f3a6bd16dba504856c5983ae1363f" ;
           secret = Some
               "0138839a4d388ed882aaf4bed56841c5e3bd701884e791067e33e428f19a11e0" };
     key_account = surf_account
@@ -175,7 +184,8 @@ let sandbox_keys = [
         "lizard all pear connect gentle state hero enrich law aerobic cook eternal";
     key_pair = Some
         { public =
-            "d183edabfa08d900dd1b177948351817771cdd57ac9ff8576925ad76856689eb" ;
+            PUBKEY.of_string
+              "d183edabfa08d900dd1b177948351817771cdd57ac9ff8576925ad76856689eb" ;
           secret = Some
               "6b51fc5b9419696f18252e2cf067e4a604bb8c06554718e289aa7724f8625753" };
     key_account =
@@ -187,7 +197,8 @@ let sandbox_keys = [
         "describe pencil flip state bench aware power fashion age drift peanut advance";
     key_pair = Some
         { public =
-            "0857aea8cc2c96b955095ee2ceaf71f6708db009caa720ca8cd962ca1aecb4f2" ;
+            PUBKEY.of_string
+              "0857aea8cc2c96b955095ee2ceaf71f6708db009caa720ca8cd962ca1aecb4f2" ;
           secret = Some
               "df0620047586fae3be0dc9f8c6b0191f5e70c6774642317ef452c835d36b3b37" };
     key_account =
@@ -199,7 +210,8 @@ let sandbox_keys = [
         "calm price ecology burger notice urge small artefact afford seed best album";
     key_pair = Some
         { public =
-            "fd9ee2babfa35b65917f732316dbb3d31935ccacd2a0aa92e043f8c762e0da28" ;
+            PUBKEY.of_string
+              "fd9ee2babfa35b65917f732316dbb3d31935ccacd2a0aa92e043f8c762e0da28" ;
           secret = Some
               "7883b5b2962f1a2d4891f52a16f125b855b6be61f84b162a4476a2f240c9e2c9" } ;
     key_account =

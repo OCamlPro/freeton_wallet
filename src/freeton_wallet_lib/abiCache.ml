@@ -14,7 +14,7 @@ open Types
 
 (* A cache of ABIs *)
 type t = {
-  abis_address2abi : ( string , (* address *)
+  abis_address2abi : ( ADDRESS.t , (* address *)
                        string * (* account name *)
                        ( string * (* contract *)
                          string Lazy.t (* abi content *)
@@ -45,7 +45,7 @@ let get_contract_abi ~abis contract =
       json
 
 let check_account ?(unknown=ref []) config ~abis ~address =
-  if address <> "" then
+  if ADDRESS.not_empty address then
     match !unknown with
     | [] -> ()
     | s :: tail ->
@@ -79,12 +79,11 @@ let check_account ?(unknown=ref []) config ~abis ~address =
 let replace_addr ~abis ~address =
     match Hashtbl.find abis.abis_address2abi address with
     | ( name, contract ) ->
-        Printf.sprintf "%s (%s%s)" address name
+        Printf.sprintf "%s (%s%s)" (ADDRESS.to_string address ) name
           ( match contract with
             | None -> ""
             | Some (contract, _ ) -> " " ^ contract)
-    | exception Not_found -> address
-
+    | exception Not_found -> ADDRESS.to_string address
 
 let create ?(abis=[]) ?(accounts=[]) config =
   let net = Config.current_network config in
@@ -133,7 +132,7 @@ let create ?(abis=[]) ?(accounts=[]) config =
 open Ton_sdk
 
 type message_body = {
-  m_address : string ;
+  m_address : ADDRESS.t ;
   m_contract_name : string ;
   m_body_type : string ;
   m_body_name : string ;
@@ -181,9 +180,11 @@ let parse_message_body ~client ~abis m =
           Some ( kind,
                  match kind with
                  | "ExtOut" ->
-                     parse_message_boc ~client ~abis ~boc ~address:m.msg_src
+                     parse_message_boc ~client ~abis ~boc
+                       ~address:( ADDRESS.of_string m.msg_src )
                  | "Internal" ->
-                     parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
+                     parse_message_boc ~client ~abis ~boc
+                       ~address:( ADDRESS.of_string m.msg_dst )
                  | kind ->
                      begin
                        match kind with
@@ -191,7 +192,8 @@ let parse_message_body ~client ~abis m =
 
                        | _ -> Printf.eprintf "msg_msg_type_name: %s\n%!" kind;
                      end;
-                     parse_message_boc ~client ~abis ~boc ~address:m.msg_dst
+                     parse_message_boc ~client ~abis ~boc
+                       ~address:( ADDRESS.of_string m.msg_dst )
                )
 
 let string_of_message_body m =

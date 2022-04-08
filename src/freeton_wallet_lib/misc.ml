@@ -224,7 +224,7 @@ let string_of_workchain wc =
 
 let gen_keyfile key_pair =
   let keypair_file = tmpfile () in
-  write_json_file Encoding.keypair keypair_file key_pair;
+  write_json_file Types.key_pair_enc keypair_file key_pair;
   keypair_file
 
 
@@ -406,7 +406,7 @@ let is_address account =
           else
             addr
         in
-        Some ( Printf.sprintf "%d:%s" wc addr )
+        Some ( ADDRESS.of_string ( Printf.sprintf "%d:%s" wc addr ) )
   else None
 
 let raw_address = function
@@ -470,7 +470,7 @@ let is_hexa_string name =
   in
   iter name 0 (String.length name)
 
-let unjson_uin256 v =
+let unjson_uint256 v =
   if v.[0] = '0' && v.[1] = 'x' && String.length v = 66 then
     String.sub v 2 64
   else
@@ -487,3 +487,15 @@ let is_uint256 name =
     if is_hexa_string name then Some name else None
   else
     None
+
+let string_of_address net addr =
+  let rec iter keys addr =
+    match keys with
+      [] -> ADDRESS.to_string addr
+    | key :: keys ->
+        match key.key_account with
+        | Some acc when acc.acc_address = addr ->
+            Printf.sprintf "%s (%s)" key.key_name ( ADDRESS.to_string addr )
+        | _ -> iter keys addr
+  in
+  iter net.net_keys addr

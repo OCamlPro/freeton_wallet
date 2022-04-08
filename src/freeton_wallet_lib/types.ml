@@ -10,8 +10,84 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module ADDRESS : sig
+
+  type t
+  val to_string : t -> string
+  val of_string : string -> t
+  val parse_string : string -> t
+  val t_enc : t Json_encoding.encoding
+  val not_empty : t -> bool
+
+end = struct
+
+  type t = string  [@@deriving json_encoding]
+
+  let to_string t = t
+  let of_string t = t
+  let parse_string t = t (* TODO: check conformity *)
+  let t_enc = enc
+  let not_empty t = t <> ""
+end
+
+module JSON_PUBKEY : sig
+
+  type t
+  val to_string : t -> string
+  val of_string : string -> t
+  val parse_string : string -> t
+  val t_enc : t Json_encoding.encoding
+
+end = struct
+
+  type t = string  [@@deriving json_encoding]
+
+  let to_string t = t
+  let of_string t = t
+  let parse_string t = t (* TODO: check conformity *)
+  let t_enc = enc
+end
+
+module PUBKEY : sig (* without 0x *)
+
+  type t
+  val to_string : t -> string
+  val to_json_string : t -> string
+  val of_string : string -> t
+  val parse_string : string -> t
+  val to_json : t -> JSON_PUBKEY.t
+  val of_json : JSON_PUBKEY.t -> t
+  val t_enc : t Json_encoding.encoding
+
+end = struct
+
+  type t = string  [@@deriving json_encoding]
+
+  let to_string t = t
+  let of_string t = t
+  let parse_string t = t (* TODO: check conformity *)
+  let to_json_string t = "0x" ^ t
+  let to_json t = JSON_PUBKEY.of_string ( to_json_string t )
+  let of_json t =
+    let t = JSON_PUBKEY.to_string t in
+    assert ( String.length t = 66 );
+    String.sub t 0 64
+  let t_enc = enc
+end
+
+type key_pair = { (* typed version of Ton_sdk.TYPES.keypair *)
+  public : PUBKEY.t ;
+  mutable secret : string option ;
+} [@@deriving json_encoding]
+
+let keypair_of_key_pair {public; secret } =
+  Ton_sdk.TYPES.{ public = PUBKEY.to_string public; secret }
+
+let key_pair_of_keypair Ton_sdk.TYPES.{public; secret } =
+  { public = PUBKEY.of_string public; secret }
+
 type account = {
-  acc_address : string ;                 [@key "address"]
+  acc_address : ADDRESS.t ;                 [@key "address"]
   mutable acc_contract : string option ; [@key "contract"]
   mutable acc_workchain : int option ;   [@key "workchain"]
   mutable acc_static_vars : string option ; [@key "static_vars"]
@@ -20,7 +96,7 @@ type account = {
 type key = {
   mutable key_name : string ;                   [@key "name"]
   mutable key_passphrase : string option ;      [@key "passphrase"]
-  mutable key_pair : Ton_sdk.TYPES.keypair option ; [@key "pair"]
+  mutable key_pair : key_pair option ; [@key "pair"]
   mutable key_account : account option ;        [@key "account"]
 } [@@deriving json_encoding]
 
@@ -62,7 +138,7 @@ type config = {
 } [@@deriving json_encoding]
 
 type address =
-  | RawAddress of string
+  | RawAddress of ADDRESS.t
   | Account of account
 
 
@@ -73,9 +149,9 @@ module MULTISIG = struct
     confirmationsMask : string ;
     signsRequired : string ;
     signsReceived : string ;
-    creator : string ; (* 0x pubkey *)
+    creator : JSON_PUBKEY.t ; (* 0x pubkey *)
     index : string ;  (* index of custodian creator *)
-    dest : string ;
+    dest : ADDRESS.t ;
     value : string;
     sendFlags : string;
     payload : string ;
@@ -89,7 +165,7 @@ module MULTISIG = struct
 
   type custodian = {
     index : string ;
-    pubkey : string ;
+    pubkey : JSON_PUBKEY.t ;
   }
   [@@deriving json_encoding]
 
@@ -103,9 +179,9 @@ module MULTISIG = struct
     update_index : string ; (* uint8 *)
     update_signs : string ; (* uint8 *)
     update_confirmationsMask : string ; (* uint32 *)
-    update_creator : string ; (* pubkey *)
+    update_creator : JSON_PUBKEY.t ; (* pubkey *)
     update_codeHash : string ;
-    update_custodians : string list ;
+    update_custodians : JSON_PUBKEY.t list ;
     update_reqConfirms : string ; (* uint8 *)
   }
   [@@deriving json_encoding]
@@ -139,7 +215,7 @@ module MANIFEST = struct
     token_chainId : int ;
     token_symbol : string ;
     token_decimals : int ;
-    token_address : string ;
+    token_address : ADDRESS.t ;
     token_logoURI : string option ;
     token_version : int ;
   }

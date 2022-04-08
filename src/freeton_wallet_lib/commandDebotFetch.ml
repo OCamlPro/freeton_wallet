@@ -18,7 +18,8 @@ open EzFile.OP
 
 let fetch config debot =
   Unix.putenv "DEBOT_LOAD_DIR" Globals.debots_dir;
-  let cmd = Utils.tonoscli config [ "debot" ; "fetch" ; debot ] in
+  let cmd = Utils.tonoscli config [ "debot" ; "fetch" ;
+                                    ADDRESS.to_string debot ] in
   Misc.call cmd;
   ()
 
@@ -55,7 +56,8 @@ let action ?debot ?boc ?(use_cached=false) () =
                 Config.load_wallet config net ;
                 let debot = Utils.address_of_account net debot in
                 let debot = Misc.raw_address debot in
-                let _, addr = EzString.cut_at debot ':' in
+                let _, addr = EzString.cut_at
+                    ( ADDRESS.to_string debot ) ':' in
                 let debot_file =
                   Globals.debots_dir //
                   Printf.sprintf "DEBOT_%s.boc" addr
@@ -64,7 +66,8 @@ let action ?debot ?boc ?(use_cached=false) () =
                   debot
                 else
                   match post net
-                          (Ton_sdk.REQUEST.account ~level:2 debot) with
+                          (Ton_sdk.REQUEST.account ~level:2
+                             ( ADDRESS.to_string debot )) with
                   | [ acc ] ->
                       begin
                         match acc.acc_boc with
@@ -76,7 +79,8 @@ let action ?debot ?boc ?(use_cached=false) () =
                             EzFile.write_file debot_file boc
                       end;
                       debot
-                  | [] -> Error.raise "No account at address %s" debot
+                  | [] -> Error.raise "No account at address %s"
+                            ( ADDRESS.to_string debot )
                   | _ -> assert false
       in
       fetch config debot

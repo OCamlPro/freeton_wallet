@@ -64,7 +64,7 @@ let query_message config ~level ?limit msg_id =
           let address = Utils.address_of_account net address in
           let addr = Misc.raw_address address in
           let filter =
-            REQUEST.(aeq field (astring addr))
+            REQUEST.(aeq field (astring ( ADDRESS.to_string addr)))
           in
           let order =
             ( "created_at" , None )
@@ -77,9 +77,9 @@ let query_messages ~client ~abis queue config ~level ids =
       let> ms = query_message ~level config msg_id in
       Lwt_list.map_s (fun m ->
           AbiCache.check_account ~unknown config ~abis
-            ~address:m.ENCODING.msg_dst ;
+            ~address:( ADDRESS.of_string m.ENCODING.msg_dst );
           AbiCache.check_account ~unknown config ~abis
-            ~address: m.msg_src ;
+            ~address: ( ADDRESS.of_string m.msg_src );
           match AbiCache.parse_message_body ~client ~abis m with
           | None -> Lwt.return ( m, None )
           | Some body ->
@@ -94,7 +94,8 @@ let query_messages ~client ~abis queue config ~level ids =
 
 let transaction ~abis ~level tr =
   let tr_account_addr =
-    AbiCache.replace_addr ~abis ~address:tr.ENCODING.tr_account_addr in
+    AbiCache.replace_addr ~abis
+      ~address:( ADDRESS.of_string tr.ENCODING.tr_account_addr ) in
   let tr_boc = if level = 4 then tr.tr_boc else None in
 
   let tr_tr_type_name = match tr.ENCODING.tr_tr_type_name with
@@ -113,8 +114,10 @@ let simplify_message ~abis ~level m =
     if level = 1 then None, None else
       m.ENCODING.msg_boc, m.msg_body
   in
-  let msg_src = AbiCache.replace_addr ~abis ~address:m.msg_src in
-  let msg_dst = AbiCache.replace_addr ~abis ~address:m.msg_dst in
+  let msg_src = AbiCache.replace_addr ~abis
+      ~address:( ADDRESS.of_string m.msg_src ) in
+  let msg_dst = AbiCache.replace_addr ~abis
+      ~address: ( ADDRESS.of_string m.msg_dst ) in
 
   (* remove defaults *)
   let msg_bounce = match m.msg_bounce with
@@ -234,7 +237,7 @@ let inspect_account ~level ?limit ~subst account =
         let net = Config.current_network config in
         let address = Utils.address_of_account net account in
         let addr = Misc.raw_address address in
-        REQUEST.account ~level addr
+        REQUEST.account ~level ( ADDRESS.to_string addr )
   in
   let accounts =
     Utils.post config request
@@ -258,6 +261,7 @@ let inspect_account_past ~level ?limit ~abis ?(f = print_transaction)
   let net = Config.current_network config in
   let address = Utils.address_of_account net account in
   let address = Misc.raw_address address in
+  let address = ADDRESS.to_string address in
   let node = Config.current_node config in
   let client = CLIENT.create node.node_url in
   let url = node.node_url in
@@ -311,6 +315,7 @@ let filter_of_shard config shard =
                   let node = Config.current_node config in
                   let client = CLIENT.create node.node_url in
                   Printf.eprintf "Querying last shard blockid for address\n%!";
+                  let address = ADDRESS.to_string address in
                   BLOCK.find_last_shard_block ~client ~address
             in
 

@@ -18,17 +18,13 @@ open Types.MULTISIG
 
 let get_waiting ?(f = fun _ -> ()) account =
   let config = Config.config () in
+  let net = Config.current_network config in
   let ctxt = Multisig.get_context config account in
   let trs = Multisig.get_transactions ctxt in
   let custodians = Multisig.get_custodians ctxt in
   let name_by_pubkey = Multisig.name_by_pubkey ctxt.net in
   let custodian_by_index =
     Multisig.custodian_by_index ~name_by_pubkey custodians in
-  let name_by_pubkey s =
-    match StringMap.find s name_by_pubkey with
-    | exception Not_found -> s
-    | name -> Printf.sprintf "%s (%s)" name s
-  in
 
   Printf.printf "%d transactions waiting:\n%!" (List.length trs);
   List.iter (fun tr ->
@@ -54,7 +50,8 @@ let get_waiting ?(f = fun _ -> ()) account =
       Printf.printf "\n%!";
       Printf.printf "   Creator: %s (%s)\n%!"
         (name_by_pubkey tr.creator) tr.index ;
-      Printf.printf "     Dest: %s\n%!" tr.dest ;
+      Printf.printf "     Dest: %s\n%!"
+        ( Misc.string_of_address net tr.dest ) ;
       Printf.printf "     Value: %s\n%!"
         ( Misc.string_of_nanoton (Int64.of_string tr.value ) ) ;
       if tr.sendFlags <> "0" then

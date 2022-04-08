@@ -13,14 +13,15 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 open CommandTokenList.TYPES
-
+open Types
 
 let action config ~account ~amount () =
   let ctxt = CommandTokenList.get_context config in
   let account_key = Misc.find_key_exn ctxt.net account in
   let account_contract = CommandMultisigCreate.check_key_contract account_key in
   let account_address = Misc.get_key_address_exn account_key in
-  Printf.printf "%s (at %s, %s):\n%!" account account_address account_contract;
+  Printf.printf "%s (at %s, %s):\n%!" account
+    ( ADDRESS.to_string account_address ) account_contract;
 
   let amount = Misc.nanotokens_of_string amount  in
   let token = CommandTokenList.get_token_by_symbol ctxt "WTON" in
@@ -42,15 +43,15 @@ let action config ~account ~amount () =
         "notify_receiver": true,
         "payload": ""
        }|}
-        ctxt.vault_address
+        ( ADDRESS.to_string ctxt.vault_address )
         ( Int64.to_string amount )
-        account_address
+        ( ADDRESS.to_string account_address )
     in
     Ton_sdk.ABI.encode_body ~abi ~meth ~params
   in
   let params = Printf.sprintf
       {|{"dest":"%s","value":%Ld,"bounce":%b,"flags":%d,"payload":"%s"}|}
-      wallet_address
+      ( ADDRESS.to_string wallet_address )
       2_000_000_000L
       true
       0
@@ -67,14 +68,14 @@ let action config ~account ~amount () =
     ~wait:true
     ();
 
-  match CommandTokenList.get_token_balance_gas ctxt wallet_address with
+  match CommandTokenList.get_token_balance_gas ctxt ~wallet_address with
   | None ->
       Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
-      Printf.printf "    address: %s\n%!" wallet_address;
+      Printf.printf "    address: %s\n%!" ( ADDRESS.to_string wallet_address );
       Printf.printf "    Broxus_TONTokenWallet contract not yet deployed\n%!";
   | Some ( balance, gas ) ->
       Printf.printf "  %s\n%!" token.Types.MANIFEST.token_name ;
-      Printf.printf "    address: %s\n%!" wallet_address;
+      Printf.printf "    address: %s\n%!" ( ADDRESS.to_string wallet_address );
       Printf.printf "    balance %s (gas %s TON)\n%!"
         ( CommandTokenList.string_of_amount_token balance token )
         ( Misc.string_of_nanoton gas )

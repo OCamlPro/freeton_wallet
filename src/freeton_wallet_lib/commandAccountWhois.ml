@@ -33,18 +33,18 @@ let action accounts =
             match key.key_pair with
             | None -> ()
             | Some { public ; _ } ->
-                if matches re public then
+                if matches re ( PUBKEY.to_string public ) then
                   Printf.printf "pubkey match: %s is %S\n%!"
-                    public key.key_name ;
+                    ( PUBKEY.to_string public ) key.key_name ;
           end;
 
           begin
             match key.key_account with
             | None -> ()
             | Some acc ->
-                if matches re acc.acc_address then
+                if matches re ( ADDRESS.to_string acc.acc_address ) then
                   Printf.printf "address match: %s is %S\n%!"
-                    acc.acc_address key.key_name ;
+                    ( ADDRESS.to_string acc.acc_address ) key.key_name ;
                 begin
                   match acc.acc_contract with
                   | None -> ()

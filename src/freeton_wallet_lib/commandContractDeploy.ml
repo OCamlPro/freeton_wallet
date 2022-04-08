@@ -25,7 +25,7 @@ let action ~contract ~force ~params ~wc ?create ?sign ~deployer
 
   let subst, _ = Subst.subst_string config in
   let initial_data = Option.map subst initial_data in
-
+  let initial_pubkey = Option.map PUBKEY.parse_string initial_pubkey in
 
   let net = Config.current_network config in
   let create =

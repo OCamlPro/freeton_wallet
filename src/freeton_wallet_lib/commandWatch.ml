@@ -16,6 +16,7 @@ open EZCMD.TYPES
 (* open EzFile.OP *)
 open Ton_sdk
 open ENCODING
+open Types
 
 let z_ton = Z.of_string "1000000000"
 let z_0 = Z.of_string "0"
@@ -202,12 +203,14 @@ let action ~account ?block_id ?timeout ~level ~on_event ?output () =
       let net = Config.current_network config in
       let address = Utils.address_of_account net account in
       let address = Misc.raw_address address in
-      Printf.fprintf oc "Watching account %s\n%!" address;
+      Printf.fprintf oc "Watching account %s\n%!"
+        ( ADDRESS.to_string address );
       let abi = Utils.abi_of_account config account in
       let node = Config.current_node config in
       let client = CLIENT.create node.node_url in
       let block_id = match block_id with
         | None ->
+            let address = ADDRESS.to_string address in
             BLOCK.find_last_shard_block ~client ~address
         | Some block_id -> block_id
       in
@@ -223,7 +226,7 @@ let action ~account ?block_id ?timeout ~level ~on_event ?output () =
       let ton = Ton_sdk.CLIENT.create node.node_url in
       let rec iter block_id =
         let b = BLOCK.wait_next_block
-            ~client ~block_id ~address
+            ~client ~block_id ~address:( ADDRESS.to_string address )
             ?timeout () in
         let block_id = b.id in
         Printf.fprintf oc "new block_id: %S\n%!" b.id;
@@ -236,7 +239,7 @@ let action ~account ?block_id ?timeout ~level ~on_event ?output () =
               (REQUEST.transactions
                  ~level:3
                  ~block_id
-                 ~account_addr:address [])
+                 ~account_addr:( ADDRESS.to_string address ) [])
           with
           | [] -> ()
           | trs ->

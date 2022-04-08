@@ -10,21 +10,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
 
 val genkey :
   ?name:string -> ?contract:string ->
   ?initial_data:string ->
-  ?initial_pubkey:string ->
+  ?initial_pubkey:PUBKEY.t ->
   Types.config -> force:bool -> unit
 
 val gen_address :
-  Types.config -> Ton_sdk.TYPES.keypair ->
+  Types.config -> Types.key_pair ->
   string ->
   ?initial_data:string ->
-  ?initial_pubkey:string ->
+  ?initial_pubkey:PUBKEY.t ->
   ?wc:int -> unit ->
-  string
+  ADDRESS.t
 
 val change_account :
   Types.config ->
@@ -33,5 +35,5 @@ val change_account :
   ?address:string ->
   ?contract:string ->
   ?initial_data:string ->
-  ?initial_pubkey:string ->
+  ?initial_pubkey:PUBKEY.t ->
   ?keyfile:string -> ?wc:int -> unit -> unit

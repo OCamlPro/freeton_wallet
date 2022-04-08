@@ -10,18 +10,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 type t
 
 val check_account :
-  ?unknown:string list ref -> Types.config -> abis:t -> address:string -> unit
-val replace_addr : abis:t -> address:string -> string
+  ?unknown:string list ref -> Types.config -> abis:t -> address:ADDRESS.t -> unit
+
+(* a better version of Misc.string_of_address *)
+val replace_addr : abis:t -> address:ADDRESS.t -> string
 val create :
   ?abis:string list ->
-  ?accounts:(string * string * string) list -> (* name, address, contract *)
+  ?accounts:(string * ADDRESS.t * string) list -> (* name, address, contract *)
   Types.config -> t
 
 type message_body = {
-  m_address : string ;
+  m_address : ADDRESS.t ;
   m_contract_name : string ;
   m_body_type : string ;
   m_body_name : string ;

@@ -13,7 +13,6 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-open Ton_sdk.TYPES
 open Types
 
 let get_key_info key ~json ~secrets =
@@ -23,13 +22,13 @@ let get_key_info key ~json ~secrets =
   else begin
     Printf.printf "Name: %s\n" key.key_name ;
     Option.iter (fun acc ->
-        Printf.printf "  %s\n%!" acc.acc_address;
+        Printf.printf "  %s\n%!" (ADDRESS.to_string acc.acc_address);
         Option.iter (fun s ->
             Printf.printf "  Contract: %s\n" s
           ) acc.acc_contract
       ) key.key_account;
     Option.iter (fun pair ->
-        Printf.printf "  Public: 0x%s\n" pair.public ;
+        Printf.printf "  Public: %s\n" (PUBKEY.to_json_string pair.public) ;
         if secrets then
           Option.iter (fun s ->
               Printf.printf "  Secret: %s\n" s ;

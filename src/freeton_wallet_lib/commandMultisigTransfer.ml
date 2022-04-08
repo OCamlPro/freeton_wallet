@@ -13,6 +13,7 @@
 open Ez_file.V1
 open Ezcmd.V2
 open EZCMD.TYPES
+open Types
 
 let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
     ?(wait=false) ?(send=false) ?subst () =
@@ -31,10 +32,11 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
         Error.raise "No private key associated with signed %S" src
     | Some key_pair ->
         let custodians = Multisig.get_custodians ctxt in
-        let public = "0x" ^ key_pair.public in
+        let public = PUBKEY.to_json key_pair.public in
         if not (List.exists (fun c ->
             Printf.eprintf "  %s = %s ??\n%!"
-              c.Types.MULTISIG.pubkey public;
+              (JSON_PUBKEY.to_string c.Types.MULTISIG.pubkey)
+              (JSON_PUBKEY.to_string public );
             c.Types.MULTISIG.pubkey = public
           ) custodians ) then
           Error.raise
@@ -94,7 +96,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
       let meth = "sendTransaction" in
       let params = Printf.sprintf
           {|{"dest":"%s","value":%s,"bounce":%b,"flags":%d,"payload":"%s"}|}
-          dst_addr
+          ( ADDRESS.to_string dst_addr )
           (if allBalance then "0" else Int64.to_string nanotokens)
           bounce
           (if allBalance then 128 else 0)
@@ -106,7 +108,7 @@ let send_transfer ~account ?src ~dst ~amount ?(bounce=false) ?(args=[])
       let meth = "submitTransaction" in
       let params = Printf.sprintf
           {|{"dest":"%s","value":%Ld,"bounce":%b,"allBalance":%b,"payload":"%s"}|}
-          dst_addr
+          ( ADDRESS.to_string dst_addr )
           nanotokens
           bounce
           allBalance

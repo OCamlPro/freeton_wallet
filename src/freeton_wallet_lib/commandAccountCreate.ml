@@ -21,7 +21,7 @@ let get_account_info config address =
   let level = if !Globals.verbosity > 1 then 3 else 1 in
   match
     Utils.post config
-      ( REQUEST.account ~level addr )
+      ( REQUEST.account ~level ( ADDRESS.to_string addr ))
   with
   | [] -> None
   |  [ account ] ->
@@ -43,7 +43,8 @@ let get_account_info config address =
                     | None -> ()
                     | Some contract ->
                         Printf.eprintf "Setting contract %S for %s\n%!"
-                          contract acc.acc_address;
+                          contract
+                          ( ADDRESS.to_string acc.acc_address );
                         acc.acc_contract <- Some contract;
                         config.modified <- true
       end;
@@ -131,32 +132,36 @@ let gen_passphrase config =
     | _ -> Error.raise "Could not parse output of tonos-cli genphrase: [%s]"
              (String.concat "|" stdout)
 
-let gen_keypair config passphrase =
+let gen_key_pair config passphrase =
   if Globals.use_ton_sdk then
     Ton_sdk.CRYPTO.generate_keypair_from_mnemonic passphrase
+    |> Types.key_pair_of_keypair
   else
     let tmpfile = Misc.tmpfile () in
     Misc.call @@ Utils.tonoscli config
       [ "getkeypair" ; tmpfile; passphrase ];
-    let keypair = Misc.read_json_file Encoding.keypair tmpfile in
+    let keypair = Misc.read_json_file Types.key_pair_enc tmpfile in
     Sys.remove tmpfile;
     keypair
 
-let gen_address config keypair contract
+let gen_address config key_pair contract
     ?initial_data ?initial_pubkey ?wc () =
   Misc.with_contract contract
     (fun ~contract_tvc ~contract_abi ->
 
        if Globals.use_ton_sdk then
          let abi = EzFile.read_file contract_abi in
+         let keypair = Types.keypair_of_key_pair key_pair in
+         let initial_pubkey = Option.map PUBKEY.to_string initial_pubkey in
          Ton_sdk.CRYPTO.generate_address
            ~tvc_file:contract_tvc
            ~abi ~keypair ?initial_data ?initial_pubkey
            ()
+       |> ADDRESS.of_string
        else
          match initial_data, initial_pubkey with
          | None, None ->
-             Misc.with_keypair keypair (fun ~keypair_file ->
+             Misc.with_keypair key_pair (fun ~keypair_file ->
 
                  let stdout = Misc.call_stdout_lines @@
                    Utils.tonoscli config ["genaddr" ;
@@ -166,7 +171,8 @@ let gen_address config keypair contract
                                           "--wc" ; Misc.string_of_workchain wc
                                          ] in
                  Misc.find_line_ok (function
-                     | [ "Raw" ; "address:" ; s ] -> Some s
+                     | [ "Raw" ; "address:" ; s ] ->
+                         Some ( ADDRESS.of_string s )
                      | _ -> None) stdout
                )
          | _ -> Error.raise "Cannot use FT_USE_TONOS with initial data/pubkey"
@@ -200,8 +206,9 @@ let add_account config ~initial_data ~initial_pubkey ~pubkey
         Error.raise "--passphrase and --keyfile are incompatible"
     | None, None -> None
     | None, Some passphrase ->
-        Some ( gen_keypair config passphrase )
-    | Some file, None -> Some ( Misc.read_json_file Encoding.keypair file )
+        Some ( gen_key_pair config passphrase )
+    | Some file, None ->
+        Some ( Misc.read_json_file Types.key_pair_enc file )
   in
 
   let key_pair =
@@ -212,7 +219,7 @@ let add_account config ~initial_data ~initial_pubkey ~pubkey
     | None, Some public ->
         if String.length public <> 64 then
           Error.raise "Pubkey should be 64 bytes hexa (no 0x)";
-        Some { Sdk_types.public ; secret = None }
+        Some { public = PUBKEY.of_string public ; secret = None }
     | key_pair, None -> key_pair
   in
 
@@ -220,6 +227,7 @@ let add_account config ~initial_data ~initial_pubkey ~pubkey
     | Some _, Some _, Some _ ->
         Error.raise "--address is incompatible with combining --contract and --keyfile/--passphrase"
     | Some acc_address, _ , _ ->
+        let acc_address = ADDRESS.parse_string acc_address in
         Some { acc_address ;
                acc_contract = contract ;
                acc_workchain = wc ;
@@ -248,6 +256,7 @@ let add_account config ~initial_data ~initial_pubkey ~pubkey
 let change_account config
     ~name ?passphrase ?address ?contract
     ?initial_data ?initial_pubkey ?keyfile ?wc () =
+  let ( initial_pubkey : PUBKEY.t option ) = initial_pubkey in
   let net = Config.current_network config in
   let key = match Misc.find_key net name with
     | None -> Error.raise "Unknown account %S cannot be modified\n%!" name
@@ -276,7 +285,7 @@ let change_account config
           end;
           None
       | Some file ->
-          Some ( Misc.read_json_file Encoding.keypair file )
+          Some ( Misc.read_json_file Types.key_pair_enc file )
       | None -> None
     in
 
@@ -287,7 +296,7 @@ let change_account config
             match keyfile with
             | None -> ()
             | Some keyfile ->
-                if keyfile.Ton_sdk.TYPES.public <> public then
+                if keyfile.public <> public then
                   Error.raise "Keyfile and initial_pubkey differ";
                 match passphrase with
                 | None -> ()
@@ -325,7 +334,8 @@ let change_account config
                 | None -> None, acc.acc_contract
                 | Some _ -> None, contract
           end
-      | _ -> address, contract
+      | None -> None, contract
+      | Some address -> Some ( ADDRESS.of_string address ), contract
     in
 
     begin
@@ -350,7 +360,7 @@ let change_account config
         if keyfile <> None then
           Error.raise "--passphrase and --keyfile are incompatible";
 
-        let key_pair = gen_keypair config passphrase in
+        let key_pair = gen_key_pair config passphrase in
 
         begin
           match key.key_pair with
@@ -358,7 +368,9 @@ let change_account config
           | Some { public ; _ } ->
               if public <> key_pair.public then
                 Error.raise
-                  "Public key %s with new passphrase does not match former one %s." key_pair.public public;
+                  "Public key %s with new passphrase does not match former one %s."
+                  ( PUBKEY.to_string key_pair.public )
+                  ( PUBKEY.to_string public );
         end;
 
         let acc_contract = match contract, key.key_account with
@@ -407,7 +419,8 @@ let change_account config
             ->
               if new_address <> former_address then
                 Error.raise "New address %s is different from former address %s. You must delete it first."
-                  new_address former_address;
+                  ( ADDRESS.to_string new_address )
+                  ( ADDRESS.to_string former_address );
         end;
 
         key.key_passphrase <- Some passphrase;
@@ -467,7 +480,8 @@ let change_account config
             ->
               if new_address <> former_address then
                 Error.raise "New address %s is different from former address %s. You must delete it first."
-                  new_address former_address;
+                  ( ADDRESS.to_string new_address )
+                  ( ADDRESS.to_string former_address );
         end;
 
         key.key_pair <- Some key_pair;
@@ -579,9 +593,10 @@ let genkey ?name ?contract ?initial_data ?initial_pubkey config ~force =
              (String.concat "|" stdout)
   in
 *)
-        let keypair = gen_keypair config seed_phrase in
+        let keypair = gen_key_pair config seed_phrase in
         Printf.eprintf "Passphrase: %S\n%!" seed_phrase;
-        Printf.eprintf "{ \"public\": \"%s\",\n%!" keypair.public;
+        Printf.eprintf "{ \"public\": \"%s\",\n%!"
+          ( PUBKEY.to_string keypair.public );
         Printf.eprintf "  \"secret\": \"%s\" }\n%!"
           (match keypair.secret with None -> assert false | Some s -> s);
         Some seed_phrase, keypair

@@ -17,6 +17,8 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open EzFile.OP
 
+open Types
+
 let dyn_substs = ref StringMap.empty
 
 let int_of_string n = try int_of_string n with
@@ -142,7 +144,7 @@ let account_substs net files rem =
     | [  "address" ; account ]
       ->
         let key = Misc.find_key_exn net account in
-        Misc.get_key_address_exn key
+        Misc.get_key_address_exn key |> ADDRESS.to_string
     | [  "wc" ; account ] ->
         let key = Misc.find_key_exn net account in
         let acc = Misc.get_key_account_exn key in
@@ -150,7 +152,7 @@ let account_substs net files rem =
     | [  "pubkey" ; account ] ->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
-        key_pair.public
+        PUBKEY.to_string key_pair.public
     | [  "seckey" ; account ] ->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
@@ -209,7 +211,7 @@ let account_substs net files rem =
           } in
 
         let msg = Ton_sdk.ENCODE.encode_internal_message
-            ~address
+            ~address: ( ADDRESS.to_string address )
             ~value: (Misc.nanotokens_of_string value )
             ~call
             ()
@@ -348,7 +350,7 @@ let subst_string ?dir ?brace:brace_arg config =
     | [ account ; "addr" ]
     | [ "addr" ; account ] ->
         let key = Misc.find_key_exn net account in
-        Misc.get_key_address_exn key
+        ADDRESS.to_string @@ Misc.get_key_address_exn key
     | [ account ; "wc" ]
     | [ "wc" ; account ] ->
         let key = Misc.find_key_exn net account in
@@ -358,7 +360,7 @@ let subst_string ?dir ?brace:brace_arg config =
     | [ "pubkey" ; account ]->
         let key = Misc.find_key_exn net account in
         let key_pair = Misc.get_key_pair_exn key in
-        key_pair.public
+        PUBKEY.to_string key_pair.public
     | [ account ; "passphrase" ]
     | [ "passphrase" ; account ] ->
         let key = Misc.find_key_exn net account in
