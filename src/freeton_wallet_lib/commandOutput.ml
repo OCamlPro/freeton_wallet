@@ -14,6 +14,8 @@ open Ez_file.V1
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Types
+
 let list_substitutions () =
   Printf.printf "%s\n%!" Subst.help
 
@@ -34,14 +36,14 @@ let action ~stdout ~file ~string ~keyfile ~addr =
             let net = Config.current_network config in
             let key = Misc.find_key_exn net account in
             let key_pair = Misc.get_key_pair_exn key in
-            EzEncoding.construct ~compact:false Encoding.keypair key_pair
+            EzEncoding.construct ~compact:false Types.key_pair_enc key_pair
         | None ->
             match addr with
             | Some account ->
                 let net = Config.current_network config in
                 let key = Misc.find_key_exn net account in
                 let acc = Misc.get_key_account_exn key in
-                acc.acc_address
+                ADDRESS.to_string acc.acc_address
             | None ->
                 Error.raise "Use one of the arguments"
   in

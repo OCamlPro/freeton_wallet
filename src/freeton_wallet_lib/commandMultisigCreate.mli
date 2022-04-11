@@ -10,6 +10,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 val cmd : Ezcmd.V2.EZCMD.TYPES.sub
 
 val create_multisig :
@@ -18,4 +20,4 @@ val create_multisig :
 
 val check_key_contract : Types.key -> string
 
-val pubkey_of_custodian : Types.network -> string -> string
+val pubkey_of_custodian : Types.network -> string -> PUBKEY.t

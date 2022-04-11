@@ -13,6 +13,8 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Types
+
 let action account =
 
   let config = Config.config () in
@@ -22,7 +24,8 @@ let action account =
   let net = Config.current_network config in
   let address = Utils.address_of_account net account in
   let address = Misc.raw_address address in
-  CommandClient.action ~exec:false [ "debot" ; "fetch" ; address ] ;
+  CommandClient.action ~exec:false [ "debot" ; "fetch" ;
+                                     ADDRESS.to_string address ] ;
   ()
 
 let cmd =

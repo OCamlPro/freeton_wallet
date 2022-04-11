@@ -14,10 +14,10 @@ open Ezcmd.V2
 open Types
 
 let shorten_key s =
-  Printf.sprintf "%s.." (String.sub s 0 6)
+  Printf.sprintf "%s.." (String.sub ( PUBKEY.to_string s ) 0 6)
 
 let shorten_addr s =
-  Printf.sprintf "%s.." (String.sub s 0 8)
+  Printf.sprintf "%s.." (String.sub ( ADDRESS.to_string s ) 0 8)
 
 let action () =
   let config = Config.config () in

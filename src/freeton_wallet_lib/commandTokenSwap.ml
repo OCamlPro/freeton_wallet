@@ -10,6 +10,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 (*
 DexRoot 0:943bad2e74894aa28ae8ddbe673be09a0f3818fd170d12b4ea8ef1ea8051e940
 
@@ -121,9 +123,11 @@ let action config ~amount ~token ~from_ ~to_ () =
   let dexpair_address =
     CommandTokenList.get_dexpair_address ctxt from_token to_token in
   let _from_address_status =
-    CommandTokenList.get_token_balance_gas ctxt from_wallet_address in
+    CommandTokenList.get_token_balance_gas ctxt
+      ~wallet_address:from_wallet_address in
   let to_address_status =
-    CommandTokenList.get_token_balance_gas ctxt to_wallet_address in
+    CommandTokenList.get_token_balance_gas ctxt
+      ~wallet_address:to_wallet_address in
 
 
   let payload =
@@ -150,7 +154,7 @@ let action config ~amount ~token ~from_ ~to_ () =
         ~local:true
         ()
     in
-    CommandTokenList.address_of_reply ~query:"buildExchangePayload" ~reply
+    CommandTokenList.string_of_reply ~query:"buildExchangePayload" ~reply
   in
 
   let payload =
@@ -167,16 +171,16 @@ let action config ~amount ~token ~from_ ~to_ () =
         "notify_receiver": true,
         "payload": "%s"
        }|}
-        dexpair_address
+        ( ADDRESS.to_string dexpair_address )
         ( Int64.to_string amount )
-        from_address
+        ( ADDRESS.to_string from_address )
         payload
     in
     Ton_sdk.ABI.encode_body ~abi ~meth ~params
   in
   let params = Printf.sprintf
       {|{"dest":"%s","value":%Ld,"bounce":%b,"flags":%d,"payload":"%s"}|}
-      from_wallet_address
+      ( ADDRESS.to_string from_wallet_address )
       ( Int64.add amount 2_000_000_000L )
       true
       0
@@ -192,10 +196,12 @@ let action config ~amount ~token ~from_ ~to_ () =
 
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:from_wallet_address ~address:from_address ~token:from_token;
+    ~wallet_address:from_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token:from_token;
   Printf.printf "Destination:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:to_wallet_address ~address:from_address ~token:to_token;
+    ~wallet_address:to_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token:to_token;
 
   Utils.call_contract config
     ~contract:from_contract
@@ -211,10 +217,12 @@ let action config ~amount ~token ~from_ ~to_ () =
   Printf.printf "AFTER TRANSFER:\n%!";
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:from_wallet_address ~address:from_address ~token:from_token;
+    ~wallet_address:from_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token:from_token;
   Printf.printf "Destination:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:to_wallet_address ~address:from_address ~token:to_token;
+    ~wallet_address:to_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token:to_token;
 
   ()
 

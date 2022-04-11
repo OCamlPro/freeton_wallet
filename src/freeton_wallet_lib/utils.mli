@@ -10,9 +10,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 val call_contract :
   Types.config ->
-  address:string ->
+  address:ADDRESS.t ->
   contract:string ->
   meth:string ->
   params:string ->
@@ -21,7 +23,7 @@ val call_contract :
   ?local:bool ->
   ?subst:(msg:string -> Types.config -> string -> unit) ->
   ?wait:bool -> (* false by default *)
-  ?accounts:(string * string * string) list ->
+  ?accounts:(string * ADDRESS.t * string) list ->
   unit -> unit
 
 val post :
@@ -36,7 +38,7 @@ val deploy_contract :
   ?sign:Types.key ->
   contract:string -> params:string -> wc:int option ->
   ?initial_data: string ->
-  ?initial_pubkey: string ->
+  ?initial_pubkey: PUBKEY.t ->
   ?client:Ton_sdk.TYPES.client ->
   unit -> unit
 
@@ -46,7 +48,7 @@ val address_of_account : Types.network -> string -> Types.address
 val abi_of_account : Types.config -> string -> string option (* content *)
 
 (* returns Some (exists, balance) if exists, None otherwise *)
-val get_account_info : Types.config -> string -> ( bool * Z.t ) option
+val get_account_info : Types.config -> ADDRESS.t -> ( bool * Z.t ) option
 
 val show_abi : contract:string -> string
 
@@ -55,12 +57,12 @@ val call_run :
   ?client:Sdk_types.client ->
   wait:bool ->
   server_url:string ->
-  address:string ->
+  address:ADDRESS.t ->
   abi:string ->
   meth:string ->
   params:string ->
   local:bool ->
-  ?keypair:Sdk_types.keypair ->
-  ?accounts:(string * string * string) list ->
+  ?key_pair:key_pair ->
+  ?accounts:(string * ADDRESS.t * string) list ->
   unit ->
   string

@@ -14,6 +14,8 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Types.MULTISIG
 
+open Types
+
 type code =
   | NoCode
   | CodeFromString of string (* base64 *)
@@ -37,12 +39,12 @@ let action ~account ~updateId ~code ~src =
   in
   let src_key = Misc.find_key_exn ctxt.net src in
 
-  let keypair =
+  let key_pair =
     match src_key.key_pair with
     | None ->
         Error.raise "No private key associated with signer %S" src
     | Some key_pair ->
-        let public = "0x" ^ key_pair.public in
+        let public = PUBKEY.to_json key_pair.public in
         if not (List.exists (fun c -> c = public) custodians ) then
           Error.raise
             "Key %S is not among old custodians (use 'ft multisig info %s')"
@@ -74,7 +76,7 @@ let action ~account ~updateId ~code ~src =
   if int_of_string update.update_signs < requiredUpdConfirms then
     Error.raise "Not enough confirmations (%s received < %d required)"
       update.update_signs requiredUpdConfirms ;
-  let update_codeHash = Misc.unjson_uin256 update.update_codeHash in
+  let update_codeHash = Misc.unjson_uint256 update.update_codeHash in
   let contract = Misc.contract_of_code_hash ~code_hash:update_codeHash in
   let contract_code = match contract with
     | Some contract ->
@@ -122,7 +124,7 @@ let action ~account ~updateId ~code ~src =
       {|{"updateId": "%s", "code": "%s" }|}
       updateId code
   in
-  Multisig.call ctxt meth ~params ~local:false ~keypair
+  Multisig.call ctxt meth ~params ~local:false ~key_pair
     Json_encoding.unit
 
 let cmd =

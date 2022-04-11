@@ -20,7 +20,7 @@ let get_address_info config address =
   let level = if !Globals.verbosity > 1 then 3 else 1 in
   match
     Utils.post config
-      ( REQUEST.account ~level addr )
+      ( REQUEST.account ~level ( ADDRESS.to_string addr ))
   with
   | [] -> None
   |  [ account ] ->
@@ -42,7 +42,7 @@ let get_address_info config address =
                     | None -> ()
                     | Some contract ->
                         Printf.eprintf "Setting contract %S for %s\n%!"
-                          contract acc.acc_address;
+                          contract ( ADDRESS.to_string acc.acc_address );
                         acc.acc_contract <- Some contract;
                         config.modified <- true
       end;
@@ -101,7 +101,8 @@ let get_live accounts =
       let address = Utils.address_of_account net account in
       let addr = Misc.raw_address address in
       let url = Printf.sprintf
-          "https://%s/accounts/accountDetails?id=%s" host addr in
+          "https://%s/accounts/accountDetails?id=%s" host
+          ( ADDRESS.to_string addr ) in
       Misc.call [ "xdg-open" ; url ]
     ) accounts
 

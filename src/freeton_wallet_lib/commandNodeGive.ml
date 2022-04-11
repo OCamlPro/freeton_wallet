@@ -80,7 +80,8 @@ let action ~amount ~accounts =
           let meth = "sendGrams" in
           let params =
             Printf.sprintf
-              {|{ "dest": "%s", "amount": "%s" }|} address amount
+              {|{ "dest": "%s", "amount": "%s" }|}
+              ( ADDRESS.to_string address ) amount
           in
 
           if Globals.use_ton_sdk then
@@ -90,7 +91,7 @@ let action ~amount ~accounts =
             let giver = Misc.find_key_exn net "giver" in
             let giver = match giver.key_account with
               | None -> assert false
-              | Some { acc_address ; _ } -> acc_address
+              | Some { acc_address ; _ } -> ADDRESS.to_string acc_address
             in
             let res =
               Ton_sdk.CALL.call

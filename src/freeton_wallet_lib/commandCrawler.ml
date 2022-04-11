@@ -14,6 +14,8 @@ open Ez_file.V1
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Types
+
 let (let>) = Db_utils.(let>)
 
 let action_start ~account =
@@ -84,6 +86,7 @@ let run_action ~dropdb ~account ~action =
   match action with
   | Crawler ->
       check_database account dropdb ;
+      let address = ADDRESS.to_string address in
       action_crawler ~account ~address ~contract ~url
   | Start ->
       check_database account dropdb ;

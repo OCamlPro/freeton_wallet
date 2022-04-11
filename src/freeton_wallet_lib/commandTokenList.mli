@@ -10,6 +10,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Types
+
 module TYPES : sig
   type ctxt = {
     config : Types.config;
@@ -19,8 +21,8 @@ module TYPES : sig
     server_url : string ;
     root_contract_abi : string ;
     wallet_contract_abi : string ;
-    vault_address : string ;
-    dexroot_address : string ;
+    vault_address : ADDRESS.t ;
+    dexroot_address : ADDRESS.t ;
     dexroot_contract_abi : string ;
     dexpair_contract_abi : string ;
   }
@@ -30,15 +32,20 @@ val cmd : string list * Ezcmd.V2.EZCMD.TYPES.sub
 val destruct : string -> 'a Json_encoding.encoding -> string -> 'a
 val get_context : Types.config -> TYPES.ctxt
 val get_token_wallet_address :
-  TYPES.ctxt -> Types.MANIFEST.token -> string -> string
+  TYPES.ctxt -> Types.MANIFEST.token -> ADDRESS.t -> ADDRESS.t
 val get_token_by_symbol :
   TYPES.ctxt -> string -> Types.MANIFEST.token
 val get_token_balance_gas :
-  TYPES.ctxt -> string -> (string * int64) option
-val print_wallet : TYPES.ctxt -> address:string ->
-  wallet_address:string -> token:Types.MANIFEST.token -> unit
+  TYPES.ctxt ->
+  wallet_address:ADDRESS.t ->
+  (string * int64) option
+val print_wallet : TYPES.ctxt ->
+  owner:string ->
+  wallet_address:ADDRESS.t -> token:Types.MANIFEST.token -> unit
 
-val address_of_reply : query:string -> reply:string -> string
+val address_of_reply : query:string -> reply:string -> ADDRESS.t
+val string_of_reply : query:string -> reply:string -> string
+
 val get_dexpair_address :
-  TYPES.ctxt -> Types.MANIFEST.token -> Types.MANIFEST.token -> string
+  TYPES.ctxt -> Types.MANIFEST.token -> Types.MANIFEST.token -> ADDRESS.t
 val string_of_amount_token : string -> Types.MANIFEST.token -> string

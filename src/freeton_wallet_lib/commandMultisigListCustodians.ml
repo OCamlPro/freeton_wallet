@@ -10,7 +10,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open EzCompat (* for StringMap *)
 open Ezcmd.V2
 open EZCMD.TYPES
 
@@ -19,11 +18,6 @@ let get_custodians account =
   let ctxt = Multisig.get_context config account in
   let custodians = Multisig.get_custodians ctxt in
   let name_by_pubkey = Multisig.name_by_pubkey ctxt.net in
-  let name_by_pubkey s =
-    match StringMap.find s name_by_pubkey with
-    | exception Not_found -> s
-    | name -> Printf.sprintf "%s (%s)" name s
-  in
 
   Printf.printf "     Custodians: %d\n%!"
     ( List.length custodians);

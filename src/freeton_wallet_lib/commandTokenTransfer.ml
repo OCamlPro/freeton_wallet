@@ -14,6 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open CommandTokenList.TYPES
 
+open Types
 
 let action config ~amount ~token ~from_ ~to_ () =
 
@@ -48,15 +49,15 @@ let action config ~amount ~token ~from_ ~to_ () =
         "notify_receiver": true,
         "payload": ""
        }|}
-        to_address
+        ( ADDRESS.to_string to_address )
         ( Int64.to_string amount )
-        from_address
+        ( ADDRESS.to_string from_address )
     in
     Ton_sdk.ABI.encode_body ~abi ~meth ~params
   in
   let params = Printf.sprintf
       {|{"dest":"%s","value":%Ld,"bounce":%b,"flags":%d,"payload":"%s"}|}
-      from_wallet_address
+      ( ADDRESS.to_string from_wallet_address )
       2_000_000_000L
       true
       0
@@ -65,10 +66,12 @@ let action config ~amount ~token ~from_ ~to_ () =
 
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:from_wallet_address ~address:from_address ~token;
+    ~wallet_address:from_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token;
   Printf.printf "Destination:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:to_wallet_address ~address:to_address ~token;
+    ~wallet_address:to_wallet_address
+    ~owner:( ADDRESS.to_string to_address ) ~token;
 
   Utils.call_contract config
     ~contract:from_contract
@@ -83,10 +86,12 @@ let action config ~amount ~token ~from_ ~to_ () =
   Printf.printf "AFTER TRANSFER:\n%!";
   Printf.printf "Source:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:from_wallet_address ~address:from_address ~token;
+    ~wallet_address:from_wallet_address
+    ~owner:( ADDRESS.to_string from_address ) ~token;
   Printf.printf "Destination:";
   CommandTokenList.print_wallet ctxt
-    ~wallet_address:to_wallet_address ~address:to_address ~token;
+    ~wallet_address:to_wallet_address
+    ~owner:( ADDRESS.to_string to_address ) ~token;
 
   ()
 

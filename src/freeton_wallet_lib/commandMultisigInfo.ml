@@ -10,9 +10,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open EzCompat (* for StringMap *)
 open Ezcmd.V2
 open EZCMD.TYPES
+open Types
 
 let get_custodians account =
   let config = Config.config () in
@@ -25,11 +25,6 @@ let get_custodians account =
 
   let parameters = Multisig.get_parameters ctxt in
   let name_by_pubkey = Multisig.name_by_pubkey ctxt.net in
-  let name_by_pubkey s =
-    match StringMap.find s name_by_pubkey with
-    | exception Not_found -> s
-    | name -> Printf.sprintf "%s (%s)" name s
-  in
 
   let open Ton_sdk.ENCODING in
   let code_hash =
@@ -50,7 +45,8 @@ let get_custodians account =
     | _ -> 0L
   in
 
-  Printf.printf "Multisig at %s\n%!" ctxt.multisig_address;
+  Printf.printf "Multisig at %s\n%!"
+    ( ADDRESS.to_string ctxt.multisig_address );
   Printf.printf "  Balance: %s\n%!"
     ( Misc.string_of_nanoton balance ) ;
   Printf.printf "  Code hash: %s\n%!" code_hash ;

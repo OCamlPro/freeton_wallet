@@ -15,6 +15,8 @@ open EzFile.OP
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Types
+
 (*
 module Int64 = struct
   include Int64
@@ -35,17 +37,23 @@ module TYPES = struct
     server_url : string ;
     root_contract_abi : string ;
     wallet_contract_abi : string ;
-    vault_address : string ;
-    dexroot_address : string ;
+    vault_address : ADDRESS.t ;
+    dexroot_address : ADDRESS.t ;
     dexroot_contract_abi : string ;
     dexpair_contract_abi : string ;
   }
 end
 open TYPES
 
-module GETWALLETADDRESS = struct
+module GETREPLY = struct
   type reply = {
     value0 : string
+  } [@@deriving json_encoding]
+end
+
+module GETWALLETADDRESS = struct
+  type reply = {
+    value0 : ADDRESS.t
   } [@@deriving json_encoding]
 end
 
@@ -127,12 +135,15 @@ let get_context config =
     dexpair_contract_abi ;
   }
 
+let string_of_reply ~query ~reply =
+  (
+    destruct (Printf.sprintf "%s reply" query) GETREPLY.reply_enc reply
+  ).value0
+
 let address_of_reply ~query ~reply =
-  let address = (
+  (
     destruct (Printf.sprintf "%s reply" query) GETWALLETADDRESS.reply_enc reply
   ).value0
-  in
-  address
 
 let string_of_amount_token amount token =
   if amount = "0" then
@@ -159,7 +170,7 @@ let get_token_wallet_address ctxt token address =
   let params = Printf.sprintf {|{ "_answer_id": 1,
                                       "wallet_public_key_": 0,
                                       "owner_address_": "%s"}|}
-      address
+      ( ADDRESS.to_string address )
   in
   let reply =
     Utils.call_run
@@ -194,7 +205,7 @@ let contract_exists ctxt address =
   | None -> false
   | Some _ -> true
 
-let get_token_balance_gas ctxt wallet_address =
+let get_token_balance_gas ctxt ~wallet_address =
   let info = CommandAccountState.get_address_info ctxt.config
       (RawAddress wallet_address) in
   match info with
@@ -219,15 +230,16 @@ let get_token_balance_gas ctxt wallet_address =
           ()
       in
       let balance = (
-        destruct "balance reply" GETWALLETADDRESS.reply_enc reply
+        destruct "balance reply" GETREPLY.reply_enc reply
       ).value0
       in
       Some ( balance, gas )
 
-let print_wallet ctxt ~address ~wallet_address ~token =
+let print_wallet ctxt ~owner ~wallet_address ~token =
   Printf.printf "wallet address: %s (for contract %s)\n%!"
-    wallet_address address;
-  match get_token_balance_gas ctxt wallet_address with
+    ( ADDRESS.to_string wallet_address )
+    owner;
+  match get_token_balance_gas ctxt ~wallet_address with
   | None ->
       Printf.printf "  Broxus_TONTokenWallet contract not yet deployed\n%!";
   | Some ( balance, gas ) ->
@@ -240,14 +252,16 @@ let print_wallets config account =
   let key = Misc.find_key_exn ctxt.net account in
   let contract = CommandMultisigCreate.check_key_contract key in
   let address = Misc.get_key_address_exn key in
-  Printf.printf "%s (at %s, %s):\n%!" account address contract;
+  Printf.printf "%s (at %s, %s):\n%!" account
+    ( ADDRESS.to_string address ) contract;
   let manifest = Lazy.force manifest in
 
   List.iter (fun token ->
 
       let wallet_address = get_token_wallet_address ctxt token address in
 
-      print_wallet ctxt ~address ~wallet_address ~token
+      print_wallet ctxt ~owner:( ADDRESS.to_string address )
+        ~wallet_address ~token
     ) manifest.Types.MANIFEST.tokens
 
 
@@ -258,8 +272,8 @@ let get_dexpair_address ctxt token1 token2 =
     Printf.sprintf {|{ "answerId": 1,
                        "left_root": "%s",
                        "right_root": "%s"}|}
-      from_token_root_address
-      to_token_root_address
+      ( ADDRESS.to_string from_token_root_address )
+      ( ADDRESS.to_string to_token_root_address )
   in
   let reply =
     Utils.call_run
@@ -282,7 +296,7 @@ let get_dexpair_exchange_rate ctxt dexpair_address from_token =
     Printf.sprintf {|{ "answerId": 1,
                        "amount": "1000000000",
                        "spent_token_root": "%s"}|}
-      from_token_root_address
+      ( ADDRESS.to_string from_token_root_address )
   in
   let reply =
     Utils.call_run
@@ -330,7 +344,7 @@ let get_dexpair_vaults ctxt dexpair_address =
       GETPAIRTWALLETS.reply_enc reply
   )
   in
-  reply.left, reply.right
+  ADDRESS.of_string reply.left, ADDRESS.of_string reply.right
 
 let get_dexpair_wallets ctxt dexpair_address =
   let params =
@@ -355,7 +369,8 @@ let get_dexpair_wallets ctxt dexpair_address =
       GETPAIRTWALLETS.reply_enc reply
   )
   in
-  reply.left, reply.right, reply.lp
+  ADDRESS.of_string reply.left, ADDRESS.of_string reply.right,
+  reply.lp
 
 let print_pairs config =
   let ctxt = get_context config in
@@ -366,7 +381,8 @@ let print_pairs config =
         let f token1 token2 =
           let dexpair_address = get_dexpair_address ctxt token1 token2 in
           Printf.printf "Pair %s/%s ( address %s )\n%!"
-            token1.token_symbol token2.token_symbol dexpair_address ;
+            token1.token_symbol token2.token_symbol
+             (ADDRESS.to_string dexpair_address ) ;
           if not ( contract_exists ctxt dexpair_address ) then
             Printf.printf "   DexPair contract does not exist\n%!"
           else
@@ -400,7 +416,7 @@ let print_pairs config =
               get_dexpair_wallets ctxt dexpair_address in
 
             print_wallet ctxt
-              ~address:( Printf.sprintf "liquidity %s" token1.token_symbol )
+              ~owner:( Printf.sprintf "liquidity %s" token1.token_symbol )
               ~wallet_address:
                 (if right_wallet_address = token1_wallet_address then
                    right_vault_address
@@ -408,7 +424,7 @@ let print_pairs config =
                    left_vault_address )
               ~token:token1 ;
             print_wallet ctxt
-              ~address:( Printf.sprintf "liquidity %s" token2.token_symbol )
+              ~owner:( Printf.sprintf "liquidity %s" token2.token_symbol )
               ~wallet_address:
                 (if right_wallet_address = token2_wallet_address then
                    right_vault_address
