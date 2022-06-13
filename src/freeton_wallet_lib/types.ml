@@ -16,7 +16,7 @@ module ADDRESS : sig
   val to_string : t -> string
   val of_string : string -> t
   val parse_string : string -> t
-  val t_enc : t Json_encoding.encoding
+  val enc : t Json_encoding.encoding
   val not_empty : t -> bool
 
 end = struct
@@ -26,7 +26,6 @@ end = struct
   let to_string t = t
   let of_string t = t
   let parse_string t = t (* TODO: check conformity *)
-  let t_enc = enc
   let not_empty t = t <> ""
 end
 
@@ -36,7 +35,7 @@ module JSON_PUBKEY : sig
   val to_string : t -> string
   val of_string : string -> t
   val parse_string : string -> t
-  val t_enc : t Json_encoding.encoding
+  val enc : t Json_encoding.encoding
 
 end = struct
 
@@ -45,7 +44,6 @@ end = struct
   let to_string t = t
   let of_string t = t
   let parse_string t = t (* TODO: check conformity *)
-  let t_enc = enc
 end
 
 module PUBKEY : sig (* without 0x *)
@@ -57,7 +55,7 @@ module PUBKEY : sig (* without 0x *)
   val parse_string : string -> t
   val to_json : t -> JSON_PUBKEY.t
   val of_json : JSON_PUBKEY.t -> t
-  val t_enc : t Json_encoding.encoding
+  val enc : t Json_encoding.encoding
 
 end = struct
 
@@ -72,7 +70,6 @@ end = struct
     let t = JSON_PUBKEY.to_string t in
     assert ( String.length t = 66 );
     String.sub t 0 64
-  let t_enc = enc
 end
 
 type key_pair = { (* typed version of Ton_sdk.TYPES.keypair *)
